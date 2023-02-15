@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-image: radial-gradient(circle farthest-side at 50% 100%, rgba(147, 51, 234, 0.6),
+      rgba(126, 34, 206, 0.4) 36%,
+      rgba(107, 33, 168, 0.2) 55%,
+      rgba(88, 28, 135, 0))
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* example: override wallet button style */
+.wallet-adapter-button:not([disabled]):hover {
+  background-color: #707070;
+}
+
+.container {
+  position: absolute;
+  width: 50%;
+  height: 300px;
+  left: 50%;
+  top: 100px;
+  margin: 0 0 0 -25%
+}
+
+.content-center {
+  text-align: center;
+}
