@@ -73,7 +73,7 @@ const RegionView = ({ code, closed }: ViewProps) => {
 
         let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
         let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
-        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer()], new PublicKey(programID))
+        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer(), regbuf], new PublicKey(programID))
 
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({

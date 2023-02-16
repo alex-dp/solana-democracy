@@ -57,7 +57,7 @@ const PetitionCard = ({
 
         let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
         let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], new PublicKey(programID))
-        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer()], new PublicKey(programID))
+        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer(), regbuf], new PublicKey(programID))
         let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
 
         let tx = new Transaction();

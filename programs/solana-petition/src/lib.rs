@@ -129,7 +129,7 @@ pub mod solana_petition {
         };
     }
 
-    pub fn make_signer(ctx: Context<MakeSigner>) -> Result<()> {
+    pub fn make_signer(ctx: Context<MakeSigner>, _region: u8) -> Result<()> {
         let signer = &mut ctx.accounts.signer;
         signer.signed = vec![];
         Ok(())
@@ -219,7 +219,7 @@ pub struct CreateProposal <'info> {
     pub regional_state: Account<'info, State>,
     #[account(
         mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes()],
+        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &region.to_be_bytes()],
         bump
     )]
     pub signer: Account<'info, Signer>,
@@ -264,8 +264,9 @@ pub struct SignProposal <'info> {
     pub signature: Account<'info, Signature>,
     #[account(
         mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes()],
-        bump
+        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &proposal.region.to_be_bytes()],
+        bump,
+        constraint = !&signer.signed.contains(&proposal.id)
     )]
     pub signer: Account<'info, Signer>,
     /// CHECK:
@@ -288,13 +289,14 @@ pub struct SignProposal <'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(_region: u8)]
 pub struct MakeSigner <'info> {
     /// CHECK:
     #[account(signer, mut)]
     pub user_authority: AccountInfo<'info>,
     #[account(
         mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes()],
+        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &_region.to_be_bytes()],
         bump
     )]
     pub signer: Account<'info, Signer>,
