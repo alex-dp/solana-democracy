@@ -116,7 +116,7 @@ const PetitionCard = ({
                     </Link>
                 </div>
                 <a href={link.toString()} className="underline">info ↗️</a>
-                {signatures} signatures
+                {signatures} signature{signatures != 1 && "s"}
                 <br />
                 {closed ? "expired" : "expiring"} on {new Date(expiry * 1000).toDateString()}
                 <div className="card-actions justify-end">
