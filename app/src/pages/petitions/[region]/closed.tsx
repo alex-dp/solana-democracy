@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import RegionView from "views/petitions/region";
+import { RegionView } from "views/petitions/region";
 import { useRouter } from 'next/router';
 import { useEffect } from "react";
 
@@ -19,13 +19,13 @@ const RegionPage: NextPage = () => {
     return (
         <div>
             <Head>
-                <title>Solana Scaffold</title>
+                <title>Solana Democracy Suite</title>
                 <meta
                     name="description"
-                    content="Basic Functionality"
+                    content="Solana Democracy Suite"
                 />
             </Head>
-            <RegionView code={region.toString()} closed={true} />
+            <RegionView code={Number(region.toString())} closed={true} />
         </div>
     );
 };

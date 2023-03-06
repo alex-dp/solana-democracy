@@ -1,9 +1,9 @@
+import { useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
 import { useCallback, useEffect } from "react";
-import useProposalStore from "stores/useProposalStore";
 import { notify } from "utils/notifications";
 
 type CardProps = {
@@ -27,6 +27,8 @@ const PetitionCard = ({
     closed,
     signatures,
 }: CardProps) => {
+    const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
+
     const wallet = useWallet();
 
     const getProvider = () => {
@@ -38,13 +40,21 @@ const PetitionCard = ({
         return provider;
     };
 
-    const connection = new Connection("http://127.0.0.1:8899");
+    const connection = new Connection("***REMOVED***");
 
     const provider = getProvider()
 
     const programID = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
 
     const sign = useCallback(async () => {
+
+        console.log(gatewayStatus)
+
+        if (!gatewayToken) {
+            requestGatewayToken()
+            return
+        }
+
         const idl = await Program.fetchIdl(programID, provider)
 
         const program = new Program(idl, programID, provider)
@@ -55,9 +65,16 @@ const PetitionCard = ({
         let regbuf = Buffer.alloc(1)
         regbuf.writeUInt8(region)
 
-        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
         let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], new PublicKey(programID))
-        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer(), regbuf], new PublicKey(programID))
+
+        let sigAcc = await connection.getAccountInfo(sigAddress[0])
+
+        if (sigAcc != null) {
+            notify({ type: "error", message: "You have already signed this petition" })
+            return
+        }
+
+        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
         let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
 
         let tx = new Transaction();
@@ -65,7 +82,7 @@ const PetitionCard = ({
             await program.methods.signProposal().accounts({
                 proposal: propAddress[0],
                 signature: sigAddress[0],
-                signer: signer[0],
+                gatewayToken: gatewayToken.publicKey,
                 regionalState: state[0],
                 userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
@@ -83,13 +100,13 @@ const PetitionCard = ({
             signature: signature,
         });
         notify({ type: 'success', message: 'Transaction successful!', txid: signature });
-    }, [wallet])
+    }, [wallet, connection, gatewayToken, gatewayStatus])
 
     return (
         <div className="card rounded-2xl w-96 m-6 bg-base-100 shadow-xl">
             <div className="card-body">
                 <div className="flex flex-row place-content-between">
-                    <p className="card-title w-fit">{title} {id}</p>
+                    <p className="card-title w-fit">{title}</p>
                     <Link href={`/petitions/${region}/${id}`}>
                         <button className="btn btn-square">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
@@ -98,7 +115,7 @@ const PetitionCard = ({
                         </button>
                     </Link>
                 </div>
-                <a href={link.toString()}>info</a>
+                <a href={link.toString()} className="underline">info ↗️</a>
                 {signatures} signatures
                 <br />
                 {closed ? "expired" : "expiring"} on {new Date(expiry * 1000).toDateString()}

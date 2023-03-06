@@ -1,19 +1,31 @@
 // Next, React
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 // Store
 import { InitializeAccount } from 'components/ubi/InitializeAccount';
 import { Mint } from 'components/ubi/Mint';
-import { TrustUser } from 'components/ubi/TrustUser'
-import { CivicTrust } from 'components/ubi/CivicTrust';
 import { Swap } from 'components/ubi/Swap';
+import useUBIInfoStore from 'stores/useUBIInfoStore';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { GatewayProvider } from '@civic/solana-gateway-react';
 
 export const UBIView: FC = ({ }) => {
+
+  const { info, infoAddress, initialized, getInfo } = useUBIInfoStore();
+
+  const wallet = useWallet();
+
+  const connection = new Connection("***REMOVED***")
+
+  useEffect(() => {
+    if (!info && initialized) getInfo(connection, wallet.publicKey)
+  }, [connection])
 
   return (
 
     <div className='md:hero mx-auto p-4'>
-      <div className="md:hero-content flex flex-col place-content-center">
+      <div className="hero-content flex flex-col place-content-center">
 
         <img src='cooler-light.svg' className='w-36'></img>
 
@@ -24,7 +36,7 @@ export const UBIView: FC = ({ }) => {
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
           Global Universal Basic Income secured by Civic
-          <div className="tooltip tooltip-bottom" data-tip="Start by initializing your account, then get verified and mint some NUBI every day">
+          <div className="tooltip tooltip-bottom" data-tip="Start by initializing your account, then mint some NUBI every day using your Civic pass">
             <button className="btn btn-sm btn-circle btn-outline ml-6">
               <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="currentColor" viewBox="0 0 48 48"><path d="M21.2 31.4q.05-4.05.95-5.95.9-1.9 3.1-3.7 2.05-1.7 3.05-3.25t1-3.4q0-2.05-1.375-3.425T24.15 10.3q-2.45 0-3.875 1.375Q18.85 13.05 18.2 14.9l-5.25-2.3q1.25-3.35 4.1-5.575Q19.9 4.8 24.15 4.8q5.25 0 8.1 2.975 2.85 2.975 2.85 7.175 0 2.75-1.05 4.875T30.75 24q-2.4 2.15-2.925 3.425Q27.3 28.7 27.3 31.4Zm2.95 13.4q-1.75 0-2.95-1.225Q20 42.35 20 40.65q0-1.7 1.2-2.925 1.2-1.225 2.95-1.225 1.75 0 2.95 1.225 1.2 1.225 1.2 2.925 0 1.7-1.225 2.925Q25.85 44.8 24.15 44.8Z" /></svg>
             </button>
@@ -36,11 +48,15 @@ export const UBIView: FC = ({ }) => {
 
         <div className="flex flex-wrap place-content-center">
 
+          <GatewayProvider
+            wallet={wallet}
+            gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
+            connection={connection}
+            options={{ autoShowModal: false }}>
 
-          <InitializeAccount />
-          <Mint />
-          <TrustUser />
-          <CivicTrust />
+            {!initialized && !info ? <InitializeAccount /> : <Mint info={info} infoAddress={infoAddress} />}
+
+          </GatewayProvider>
           <Swap />
 
         </div>

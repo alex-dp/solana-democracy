@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction, TransactionSignature } from '@solana/web3.js';
-import { FC, useCallback } from 'react';
+import { useCallback } from 'react';
 import { notify } from "../../utils/notifications";
 
 import { Buffer } from 'buffer';
@@ -10,16 +10,24 @@ import { Program, AnchorProvider, web3 } from '@project-serum/anchor';
 import idl from '../../ubi_idl.json'
 import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
-import { UBIInfo, getMint } from '../../types/types';
+import { RawUBIInfo, getMint } from '../../types/types';
+import { useGateway } from '@civic/solana-gateway-react';
 
 const { SystemProgram } = web3;
 
 const programID = new PublicKey(idl.metadata.address);
 
-export const Mint: FC = () => {
+type MintProps = {
+    info: RawUBIInfo,
+    infoAddress: PublicKey
+}
+
+export const Mint = ({ info, infoAddress }: MintProps) => {
     const connection = new Connection("***REMOVED***");
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet();
+
+    const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -31,22 +39,19 @@ export const Mint: FC = () => {
     };
 
     const onClick = useCallback(async () => {
+
+        console.log(gatewayToken)
+
+        if (!gatewayToken) {
+            requestGatewayToken()
+            return
+        }
+
         let idl = await Program.fetchIdl(programID, getProvider())
 
         if (!wallet.publicKey) {
             notify({ type: 'error', message: 'Please connect your wallet' });
             return;
-        }
-
-        let pda = PublicKey.findProgramAddressSync(
-            [Buffer.from("ubi_info7"), wallet.publicKey.toBytes()],
-            programID
-        )
-
-        let info_raw = await connection.getAccountInfo(pda[0])
-
-        if (!info_raw) {
-            notify({ type: 'error', message: "Please initialize your account" })
         }
 
         let provider: AnchorProvider = null
@@ -101,28 +106,26 @@ export const Mint: FC = () => {
             }
         }
 
-        let info = new UBIInfo(info_raw.data)
         const program = new Program(idl, programID, provider)
 
-        if (!info.getIsTrusted().valueOf()) {
-            notify({ type: 'error', message: "Need 8 trusters or civic pass in order to mint" })
-            return
-        } else if (new Date().getTime() / 1000 < info.getLastIssuance() + 24 * 3600) {
+        console.log(mint_signer[0].toString())
+
+        if (new Date().getTime() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
             notify({ type: 'error', message: "You minted NUBI less than 24 hours ago" })
             return
         } else {
             let signature: TransactionSignature = '';
             try {
 
-
                 let transaction = new Transaction().add(
-                    await program.methods.mintToken().accounts({
+                    await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
                         mintSigner: mint_signer[0],
                         ubiMint: getMint(moniker),
                         userAuthority: wallet.publicKey,
                         ubiTokenAccount: ata,
-                        ubiInfo: pda[0],
+                        ubiInfo: infoAddress,
                         state: "BfNHs2d373sCcxw5MjNmgLgQCEoFHM3Hv8XpEvqePLjD",
+                        gatewayToken: gatewayToken.publicKey,
                         tokenProgram: TOKEN_PROGRAM_ID,
                         systemProgram: SystemProgram.programId,
                         rent: web3.SYSVAR_RENT_PUBKEY,
@@ -148,6 +151,7 @@ export const Mint: FC = () => {
     }, [wallet.publicKey, connection]);
 
     return (
+
         <button
             className="px-8 m-2 btn bg-gradient-to-r from-[#c53fe9ff] to-indigo-600 hover:from-[#303030] hover:to-[#303030] max-width-200 width-20 ..."
             onClick={onClick}

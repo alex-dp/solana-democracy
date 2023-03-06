@@ -2,13 +2,14 @@ import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import RegionRow from "components/petition/RegionRow";
+import Link from "next/link";
 import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
 import { notify } from "utils/notifications";
 
 export const PetitionsView: FC = ({ }) => {
 
-  const connection = new Connection("http://127.0.0.1:8899");
+  const connection = new Connection("***REMOVED***");
 
   const { regionList, getRegions, regStates, getRegStates } = useActiveRegionsStore()
 
@@ -41,7 +42,7 @@ export const PetitionsView: FC = ({ }) => {
     const program = new Program(idl, programID, provider)
 
     let regbuf = Buffer.from([0])
-    regbuf.writeUInt8(regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
+    regbuf.writeUInt8(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
 
     let desc = e.target[0].value.toString()
     let gk = new PublicKey(e.target[1].value.toString())
@@ -76,12 +77,19 @@ export const PetitionsView: FC = ({ }) => {
 
   return (
     <div className="md:hero mx-auto p-4">
-      <div className="md:hero-content flex flex-col">
+      <div className="hero-content flex flex-col">
         <h1 className="text-center text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-[#c53fe9ff] to-blue-600 py-8">
           Petitions
         </h1>
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
+          <Link href={`/`}>
+            <button className="btn btn-square mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
+                <path d="M480 902.218 153.782 576 480 249.782l56.131 55.566-230.477 231.043h500.564v79.218H305.654l230.477 230.478L480 902.218Z" />
+              </svg>
+            </button>
+          </Link>
           Active regions
           <p className='text-slate-500 text-2xl leading-relaxed text-center'>
             You are using verifiable Free (Libre) open source software
@@ -90,7 +98,9 @@ export const PetitionsView: FC = ({ }) => {
 
         <label htmlFor="my-modal-4" className="btn btn-active">
           Create new region
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48"><path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
+            <path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z" />
+          </svg>
         </label>
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />

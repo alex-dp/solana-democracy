@@ -1,7 +1,9 @@
+import { GatewayProvider, useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, BN, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import PetitionCard from "components/petition/PetitionCard";
+import Link from "next/link";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { notify } from "utils/notifications";
@@ -18,7 +20,7 @@ type ViewProps = {
     closed: boolean
 }
 
-const RegionView = ({ code, closed }: ViewProps) => {
+export const RegionView = ({ code, closed }: ViewProps) => {
 
     const wallet = useWallet();
 
@@ -31,9 +33,10 @@ const RegionView = ({ code, closed }: ViewProps) => {
         return provider;
     };
 
-    const connection = new Connection("http://127.0.0.1:8899");
+    const connection = new Connection("***REMOVED***");
 
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps } = useProposalStore()
+    const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
     const provider = getProvider()
 
@@ -52,8 +55,13 @@ const RegionView = ({ code, closed }: ViewProps) => {
         } else fetchedAll = true;
     }, [state])
 
-    const addPetition = useCallback(async (e: FormEvent<HTMLFormElement>) => {
+    let addPetition = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (!gatewayToken) {
+            requestGatewayToken()
+            return
+        }
 
         const idl = await Program.fetchIdl(programID, provider)
 
@@ -73,14 +81,15 @@ const RegionView = ({ code, closed }: ViewProps) => {
 
         let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
         let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
-        let signer = PublicKey.findProgramAddressSync([Buffer.from("u"), wallet.publicKey.toBuffer(), regbuf], new PublicKey(programID))
+
+        console.log("ppda", ppda[0].toString())
+        console.log("statepda", statepda[0].toString())
 
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({
                 proposal: ppda[0],
                 regionalState: statepda[0],
-                signer: signer[0],
-                gatewayToken: null,
+                gatewayToken: gatewayToken.publicKey,
                 userAuthority: "7KJGpvi9KdS6eFNwofcVqLQeqPTbUnGTcQShJzsqdqdv",
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
                 systemProgram: SystemProgram.programId,
@@ -98,7 +107,7 @@ const RegionView = ({ code, closed }: ViewProps) => {
             signature: signature,
         });
         notify({ type: 'success', message: 'Transaction successful!', txid: signature });
-    }, [state, wallet])
+    }, [gatewayToken, gatewayStatus, connection, wallet])
 
     let date = new Date()
     date.setDate(date.getDate() + 1)
@@ -112,17 +121,28 @@ const RegionView = ({ code, closed }: ViewProps) => {
                 </h1>
 
                 <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
-                    {map(code)}
+                    <Link href={`/petitions`}>
+                        <button className="btn btn-square mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
+                                <path d="M480 902.218 153.782 576 480 249.782l56.131 55.566-230.477 231.043h500.564v79.218H305.654l230.477 230.478L480 902.218Z" />
+                            </svg>
+                        </button>
+                    </Link>
+                    {state?.description}
                     <p className='text-slate-500 text-2xl leading-relaxed text-center'>
                         You are using verifiable Free (Libre) open source software
                     </p>
                 </h4>
 
-                <label htmlFor="my-modal-4" className="btn btn-primary btn-circle mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48"><path d="M22.5 36.3h3v-6.45H32v-3h-6.5v-6.5h-3v6.5H16v3h6.5ZM11 44q-1.2 0-2.1-.9Q8 42.2 8 41V7q0-1.2.9-2.1Q9.8 4 11 4h18.05L40 14.95V41q0 1.2-.9 2.1-.9.9-2.1.9Zm16.55-27.7V7H11v34h26V16.3ZM11 7v9.3V7v34V7Z" /></svg>
+                <label htmlFor="my-modal-4" className="btn btn-active mx-auto">
+                    Make a proposal
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
+                        <path d="M22.5 36.3h3v-6.45H32v-3h-6.5v-6.5h-3v6.5H16v3h6.5ZM11 44q-1.2 0-2.1-.9Q8 42.2 8 41V7q0-1.2.9-2.1Q9.8 4 11 4h18.05L40 14.95V41q0 1.2-.9 2.1-.9.9-2.1.9Zm16.55-27.7V7H11v34h26V16.3ZM11 7v9.3V7v34V7Z" />
+                    </svg>
                 </label>
 
                 <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
+
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
                     <label className="modal-box" htmlFor="">
                         <h3 className="text-lg font-bold my-6 text-center">Create a proposal</h3>
@@ -143,10 +163,7 @@ const RegionView = ({ code, closed }: ViewProps) => {
                 <div className="flex flex-wrap place-content-center">
                     {(closed ? closedProps : liveProps).map((e, i) => <PetitionCard {...e} key={i} />)}
                 </div>
-
             </div>
         </div>
     );
 };
-
-export default RegionView

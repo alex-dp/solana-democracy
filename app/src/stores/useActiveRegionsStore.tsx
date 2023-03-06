@@ -16,20 +16,14 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
     regStates: null,
     getRegions: async (connection) => {
         try {
-            console.log("getting regionssssss")
             let pda = PublicKey.findProgramAddressSync(
                 [Buffer.from("r")],
                 programID
             )
 
-            console.log("pda", pda[0].toString())
-
             let acc = await connection.getAccountInfo(pda[0])
-
-            console.log("acccc", acc.data)
             set((s) => {
                 s.regionList = ActiveRegionsLayout.decode(acc.data)
-                console.log("regionsss", s.regionList)
             })
         } catch (error) { console.log(error) }
     },

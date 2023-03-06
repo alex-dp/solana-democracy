@@ -1,31 +1,54 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import RegionView from "views/petitions/region";
+import { RegionView } from "views/petitions/region";
 import { useRouter } from 'next/router';
 import { useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import useProposalStore from "stores/useProposalStore";
+import { GatewayProvider } from "@civic/solana-gateway-react";
 
 const RegionPage: NextPage = () => {
 
+    const wallet = useWallet();
+
+    const connection = new Connection("***REMOVED***");
+
+    const { state, getState } = useProposalStore();
+
     const router = useRouter()
 
-    let region = router.query.region;
+    let regionID = router.query.region;
 
     useEffect(() => {
-        if (!region && router.isReady) {
-            region = router.query.region
+        if (!regionID && router.isReady) {
+            regionID = router.query.region
         }
-    }, [router.isReady])
+
+        if (regionID != null && !state) {
+            getState(connection, Number(regionID.toString()))
+        }
+    }, [router.isReady, state])
 
     return (
         <div>
             <Head>
-                <title>Solana Scaffold</title>
+                <title>Solana Democracy Suite</title>
                 <meta
                     name="description"
-                    content="Basic Functionality"
+                    content="Solana Democracy Suite"
                 />
             </Head>
-            <RegionView code={Number(region.toString())} closed={false} />
+            {state?.gatekeeper &&
+                <GatewayProvider
+                    wallet={wallet}
+                    gatekeeperNetwork={state.gatekeeper}
+                    connection={connection}
+                    options={{ autoShowModal: false }}>
+                    <RegionView code={Number(regionID.toString())} closed={false} />
+                </GatewayProvider>
+            }
+
         </div>
     );
 };

@@ -48,7 +48,7 @@ export const InitializeAccount: FC = () => {
         }
 
         let pda = PublicKey.findProgramAddressSync(
-            [Buffer.from("ubi_info7"), wallet.publicKey.toBytes()],
+            [Buffer.from("ubi_info3"), wallet.publicKey.toBytes()],
             programID
         )
 

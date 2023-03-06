@@ -10,7 +10,6 @@ declare_id!("E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8");
 const STATE: &str = "d";
 const PROPOSAL: &str = "p";
 const SIGNATURE: &str = "s";
-const SIGNER: &str = "u";
 const REGIONS: &str = "r";
 
 const FEE_ADDRESS: &str = "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv";
@@ -116,23 +115,11 @@ pub mod solana_petition {
             None,
         ).is_ok() {
             true => {
-                let signer = &mut ctx.accounts.signer;
-                let sp = &mut ctx.accounts.system_program;
-
                 proposal.signatures = proposal.signatures + 1;
-
-                resize(&mut signer.to_account_info(), size_of::<u32>() as i16, user_auth, &mut sp.to_account_info());
-                signer.signed.push(proposal.id);
                 return Ok(())
             }
             false => { panic!("cannot verify token") }
         };
-    }
-
-    pub fn make_signer(ctx: Context<MakeSigner>, _region: u8) -> Result<()> {
-        let signer = &mut ctx.accounts.signer;
-        signer.signed = vec![];
-        Ok(())
     }
 
     pub fn close_proposal(ctx: Context<CloseProposal>) -> Result<()> {
@@ -217,12 +204,6 @@ pub struct CreateProposal <'info> {
         bump
     )]
     pub regional_state: Account<'info, State>,
-    #[account(
-        mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &region.to_be_bytes()],
-        bump
-    )]
-    pub signer: Account<'info, Signer>,
     /// CHECK:
     #[account(
         constraint = Gateway::verify_gateway_token_account_info(
@@ -262,13 +243,6 @@ pub struct SignProposal <'info> {
         bump
     )]
     pub signature: Account<'info, Signature>,
-    #[account(
-        mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &proposal.region.to_be_bytes()],
-        bump,
-        constraint = !&signer.signed.contains(&proposal.id)
-    )]
-    pub signer: Account<'info, Signer>,
     /// CHECK:
     #[account()]
     pub gateway_token: AccountInfo<'info>,
@@ -285,21 +259,6 @@ pub struct SignProposal <'info> {
     #[account(mut, address = Pubkey::from_str(FEE_ADDRESS).ok().unwrap())]
     pub platform_fee_account: AccountInfo<'info>,
 
-    pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
-#[instruction(_region: u8)]
-pub struct MakeSigner <'info> {
-    /// CHECK:
-    #[account(signer, mut)]
-    pub user_authority: AccountInfo<'info>,
-    #[account(
-        mut,
-        seeds = [SIGNER.as_bytes(), &user_authority.key().to_bytes(), &_region.to_be_bytes()],
-        bump
-    )]
-    pub signer: Account<'info, Signer>,
     pub system_program: Program<'info, System>,
 }
 
@@ -339,16 +298,6 @@ pub struct State {
 
 impl State {
     pub const MIN_SIZE: usize = 4 + 4 + 1 + 4 + 32 + 4;
-}
-
-//dynamic size. signed is proposal IDs
-#[account]
-pub struct Signer {
-    signed: Vec<u32>,
-}
-
-impl Signer {
-    pub const MIN_SIZE: usize = 4 + 4;
 }
 
 //empty. valid if exists
