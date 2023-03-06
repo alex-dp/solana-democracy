@@ -2,6 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import * as borsh from "@project-serum/borsh"
 
 export type EndpointTypes = 'mainnet' | 'devnet' | 'localnet'
+
 export function getMint(network) {
     switch (network) {
         case "mainnet":
