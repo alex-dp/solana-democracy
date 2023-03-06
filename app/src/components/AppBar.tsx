@@ -10,9 +10,11 @@ const WalletMultiButtonDynamic = dynamic(
   { ssr: false }
 );
 
-export const AppBar: React.FC = () => {
-  const { autoConnect, setAutoConnect } = useAutoConnect();
+export const AppBar: FC = () => {
+  const { setAutoConnect } = useAutoConnect();
   const [isNavOpen, setIsNavOpen] = useState(false);
+
+  setAutoConnect(true);
   return (
     <div>
       {/* NavBar / Header */}
