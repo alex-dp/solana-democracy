@@ -23,16 +23,22 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
             <Text variant="heading" className='font-extrabold tracking-tighter text-center text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-10'>Menu</Text>
           </li>
           <li>
-          <NavElement
-            label="Home"
-            href="/"
-          />
+            <NavElement
+              label="Home"
+              href="/"
+            />
           </li>
           <li>
-          <NavElement
-            label="Basics"
-            href="/basics"
-          />
+            <NavElement
+              label="UBI"
+              href="/ubi"
+            />
+          </li>
+          <li>
+            <NavElement
+              label="Petitions"
+              href="/petitions"
+            />
           </li>
         </ul>
       </div>

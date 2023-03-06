@@ -9,6 +9,7 @@ import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { GatewayProvider } from '@civic/solana-gateway-react';
+import Link from 'next/link';
 
 export const UBIView: FC = ({ }) => {
 
@@ -27,7 +28,7 @@ export const UBIView: FC = ({ }) => {
     <div className='md:hero mx-auto p-4'>
       <div className="hero-content flex flex-col place-content-center">
 
-        <img src='cooler-light.svg' className='w-36'></img>
+        <img src='cooler-light.svg' className='w-36' />
 
         <h1 className="text-center text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-[#c53fe9ff] to-blue-600 py-8">
           Nuclear UBI
@@ -47,6 +48,14 @@ export const UBIView: FC = ({ }) => {
         </h4>
 
         <div className="flex flex-wrap place-content-center">
+
+          <Link href={`/`}>
+            <button className="btn btn-square m-2">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
+                <path d="M480 902.218 153.782 576 480 249.782l56.131 55.566-230.477 231.043h500.564v79.218H305.654l230.477 230.478L480 902.218Z" />
+              </svg>
+            </button>
+          </Link>
 
           <GatewayProvider
             wallet={wallet}
