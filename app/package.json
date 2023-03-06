@@ -34,7 +34,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
     "tweetnacl": "^1.0.3",
-    "zustand": "^3.6.9"
+    "zustand": "^3.6.9",
+    "@project-serum/anchor": "^0.25.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
