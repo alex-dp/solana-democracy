@@ -57,15 +57,18 @@ export const UBIView: FC = ({ }) => {
             </button>
           </Link>
 
-          <GatewayProvider
-            wallet={wallet}
-            gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
-            connection={connection}
-            options={{ autoShowModal: false }}>
+          {
+            wallet.connected &&
+            <GatewayProvider
+              wallet={wallet}
+              gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
+              connection={connection}
+              options={{ autoShowModal: false }}>
 
-            {!initialized && !info ? <InitializeAccount /> : <Mint info={info} infoAddress={infoAddress} />}
+              {!initialized && !info ? <InitializeAccount /> : <Mint info={info} infoAddress={infoAddress} />}
 
-          </GatewayProvider>
+            </GatewayProvider>
+          }
           <Swap />
 
         </div>

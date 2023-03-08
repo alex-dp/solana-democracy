@@ -1,6 +1,4 @@
 import { FC } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 export const Footer: FC = () => {
     return (
         <div className="relative">
@@ -12,11 +10,7 @@ export const Footer: FC = () => {
                         </div>
 
                         <div className="mb-6 items-center mx-auto max-w-screen-lg">
-                            <a href="https://github.com/alex-dp/solana-ubi" className='underline'>UBI Program</a>
-                        </div>
-
-                        <div className="mb-6 items-center mx-auto max-w-screen-lg">
-                            <a href="https://github.com/alex-dp/solana-democracy" className='underline'>Frontend and petition program</a>
+                            <a href="https://github.com/alex-dp/solana-democracy" className='underline' target="_blank">Full source code ↗️</a>
                         </div>
                     </div>
                 </div>
