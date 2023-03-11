@@ -1,19 +1,13 @@
-import { GatewayProvider, useGateway } from "@civic/solana-gateway-react";
+import { useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, BN, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { notify } from "utils/notifications";
-
-function map(code) {
-    switch (code) {
-        case "g":
-            return "Global"
-    }
-}
 
 type ViewProps = {
     code: number,
@@ -129,9 +123,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                         </button>
                     </Link>
                     {state?.description}
-                    <p className='text-slate-500 text-2xl leading-relaxed text-center'>
-                        You are using verifiable Free (Libre) open source software
-                    </p>
+                    <OSS />
                 </h4>
 
                 {

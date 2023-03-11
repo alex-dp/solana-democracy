@@ -1,6 +1,7 @@
 import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { OSS } from "components/OSS";
 import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
 import { FC, FormEvent, useCallback, useEffect } from "react";
@@ -91,9 +92,7 @@ export const PetitionsView: FC = ({ }) => {
             </button>
           </Link>
           Active regions
-          <p className='text-slate-500 text-2xl leading-relaxed text-center'>
-            You are using verifiable Free (Libre) open source software
-          </p>
+          <OSS />
         </h4>
 
         {

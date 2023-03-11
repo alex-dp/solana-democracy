@@ -13,8 +13,7 @@ no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
-default = ["init-if-needed"]
-init-if-needed = ["anchor-derive-accounts/init-if-needed"]
+default = []
 
 [dependencies]
 anchor-lang = "0.25.0"
