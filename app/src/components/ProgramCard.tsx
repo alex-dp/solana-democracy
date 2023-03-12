@@ -14,7 +14,7 @@ export const ProgramCard = ({ title, description, destination, button, disabled 
             <div className="card-body">
                 <h2 className="card-title">{title}</h2>
                 <p>{description}</p>
-                <Link href={destination}>
+                <Link href={destination} onClick={(e) => { if (disabled) e.preventDefault() }}>
                     <div className="card-actions justify-end">
                         <button className="btn gap-2" disabled={disabled}>
                             {button}
