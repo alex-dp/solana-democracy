@@ -15,23 +15,21 @@ const NotificationList = () => {
     (s) => s
   )
 
-  const reversedNotifications = [...notifications].reverse()
-
   return (
     <div
-      className={`z-20 fixed inset-20 flex items-end px-4 py-6 pointer-events-none sm:p-6`}
+      className={`z-20 fixed inset-0 flex items-end pointer-events-none`}
     >
       <div className={`flex flex-col w-full`}>
-        {reversedNotifications.map((n, idx) => (
+        {notifications.reverse().map((n, idx) => (
           <Notification
-            key={`${n.message}${idx}`}
+            key={idx}
             type={n.type}
             message={n.message}
             description={n.description}
             txid={n.txid}
             onHide={() => {
               setNotificationStore((state: any) => {
-                const reversedIndex = reversedNotifications.length - 1 - idx;
+                const reversedIndex = notifications.length - 1 - idx;
                 state.notifications = [
                   ...notifications.slice(0, reversedIndex),
                   ...notifications.slice(reversedIndex + 1),
@@ -66,7 +64,7 @@ const Notification = ({ type, message, description, txid, onHide }) => {
 
   return (
     <div
-      className={`max-w-sm w-full bg-bkg-1 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 p-2 mx-4 mb-12 overflow-hidden`}
+      className={`max-w-sm w-full bg-black/50 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 p-2 mx-4 mb-12 overflow-hidden`}
     >
       <div className={`p-4`}>
         <div className={`flex items-center`}>
@@ -86,7 +84,7 @@ const Notification = ({ type, message, description, txid, onHide }) => {
             ) : null}
             {txid ? (
               <div className="flex flex-row">
-         
+
                 <a
                   href={'https://explorer.solana.com/tx/' + txid + `?cluster=${networkConfiguration}`}
                   target="_blank"

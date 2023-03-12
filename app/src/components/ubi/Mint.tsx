@@ -153,7 +153,7 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
     return (
 
         <button
-            className="px-8 m-2 btn bg-gradient-to-r from-[#c53fe9ff] to-indigo-600 hover:from-[#303030] hover:to-[#303030] max-width-200 width-20 ..."
+            className="px-8 m-2 btn btn-active btn-primary gap-2"
             onClick={onClick}
         >
             <span>mint</span>

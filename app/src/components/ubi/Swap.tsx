@@ -11,9 +11,9 @@ export const Swap: FC = () => {
 
     return (
         <button
-            className="px-8 m-2 btn bg-gradient-to-r from-[#5ac4beff] via-[#3773feff] to-[#c200fbff] hover:from-[#303030] hover:to-[#303030] max-width-200 width-20 ..."
+            className="px-8 m-2 btn btn-active btn-primary gap-2"
             onClick={onClick}>
-            <img src='raydium.svg' className='btn-img-text-large'></img> &nbsp; Swap
+            <img src='raydium.svg' className='btn-img-text-large'></img> Swap
         </button>
     );
 };
