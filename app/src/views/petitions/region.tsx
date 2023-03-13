@@ -5,7 +5,6 @@ import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY }
 import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
 import Link from "next/link";
-import { env } from "process";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM } from "types/types";
