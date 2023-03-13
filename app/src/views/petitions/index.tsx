@@ -12,7 +12,7 @@ import { notify } from "utils/notifications";
 
 export const PetitionsView: FC = ({ }) => {
 
-  const connection = new Connection(env.ENDPOINT);
+  const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT);
 
   const { regionList, getRegions, regStates, getRegStates } = useActiveRegionsStore()
 

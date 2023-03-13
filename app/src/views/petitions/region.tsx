@@ -29,7 +29,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         return provider;
     };
 
-    const connection = new Connection(env.ENDPOINT);
+    const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT);
 
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps } = useProposalStore()
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();

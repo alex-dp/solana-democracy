@@ -17,10 +17,10 @@ export const UBIView = () => {
 
   const wallet = useWallet();
 
-  const connection = new Connection(env.ENDPOINT)
-
   console.log(env)
-  console.log(env.ENDPOINT)
+  console.log(env.NEXT_PUBLIC_ENDPOINT)
+
+  const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT)
 
   useEffect(() => {
     if (!info && initialized) getInfo(connection, wallet.publicKey)

@@ -24,7 +24,7 @@ const { SystemProgram } = web3;
 const programID = new PublicKey(idl.metadata.address);
 
 export const InitializeAccount: FC = () => {
-    const connection = new Connection(env.ENDPOINT);
+    const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT);
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet()
 
