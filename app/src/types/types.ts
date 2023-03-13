@@ -1,6 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
 import * as borsh from "@project-serum/borsh"
-import { env } from "process";
 
 export type EndpointTypes = 'mainnet' | 'devnet' | 'localnet'
 

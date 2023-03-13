@@ -12,7 +12,6 @@ import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
 import { RawUBIInfo, getMint } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
-import { env } from 'process';
 
 const { SystemProgram } = web3;
 

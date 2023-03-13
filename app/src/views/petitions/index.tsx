@@ -4,7 +4,6 @@ import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.
 import { OSS } from "components/OSS";
 import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
-import { env } from "process";
 import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
 import { PETITION_PROGRAM } from "types/types";

@@ -3,7 +3,6 @@ import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
-import { env } from "process";
 import { useCallback, useEffect } from "react";
 import { PETITION_PROGRAM } from "types/types";
 import { notify } from "utils/notifications";

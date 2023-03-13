@@ -17,7 +17,6 @@ import {
 
 import idl from '../../ubi_idl.json'
 import { getMint } from '../../types/types';
-import { env } from 'process';
 
 const { SystemProgram } = web3;
 
