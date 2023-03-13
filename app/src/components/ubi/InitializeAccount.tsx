@@ -2,7 +2,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, TransactionSignature } from '@solana/web3.js';
 import { FC, useCallback } from 'react';
 import { notify } from "../../utils/notifications";
-import useUserSOLBalanceStore from '../../stores/useUserSOLBalanceStore';
 
 import { Buffer } from 'buffer';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -18,16 +17,16 @@ import {
 
 import idl from '../../ubi_idl.json'
 import { getMint } from '../../types/types';
+import { env } from 'process';
 
 const { SystemProgram } = web3;
 
 const programID = new PublicKey(idl.metadata.address);
 
 export const InitializeAccount: FC = () => {
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet()
-    const { getUserSOLBalance } = useUserSOLBalanceStore();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -132,7 +131,7 @@ export const InitializeAccount: FC = () => {
 
         }
 
-    }, [wallet.publicKey, connection, getUserSOLBalance]);
+    }, [wallet.publicKey, connection]);
 
     return (
         <button

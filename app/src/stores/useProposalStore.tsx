@@ -1,8 +1,8 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { PropLayout, RawProp, RawState, StateLayout } from 'types/types';
+import { PETITION_PROGRAM, PropLayout, RawProp, RawState, StateLayout } from 'types/types';
 
-const programID = new PublicKey("E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8");
+const programID = new PublicKey(PETITION_PROGRAM);
 
 interface ProposalStore extends State {
     liveProps: RawProp[];
@@ -18,20 +18,18 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
     closedProps: [],
     state: null,
     getState: async (connection, region) => {
-        try {
-            let regbuf = Buffer.alloc(1)
-            regbuf.writeUInt8(region)
+        let regbuf = Buffer.alloc(1)
+        regbuf.writeUInt8(region)
 
-            let pda = PublicKey.findProgramAddressSync(
-                [Buffer.from("d"), regbuf],
-                programID
-            )
+        let pda = PublicKey.findProgramAddressSync(
+            [Buffer.from("d"), regbuf],
+            programID
+        )
 
-            let acc = await connection.getAccountInfo(pda[0])
-            set((s) => {
-                s.state = StateLayout.decode(acc.data)
-            })
-        } catch (error) { console.log(error) }
+        let acc = await connection.getAccountInfo(pda[0])
+        set((s) => {
+            s.state = StateLayout.decode(acc.data)
+        })
     },
     //TODO paging!!!!!!!!!!!!!
     getLiveProps: async (connection, state) => {
@@ -52,7 +50,7 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
             s.liveProps = accs.map((e) => PropLayout.decode(e.data))
         })
     },
-    getClosedProps: async (connection, state) => {      //reverse: most recent first
+    getClosedProps: async (connection, state) => {
         let idbuf = Buffer.alloc(4)
         let regbuf = Buffer.alloc(1)
 

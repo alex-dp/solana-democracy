@@ -1,8 +1,8 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { RawUBIInfo, UBIInfoLayout } from 'types/types';
+import { RawUBIInfo, UBIInfoLayout, UBI_PROGRAM } from 'types/types';
 
-const programID = new PublicKey("EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd");
+const programID = new PublicKey(UBI_PROGRAM);
 
 interface UBIInfoStore extends State {
     info: RawUBIInfo;
@@ -16,22 +16,20 @@ const useUBIInfoStore = create<UBIInfoStore>((set, _get) => ({
     infoAddress: null,
     initialized: true,
     getInfo: async (connection, pk) => {
-        try {
-            let pda = PublicKey.findProgramAddressSync(
-                [Buffer.from("ubi_info3"), pk.toBuffer()],
-                programID
-            )
+        let pda = PublicKey.findProgramAddressSync(
+            [Buffer.from("ubi_info3"), pk.toBuffer()],
+            programID
+        )
 
-            let acc = await connection.getAccountInfo(pda[0])
-            set((s) => {
-                if (acc) {
-                    s.info = UBIInfoLayout.decode(acc.data)
-                    s.infoAddress = pda[0]
-                    s.initialized = true
-                }
-                else s.initialized = false
-            })
-        } catch (error) { console.log(error) }
+        let acc = await connection.getAccountInfo(pda[0])
+        set((s) => {
+            if (acc) {
+                s.info = UBIInfoLayout.decode(acc.data)
+                s.infoAddress = pda[0]
+                s.initialized = true
+            }
+            else s.initialized = false
+        })
     },
 }));
 

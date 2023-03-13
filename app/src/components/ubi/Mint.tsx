@@ -12,6 +12,7 @@ import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
 import { RawUBIInfo, getMint } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
+import { env } from 'process';
 
 const { SystemProgram } = web3;
 
@@ -23,7 +24,7 @@ type MintProps = {
 }
 
 export const Mint = ({ info, infoAddress }: MintProps) => {
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet();
 
@@ -39,8 +40,6 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
     };
 
     const onClick = useCallback(async () => {
-
-        console.log(gatewayToken)
 
         if (!gatewayToken) {
             requestGatewayToken()
@@ -107,8 +106,6 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
         }
 
         const program = new Program(idl, programID, provider)
-
-        console.log(mint_signer[0].toString())
 
         if (new Date().getTime() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
             notify({ type: 'error', message: "You minted NUBI less than 24 hours ago" })

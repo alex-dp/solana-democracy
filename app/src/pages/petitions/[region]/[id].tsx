@@ -9,12 +9,13 @@ import useSingleProposalStore from "stores/useSingleProposalStore";
 import PetitionCard from "components/petition/PetitionCard";
 import useProposalStore from "stores/useProposalStore";
 import Link from "next/link";
+import { env } from "process";
 
 const RegionPage: NextPage = () => {
 
     const wallet = useWallet();
 
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
 
     const { proposal, getProposal } = useSingleProposalStore();
 

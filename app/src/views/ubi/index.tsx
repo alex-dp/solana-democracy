@@ -9,6 +9,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { GatewayProvider } from '@civic/solana-gateway-react';
 import Link from 'next/link';
 import { OSS } from 'components/OSS';
+import { env } from 'process';
 
 export const UBIView = () => {
 
@@ -16,7 +17,7 @@ export const UBIView = () => {
 
   const wallet = useWallet();
 
-  const connection = new Connection("***REMOVED***")
+  const connection = new Connection(env.ENDPOINT)
 
   useEffect(() => {
     if (!info && initialized) getInfo(connection, wallet.publicKey)

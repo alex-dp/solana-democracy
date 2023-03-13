@@ -5,8 +5,10 @@ import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY }
 import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
 import Link from "next/link";
+import { env } from "process";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
+import { PETITION_PROGRAM } from "types/types";
 import { notify } from "utils/notifications";
 
 type ViewProps = {
@@ -27,14 +29,14 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         return provider;
     };
 
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
 
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps } = useProposalStore()
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
     const provider = getProvider()
 
-    const programID = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
+    const programID = new PublicKey(PETITION_PROGRAM)
 
     let fetchedAll = false
 
@@ -73,11 +75,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
         let tx = new Transaction()
 
-        let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
-        let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
-
-        console.log("ppda", ppda[0].toString())
-        console.log("statepda", statepda[0].toString())
+        let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
+        let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
 
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({

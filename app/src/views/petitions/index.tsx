@@ -4,13 +4,15 @@ import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.
 import { OSS } from "components/OSS";
 import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
+import { env } from "process";
 import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
+import { PETITION_PROGRAM } from "types/types";
 import { notify } from "utils/notifications";
 
 export const PetitionsView: FC = ({ }) => {
 
-  const connection = new Connection("***REMOVED***");
+  const connection = new Connection(env.ENDPOINT);
 
   const { regionList, getRegions, regStates, getRegStates } = useActiveRegionsStore()
 
@@ -27,7 +29,7 @@ export const PetitionsView: FC = ({ }) => {
 
   const provider = getProvider()
 
-  const programID = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
+  const programID = new PublicKey(PETITION_PROGRAM)
 
   useEffect(() => {
     if (!regStates) {
@@ -48,9 +50,9 @@ export const PetitionsView: FC = ({ }) => {
     let desc = e.target[0].value.toString()
     let gk = new PublicKey(e.target[1].value.toString())
 
-    let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
-    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], new PublicKey(programID))
-    let gkLinkPda = PublicKey.findProgramAddressSync([gk.toBuffer()], new PublicKey(programID))
+    let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
+    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], programID)
+    let gkLinkPda = PublicKey.findProgramAddressSync([gk.toBuffer()], programID)
 
     let tx = new Transaction();
     tx.add(

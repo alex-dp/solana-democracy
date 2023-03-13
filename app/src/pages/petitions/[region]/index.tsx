@@ -7,12 +7,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useProposalStore from "stores/useProposalStore";
 import { GatewayProvider } from "@civic/solana-gateway-react";
+import { env } from "process";
 
 const RegionPage: NextPage = () => {
 
     const wallet = useWallet();
 
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
 
     const { state, getState } = useProposalStore();
 

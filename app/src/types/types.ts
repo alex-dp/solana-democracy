@@ -1,5 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import * as borsh from "@project-serum/borsh"
+import { env } from "process";
 
 export type EndpointTypes = 'mainnet' | 'devnet' | 'localnet'
 
@@ -11,6 +12,39 @@ export function getMint(network) {
         case "devnet":
             return "2LkCYPkW7zJu8w7Wa12ABgxcbzp8cH8siskPCjPLwV67";
     }
+}
+
+export enum Programs {
+    UBI,
+    Petitions
+}
+
+export const
+    UBI_PROGRAM = "EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd",
+    PETITION_PROGRAM = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
+
+export class Expirable<T> {
+    expiration: number
+    object: T
+
+    constructor(expiration: number, object: T) {
+        this.expiration = expiration
+        this.object = object
+    }
+}
+
+export function expired(o: Expirable<any>) {
+    return Date.now() > o.expiration
+}
+
+export function getWithSeeds(program: Programs, seeds: any[]) {
+    seeds.splice(0, 0, program)
+    return JSON.parse(localStorage.getItem(JSON.stringify(seeds)))
+}
+
+export function setWithSeeds(program: Programs, seeds: any[], value) {
+    seeds.splice(0, 0, program)
+    localStorage.setItem(JSON.stringify(seeds), JSON.stringify(value))
 }
 
 export interface RawUBIInfo {

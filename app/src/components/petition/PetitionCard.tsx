@@ -3,7 +3,9 @@ import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
+import { env } from "process";
 import { useCallback, useEffect } from "react";
+import { PETITION_PROGRAM } from "types/types";
 import { notify } from "utils/notifications";
 
 type CardProps = {
@@ -40,24 +42,20 @@ const PetitionCard = ({
         return provider;
     };
 
-    const connection = new Connection("***REMOVED***");
+    const connection = new Connection(env.ENDPOINT);
 
     const provider = getProvider()
 
-    const programID = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
-
     const sign = useCallback(async () => {
-
-        console.log(gatewayStatus)
 
         if (!gatewayToken) {
             requestGatewayToken()
             return
         }
 
-        const idl = await Program.fetchIdl(programID, provider)
+        const idl = await Program.fetchIdl(PETITION_PROGRAM, provider)
 
-        const program = new Program(idl, programID, provider)
+        const program = new Program(idl, PETITION_PROGRAM, provider)
 
         let idbuf = Buffer.alloc(4)
         idbuf.writeInt32BE(id)
@@ -65,7 +63,7 @@ const PetitionCard = ({
         let regbuf = Buffer.alloc(1)
         regbuf.writeUInt8(region)
 
-        let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], new PublicKey(programID))
+        let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], new PublicKey(PETITION_PROGRAM))
 
         let sigAcc = await connection.getAccountInfo(sigAddress[0])
 
@@ -74,8 +72,8 @@ const PetitionCard = ({
             return
         }
 
-        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(programID))
-        let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(programID))
+        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(PETITION_PROGRAM))
+        let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(PETITION_PROGRAM))
 
         let tx = new Transaction();
         tx.add(
