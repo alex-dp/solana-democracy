@@ -15,7 +15,7 @@ const RegionPage: NextPage = () => {
 
     const wallet = useWallet();
 
-    const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT);
+    const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
     const { proposal, getProposal } = useSingleProposalStore();
 

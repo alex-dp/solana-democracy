@@ -17,6 +17,7 @@ export const UBIView = () => {
   const wallet = useWallet();
 
   console.log(process.env)
+  console.log("endpoint", process.env.ENDPOINT)
   console.log(process.env.NEXT_PUBLIC_ENDPOINT)
 
   const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT)

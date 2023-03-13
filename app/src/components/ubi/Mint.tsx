@@ -24,7 +24,7 @@ type MintProps = {
 }
 
 export const Mint = ({ info, infoAddress }: MintProps) => {
-    const connection = new Connection(env.NEXT_PUBLIC_ENDPOINT);
+    const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet();
 
