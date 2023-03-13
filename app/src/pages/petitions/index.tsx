@@ -6,10 +6,10 @@ const Petitions: NextPage = (props) => {
   return (
     <div>
       <Head>
-        <title>Solana Democracy Suite</title>
+        <title>Petitions | Solana Democracy Suite</title>
         <meta
           name="description"
-          content="Solana Democracy Suite"
+          content="Petitions | Solana Democracy Suite"
         />
       </Head>
       <PetitionsView />

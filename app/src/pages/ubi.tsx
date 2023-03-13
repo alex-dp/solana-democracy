@@ -6,10 +6,10 @@ const UBI: NextPage = (props) => {
     return (
         <div className="ubi-body">
             <Head>
-                <title>Solana Democracy Suite</title>
+                <title>UBI | Solana Democracy Suite</title>
                 <meta
                     name="description"
-                    content="Solana Democracy Suite"
+                    content="Universal Basic Income | Solana Democracy Suite"
                 />
             </Head>
             <UBIView />

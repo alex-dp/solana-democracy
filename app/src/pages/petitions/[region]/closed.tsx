@@ -19,10 +19,10 @@ const RegionPage: NextPage = () => {
     return (
         <div>
             <Head>
-                <title>Solana Democracy Suite</title>
+                <title>Closed Petitions | Solana Democracy Suite</title>
                 <meta
                     name="description"
-                    content="Solana Democracy Suite"
+                    content="Closed Petitions | Solana Democracy Suite"
                 />
             </Head>
             <RegionView code={Number(region.toString())} closed={true} />
