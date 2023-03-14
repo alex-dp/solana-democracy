@@ -67,6 +67,8 @@ export const PetitionsView: FC = ({ }) => {
 
     let signature = await wallet.sendTransaction(tx, connection);
 
+    notify({ type: 'info', message: `Region ${desc} has been submitted`, txid: signature });
+
     const latestBlockHash = await connection.getLatestBlockhash();
 
     await connection.confirmTransaction({
@@ -74,7 +76,7 @@ export const PetitionsView: FC = ({ }) => {
       lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       signature: signature,
     });
-    notify({ type: 'success', message: 'Transaction successful!', txid: signature });
+    notify({ type: 'success', message: `Region ${desc} has been listed!`, txid: signature });
   }, [connection, regionList])
 
   return (

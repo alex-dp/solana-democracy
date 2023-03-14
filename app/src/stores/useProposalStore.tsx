@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { Expirable, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
+import { Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -22,7 +22,7 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
 
         let state: Expirable<RawState> = getWithSeeds(Programs.Petitions, ["d", region])
 
-        if (!state) {
+        if (!state || expired(state)) {
             let regbuf = Buffer.alloc(1)
             regbuf.writeUInt8(region)
 
@@ -41,39 +41,55 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
     },
     //TODO paging!!!!!!!!!!!!!
     getLiveProps: async (connection, state) => {
-        let idbuf = Buffer.alloc(4)
-        let regbuf = Buffer.alloc(1)
+        let lp: Expirable<RawProp[]> = getWithSeeds(Programs.Petitions, ["liveprops", state.region])
 
-        let adds = state.liveProps.reverse().map((e) => {   //reverse: most recent first
-            idbuf.writeUInt32BE(e)
-            regbuf.writeUInt8(state.region)
-            return PublicKey.findProgramAddressSync(
-                [Buffer.from("p"), regbuf, idbuf],
-                programID
-            )[0]
-        })
+        if (!lp || expired(lp) || lp.object.length != state.liveProps.length) {
+            let idbuf = Buffer.alloc(4)
+            let regbuf = Buffer.alloc(1)
 
-        let accs = await connection.getMultipleAccountsInfo(adds)
+            let adds = state.liveProps.reverse().map((e) => {   //reverse: most recent first
+                idbuf.writeUInt32BE(e)
+                regbuf.writeUInt8(state.region)
+                return PublicKey.findProgramAddressSync(
+                    [Buffer.from("p"), regbuf, idbuf],
+                    programID
+                )[0]
+            })
+
+            let accs = await connection.getMultipleAccountsInfo(adds)
+            lp = new Expirable(Date.now() + 1000 * 60 * 30, accs.map((e) => PropLayout.decode(e.data)))
+
+            setWithSeeds(Programs.Petitions, ["liveprops", state.region], lp)
+        }
+
         set((s) => {
-            s.liveProps = accs.map((e) => PropLayout.decode(e.data))
+            s.liveProps = lp.object
         })
     },
     getClosedProps: async (connection, state) => {
-        let idbuf = Buffer.alloc(4)
-        let regbuf = Buffer.alloc(1)
+        let cp: Expirable<RawProp[]> = getWithSeeds(Programs.Petitions, ["closedprops", state.region])
 
-        let adds = state.closedProps.reverse().map((e) => {
-            idbuf.writeInt32BE(e)
-            regbuf.writeUInt8(state.region)
-            return PublicKey.findProgramAddressSync(
-                [Buffer.from("p"), regbuf, idbuf],
-                programID
-            )[0]
-        })
+        if (!cp || expired(cp) || cp.object.length != state.closedProps.length) {
+            let idbuf = Buffer.alloc(4)
+            let regbuf = Buffer.alloc(1)
 
-        let accs = await connection.getMultipleAccountsInfo(adds)
+            let adds = state.closedProps.reverse().map((e) => {   //reverse: most recent first
+                idbuf.writeUInt32BE(e)
+                regbuf.writeUInt8(state.region)
+                return PublicKey.findProgramAddressSync(
+                    [Buffer.from("p"), regbuf, idbuf],
+                    programID
+                )[0]
+            })
+
+            let accs = await connection.getMultipleAccountsInfo(adds)
+            cp = new Expirable(Date.now() + 1000 * 60 * 30, accs.map((e) => PropLayout.decode(e.data)))
+
+            setWithSeeds(Programs.Petitions, ["closedprops", state.region], cp)
+        }
+
         set((s) => {
-            s.closedProps = accs.map((e) => PropLayout.decode(e.data))
+            s.liveProps = cp.object
         })
     },
     hasSigned: async (connection, region, id, pk, sigAddress) => {

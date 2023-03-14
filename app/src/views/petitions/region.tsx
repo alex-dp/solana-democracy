@@ -93,6 +93,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
         let signature = await wallet.sendTransaction(tx, connection);
 
+        notify({ type: 'info', message: 'Your petition is being submitted', txid: signature });
+
         const latestBlockHash = await connection.getLatestBlockhash();
 
         await connection.confirmTransaction({
@@ -100,7 +102,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
             lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
             signature: signature,
         });
-        notify({ type: 'success', message: 'Transaction successful!', txid: signature });
+        notify({ type: 'success', message: 'Your petition has been recorded!', txid: signature });
     }, [gatewayToken, gatewayStatus, connection, wallet])
 
     let date = new Date()

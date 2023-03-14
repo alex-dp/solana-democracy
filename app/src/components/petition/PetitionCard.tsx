@@ -92,6 +92,8 @@ const PetitionCard = ({
 
         let signature = await wallet.sendTransaction(tx, connection);
 
+        notify({ type: 'info', message: 'The petition is being signed', txid: signature });
+
         const latestBlockHash = await connection.getLatestBlockhash();
 
         await connection.confirmTransaction({
@@ -99,7 +101,7 @@ const PetitionCard = ({
             lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
             signature: signature,
         });
-        notify({ type: 'success', message: 'Transaction successful!', txid: signature });
+        notify({ type: 'success', message: 'Petition signed successfully!', txid: signature });
     }, [wallet, connection, gatewayToken, gatewayStatus])
 
     return (

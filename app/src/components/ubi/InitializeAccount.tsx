@@ -118,9 +118,11 @@ export const InitializeAccount: FC = () => {
         if (txs.length != 0) {
             try {
                 let signedTxs = await wallet.signAllTransactions(txs)
-                signedTxs.forEach(element => {
-                    connection.sendRawTransaction(element.serialize())
+                notify({ type: 'info', message: 'Your account is being initialized' });
+                let sigs: Promise<TransactionSignature>[] = signedTxs.map(async (t) => {
+                    return connection.sendRawTransaction(t.serialize())
                 });
+                await Promise.all(sigs)
                 notify({ type: 'success', message: 'Your account has been initialized' });
             } catch (error) {
                 notify({ type: 'error', message: error?.message });

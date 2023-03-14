@@ -134,6 +134,8 @@ export const Mint = ({ info }: MintProps) => {
 
             signature = await wallet.sendTransaction(transaction, connection);
 
+            notify({ type: 'info', message: 'Minting in progress', txid: signature });
+
             const latestBlockHash = await connection.getLatestBlockhash();
 
             await connection.confirmTransaction({
