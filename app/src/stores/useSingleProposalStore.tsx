@@ -14,6 +14,8 @@ const useSingleProposalStore = create<SingleProposalStore>((set, _get) => ({
     getProposal: async (connection, region, id) => {
         let prop: RawProp = getWithSeeds(Programs.Petitions, ["p", region, id])
 
+        console.log(prop)
+
         if (!prop) {
             let idbuf = Buffer.alloc(4)
             let regbuf = Buffer.alloc(1)

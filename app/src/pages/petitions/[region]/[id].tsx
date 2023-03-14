@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Connection } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { GatewayProvider } from "@civic/solana-gateway-react";
 import useSingleProposalStore from "stores/useSingleProposalStore";
 import PetitionCard from "components/petition/PetitionCard";
@@ -62,7 +62,7 @@ const RegionPage: NextPage = () => {
                         {(state?.gatekeeper && proposal) &&
                             <GatewayProvider
                                 wallet={wallet}
-                                gatekeeperNetwork={state.gatekeeper}
+                                gatekeeperNetwork={new PublicKey(state.gatekeeper)}
                                 connection={connection}
                                 cluster={"mainnet"}
                                 options={{ autoShowModal: false }}>

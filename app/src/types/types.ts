@@ -1,5 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import * as borsh from "@project-serum/borsh"
+import BN, { isBN } from "bn.js";
+import { AnchorProvider, Idl, Program } from "@project-serum/anchor";
 
 export type EndpointTypes = 'mainnet' | 'devnet' | 'localnet'
 
@@ -38,12 +40,29 @@ export function expired(o: Expirable<any>) {
 
 export function getWithSeeds(program: Programs, seeds: any[]) {
     seeds.splice(0, 0, program)
-    return JSON.parse(localStorage.getItem(JSON.stringify(seeds)))
+    return JSON.parse(localStorage.getItem(JSON.stringify(seeds)),)
 }
 
 export function setWithSeeds(program: Programs, seeds: any[], value) {
     seeds.splice(0, 0, program)
-    localStorage.setItem(JSON.stringify(seeds), JSON.stringify(value))
+    localStorage.setItem(JSON.stringify(seeds), JSON.stringify(value, (_k, v) => {
+        //TODO big number big hack. please fix me
+        if (typeof v == "string" && v.length > 4 && !Number.isNaN(Number("0x" + v))) {
+            return Number("0x" + v)
+        }
+        return v
+    }))
+}
+
+export async function useIDL(id: PublicKey, provider: AnchorProvider): Promise<Idl> {
+    let idl = localStorage.getItem("idl" + id.toString())
+
+    if (idl) return JSON.parse(idl)
+    else {
+        let fetchedIdl = await Program.fetchIdl(id, provider)
+        localStorage.setItem("idl" + id.toString(), JSON.stringify(fetchedIdl))
+        return fetchedIdl
+    }
 }
 
 export interface RawUBIInfo {

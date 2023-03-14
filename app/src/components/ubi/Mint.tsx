@@ -10,7 +10,7 @@ import { Program, AnchorProvider, web3 } from '@project-serum/anchor';
 import idl from '../../ubi_idl.json'
 import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
-import { RawUBIInfo, getMint } from '../../types/types';
+import { RawUBIInfo, getMint, useIDL } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
 
 const { SystemProgram } = web3;
@@ -18,16 +18,15 @@ const { SystemProgram } = web3;
 const programID = new PublicKey(idl.metadata.address);
 
 type MintProps = {
-    info: RawUBIInfo,
-    infoAddress: PublicKey
+    info: RawUBIInfo
 }
 
-export const Mint = ({ info, infoAddress }: MintProps) => {
+export const Mint = ({ info }: MintProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet();
 
-    const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
+    const { gatewayToken, requestGatewayToken } = useGateway();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -45,7 +44,12 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
             return
         }
 
-        let idl = await Program.fetchIdl(programID, getProvider())
+        if (Date.now() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
+            notify({ type: 'error', message: "You minted NUBI less than 24 hours ago" })
+            return
+        }
+
+        let idl = await useIDL(programID, getProvider())
 
         if (!wallet.publicKey) {
             notify({ type: 'error', message: 'Please connect your wallet' });
@@ -106,42 +110,43 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
 
         const program = new Program(idl, programID, provider)
 
-        if (new Date().getTime() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
-            notify({ type: 'error', message: "You minted NUBI less than 24 hours ago" })
-            return
-        } else {
-            let signature: TransactionSignature = '';
-            try {
 
-                let transaction = new Transaction().add(
-                    await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
-                        mintSigner: mint_signer[0],
-                        ubiMint: getMint(moniker),
-                        userAuthority: wallet.publicKey,
-                        ubiTokenAccount: ata,
-                        ubiInfo: infoAddress,
-                        state: "BfNHs2d373sCcxw5MjNmgLgQCEoFHM3Hv8XpEvqePLjD",
-                        gatewayToken: gatewayToken.publicKey,
-                        tokenProgram: TOKEN_PROGRAM_ID,
-                        systemProgram: SystemProgram.programId,
-                        rent: web3.SYSVAR_RENT_PUBKEY,
-                    }).instruction()
-                );
+        let signature: TransactionSignature = '';
+        try {
 
-                signature = await wallet.sendTransaction(transaction, connection);
+            let pda = PublicKey.findProgramAddressSync(
+                [Buffer.from("ubi_info3"), wallet.publicKey.toBuffer()],
+                programID
+            )
 
-                const latestBlockHash = await connection.getLatestBlockhash();
+            let transaction = new Transaction().add(
+                await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
+                    mintSigner: mint_signer[0],
+                    ubiMint: getMint(moniker),
+                    userAuthority: wallet.publicKey,
+                    ubiTokenAccount: ata,
+                    ubiInfo: pda[0],
+                    state: "BfNHs2d373sCcxw5MjNmgLgQCEoFHM3Hv8XpEvqePLjD",
+                    gatewayToken: gatewayToken.publicKey,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    systemProgram: SystemProgram.programId,
+                    rent: web3.SYSVAR_RENT_PUBKEY,
+                }).instruction()
+            );
 
-                await connection.confirmTransaction({
-                    blockhash: latestBlockHash.blockhash,
-                    lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-                    signature: signature,
-                });
+            signature = await wallet.sendTransaction(transaction, connection);
 
-                notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
-            } catch (error) {
-                notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
-            }
+            const latestBlockHash = await connection.getLatestBlockhash();
+
+            await connection.confirmTransaction({
+                blockhash: latestBlockHash.blockhash,
+                lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+                signature: signature,
+            });
+
+            notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
+        } catch (error) {
+            notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
         }
 
     }, [wallet.publicKey, connection]);
@@ -149,7 +154,7 @@ export const Mint = ({ info, infoAddress }: MintProps) => {
     return (
 
         <button
-            className="px-8 m-2 btn btn-active btn-primary gap-2"
+            className="px-8 m-2 btn btn-active btn-primary"
             onClick={onClick}
         >
             <span>mint</span>

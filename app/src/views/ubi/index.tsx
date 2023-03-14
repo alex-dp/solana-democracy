@@ -12,14 +12,14 @@ import { OSS } from 'components/OSS';
 
 export const UBIView = () => {
 
-  const { info, infoAddress, initialized, getInfo } = useUBIInfoStore();
+  const { info, initialized, getInfo } = useUBIInfoStore();
 
   const wallet = useWallet();
 
   const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT)
 
   useEffect(() => {
-    if (!info && initialized) getInfo(connection, wallet.publicKey)
+    if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
   }, [connection])
 
   return (
@@ -62,7 +62,7 @@ export const UBIView = () => {
               connection={connection}
               options={{ autoShowModal: false }}>
 
-              {!initialized && !info ? <InitializeAccount /> : <Mint info={info} infoAddress={infoAddress} />}
+              {!initialized && !info ? <InitializeAccount /> : <Mint info={info} />}
 
             </GatewayProvider>
           }

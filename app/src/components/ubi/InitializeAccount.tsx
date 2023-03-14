@@ -16,7 +16,7 @@ import {
 } from "@solana/spl-token";
 
 import idl from '../../ubi_idl.json'
-import { getMint } from '../../types/types';
+import { getMint, useIDL } from '../../types/types';
 
 const { SystemProgram } = web3;
 
@@ -38,7 +38,7 @@ export const InitializeAccount: FC = () => {
 
     const onClick = useCallback(async () => {
 
-        const idl = await Program.fetchIdl(programID, getProvider())
+        const idl = await useIDL(programID, getProvider())
 
         if (!wallet.publicKey) {
             notify({ type: 'error', message: 'Please connect your wallet' });
@@ -134,7 +134,7 @@ export const InitializeAccount: FC = () => {
 
     return (
         <button
-            className="px-8 m-2 btn bg-gradient-to-r from-[#c53fe9ff] to-indigo-600 hover:from-[#303030] hover:to-[#303030] max-width-200 width-20..."
+            className="px-8 m-2 btn btn-active btn-primary"
             onClick={onClick}
         >
             <span>initialize</span>

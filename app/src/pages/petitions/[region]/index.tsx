@@ -42,7 +42,7 @@ const RegionPage: NextPage = () => {
             {state?.gatekeeper &&
                 <GatewayProvider
                     wallet={wallet}
-                    gatekeeperNetwork={state.gatekeeper}
+                    gatekeeperNetwork={new PublicKey(state.gatekeeper)}
                     connection={connection}
                     options={{ autoShowModal: false }}>
                     <RegionView code={Number(regionID.toString())} closed={false} />

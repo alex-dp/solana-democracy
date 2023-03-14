@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { PETITION_PROGRAM, PropLayout, RawProp, RawState, StateLayout } from 'types/types';
+import { Expirable, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -11,6 +11,7 @@ interface ProposalStore extends State {
     getState: (connection: Connection, region: number) => void;
     getLiveProps: (connection: Connection, state: RawState) => void;
     getClosedProps: (connection: Connection, state: RawState) => void;
+    hasSigned: (connection: Connection, region: number, id: number, pk: PublicKey, sigAddress: PublicKey) => Promise<boolean>
 }
 
 const useProposalStore = create<ProposalStore>((set, _get) => ({
@@ -18,17 +19,24 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
     closedProps: [],
     state: null,
     getState: async (connection, region) => {
-        let regbuf = Buffer.alloc(1)
-        regbuf.writeUInt8(region)
 
-        let pda = PublicKey.findProgramAddressSync(
-            [Buffer.from("d"), regbuf],
-            programID
-        )
+        let state: Expirable<RawState> = getWithSeeds(Programs.Petitions, ["d", region])
 
-        let acc = await connection.getAccountInfo(pda[0])
+        if (!state) {
+            let regbuf = Buffer.alloc(1)
+            regbuf.writeUInt8(region)
+
+            let pda = PublicKey.findProgramAddressSync(
+                [Buffer.from("d"), regbuf],
+                programID
+            )
+
+            let acc = await connection.getAccountInfo(pda[0])
+            state = new Expirable(Date.now() + 1000 * 60 * 5, StateLayout.decode(acc.data))
+            setWithSeeds(Programs.Petitions, ["d", region], state)
+        }
         set((s) => {
-            s.state = StateLayout.decode(acc.data)
+            s.state = state.object
         })
     },
     //TODO paging!!!!!!!!!!!!!
@@ -67,6 +75,20 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         set((s) => {
             s.closedProps = accs.map((e) => PropLayout.decode(e.data))
         })
+    },
+    hasSigned: async (connection, region, id, pk, sigAddress) => {
+        let sig = getWithSeeds(Programs.Petitions, ["s", pk, region, id])
+
+        if (sig) return true
+
+        let sigAcc = await connection.getAccountInfo(sigAddress)
+
+        if (sigAcc) {
+            setWithSeeds(Programs.Petitions, ["s", pk, region, id], true)
+            return true
+        }
+
+        return false
     }
 }));
 

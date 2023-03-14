@@ -17,8 +17,6 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
     getRegions: async (connection) => {
         let regionList: Expirable<RawActiveRegions> = getWithSeeds(Programs.Petitions, ["r"])
 
-        console.log(regionList)
-
         if (!regionList || expired(regionList)) {
             let pda = PublicKey.findProgramAddressSync(
                 [Buffer.from("r")],

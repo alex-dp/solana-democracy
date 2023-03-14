@@ -3,8 +3,9 @@ import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
-import { useCallback, useEffect } from "react";
-import { PETITION_PROGRAM } from "types/types";
+import { useCallback } from "react";
+import useProposalStore from "stores/useProposalStore";
+import { PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
 type CardProps = {
@@ -30,6 +31,8 @@ const PetitionCard = ({
 }: CardProps) => {
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
+    const { hasSigned } = useProposalStore();
+
     const wallet = useWallet();
 
     const getProvider = () => {
@@ -45,6 +48,8 @@ const PetitionCard = ({
 
     const provider = getProvider()
 
+    const programID = new PublicKey(PETITION_PROGRAM)
+
     const sign = useCallback(async () => {
 
         if (!gatewayToken) {
@@ -52,27 +57,25 @@ const PetitionCard = ({
             return
         }
 
-        const idl = await Program.fetchIdl(PETITION_PROGRAM, provider)
-
-        const program = new Program(idl, PETITION_PROGRAM, provider)
-
         let idbuf = Buffer.alloc(4)
         idbuf.writeInt32BE(id)
 
         let regbuf = Buffer.alloc(1)
         regbuf.writeUInt8(region)
 
-        let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], new PublicKey(PETITION_PROGRAM))
+        let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], programID)
 
-        let sigAcc = await connection.getAccountInfo(sigAddress[0])
-
-        if (sigAcc != null) {
+        if (hasSigned(connection, region, id, wallet.publicKey, sigAddress[0])) {
             notify({ type: "error", message: "You have already signed this petition" })
             return
         }
 
-        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], new PublicKey(PETITION_PROGRAM))
-        let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], new PublicKey(PETITION_PROGRAM))
+        const idl = await useIDL(programID, provider)
+
+        const program = new Program(idl, PETITION_PROGRAM, provider)
+
+        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
+        let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
 
         let tx = new Transaction();
         tx.add(

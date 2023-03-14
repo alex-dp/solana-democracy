@@ -7,7 +7,7 @@ import PetitionCard from "components/petition/PetitionCard";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
-import { PETITION_PROGRAM } from "types/types";
+import { PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
 type ViewProps = {
@@ -58,7 +58,9 @@ export const RegionView = ({ code, closed }: ViewProps) => {
             return
         }
 
-        const idl = await Program.fetchIdl(programID, provider)
+        const idl = await useIDL(programID, provider)
+
+        console.log(idl)
 
         const program = new Program(idl, programID, provider)
 

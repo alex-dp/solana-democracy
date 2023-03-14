@@ -6,7 +6,7 @@ import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
 import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
-import { PETITION_PROGRAM } from "types/types";
+import { PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
 export const PetitionsView: FC = ({ }) => {
@@ -39,7 +39,7 @@ export const PetitionsView: FC = ({ }) => {
 
   const createRegion = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const idl = await Program.fetchIdl(programID, provider)
+    const idl = await useIDL(programID, provider)
 
     const program = new Program(idl, programID, provider)
 
