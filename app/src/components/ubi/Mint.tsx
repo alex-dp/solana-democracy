@@ -43,7 +43,8 @@ export const Mint = ({ info }: MintProps) => {
         }
 
         if (Date.now() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
-            notify({ type: 'error', message: "You minted NUBI less than 24 hours ago" })
+            let hDiff = Math.ceil((Number(info.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
+            notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 && "s"}` })
             return
         }
 

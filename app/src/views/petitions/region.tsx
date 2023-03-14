@@ -60,8 +60,6 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
         const idl = await useIDL(programID, provider)
 
-        console.log(idl)
-
         const program = new Program(idl, programID, provider)
 
         let title = e.target[0].value
