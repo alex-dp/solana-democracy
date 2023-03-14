@@ -15,16 +15,14 @@ import {
     TokenInvalidAccountOwnerError,
 } from "@solana/spl-token";
 
-import idl from '../../ubi_idl.json'
-import { getMint, useIDL } from '../../types/types';
+import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
 
 const { SystemProgram } = web3;
 
-const programID = new PublicKey(idl.metadata.address);
+const programID = new PublicKey(UBI_PROGRAM);
 
 export const InitializeAccount: FC = () => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
-    const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet()
 
     const getProvider = () => {
@@ -55,7 +53,7 @@ export const InitializeAccount: FC = () => {
         let signature: TransactionSignature = '';
 
         let ata = await getAssociatedTokenAddress(
-            new PublicKey(getMint(moniker)), // mint
+            new PublicKey(UBI_MINT), // mint
             wallet.publicKey, // owner
             false // allow owner off curve
         );
@@ -100,7 +98,7 @@ export const InitializeAccount: FC = () => {
                             wallet.publicKey, // payer
                             ata, // ata
                             wallet.publicKey, // owner
-                            new PublicKey(getMint(moniker)) // mint
+                            new PublicKey(UBI_MINT) // mint
                         )
                     );
                     tx.recentBlockhash = latest.blockhash;

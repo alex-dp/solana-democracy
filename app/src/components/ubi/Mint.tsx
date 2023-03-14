@@ -7,15 +7,14 @@ import { Buffer } from 'buffer';
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, web3 } from '@project-serum/anchor';
 
-import idl from '../../ubi_idl.json'
 import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
-import { RawUBIInfo, getMint, useIDL } from '../../types/types';
+import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
 
 const { SystemProgram } = web3;
 
-const programID = new PublicKey(idl.metadata.address);
+const programID = new PublicKey(UBI_PROGRAM);
 
 type MintProps = {
     info: RawUBIInfo
@@ -23,7 +22,6 @@ type MintProps = {
 
 export const Mint = ({ info }: MintProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
-    const moniker = connection.rpcEndpoint.includes("mainnet") ? "mainnet-beta" : "devnet"
     const wallet = useWallet();
 
     const { gatewayToken, requestGatewayToken } = useGateway();
@@ -68,7 +66,7 @@ export const Mint = ({ info }: MintProps) => {
         )
 
         let ata = await getAssociatedTokenAddress(
-            new PublicKey(getMint(moniker)), // mint
+            new PublicKey(UBI_MINT), // mint
             wallet.publicKey, // owner
             false // allow owner off curve
         );
@@ -85,7 +83,7 @@ export const Mint = ({ info }: MintProps) => {
                             wallet.publicKey, // payer
                             ata, // ata
                             wallet.publicKey, // owner
-                            new PublicKey(getMint(moniker)) // mint
+                            new PublicKey(UBI_MINT) // mint
                         )
                     );
 
@@ -122,7 +120,7 @@ export const Mint = ({ info }: MintProps) => {
             let transaction = new Transaction().add(
                 await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
                     mintSigner: mint_signer[0],
-                    ubiMint: getMint(moniker),
+                    ubiMint: UBI_MINT,
                     userAuthority: wallet.publicKey,
                     ubiTokenAccount: ata,
                     ubiInfo: pda[0],
