@@ -40,7 +40,9 @@ export function setWithSeeds(program: Programs, seeds: any[], value) {
     localStorage.setItem(JSON.stringify(seeds), JSON.stringify(value, (k, v) => {
         //TODO big number big hack. please fix me. big numbers get parsed as hex strings
         if (k == "lastIssuance" || k == "expiry") {
-            return Number("0x" + v)
+            if (typeof v == "string")
+                return Number("0x" + v)
+            else return Number(v)
         }
         return v
     }))
