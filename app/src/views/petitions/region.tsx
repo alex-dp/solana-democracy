@@ -30,7 +30,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
-    const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps } = useProposalStore()
+    const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps, clearLiveProps } = useProposalStore()
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
     const provider = getProvider()
@@ -40,15 +40,16 @@ export const RegionView = ({ code, closed }: ViewProps) => {
     let fetchedAll = false
 
     useEffect(() => {
-        if (!fetchedAll && !state) {
-            getState(connection, code);
-        } else if (state) {
-            if (!closed && liveProps.length == 0 && state.liveProps.length != 0)
+
+        if (!fetchedAll) {
+            if (!state) getState(connection, code)
+            else if (!closed && liveProps.length != state.liveProps.length)
                 getLiveProps(connection, state)
-            else if (closedProps.length == 0 && state.closedProps.length != 0)
+            else if (closedProps.length != state.closedProps.length)
                 getClosedProps(connection, state)
-        } else fetchedAll = true;
-    }, [state])
+            else fetchedAll = true;
+        }
+    }, [state, liveProps, closedProps])
 
     let addPetition = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -101,6 +102,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
             signature: signature,
         });
         notify({ type: 'success', message: 'Your petition has been recorded!', txid: signature });
+        clearLiveProps(state.region)
+        getState(connection, state.region)
     }, [gatewayToken, gatewayStatus, connection, wallet])
 
     let date = new Date()

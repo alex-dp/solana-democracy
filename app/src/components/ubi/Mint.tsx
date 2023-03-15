@@ -11,6 +11,7 @@ import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
 import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
+import useUBIInfoStore from 'stores/useUBIInfoStore';
 
 const { SystemProgram } = web3;
 
@@ -25,6 +26,8 @@ export const Mint = ({ info }: MintProps) => {
     const wallet = useWallet();
 
     const { gatewayToken, requestGatewayToken } = useGateway();
+
+    const { getInfo } = useUBIInfoStore();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -147,6 +150,7 @@ export const Mint = ({ info }: MintProps) => {
             });
 
             notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
+            getInfo(connection, wallet.publicKey)
         } catch (error) {
             notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
         }

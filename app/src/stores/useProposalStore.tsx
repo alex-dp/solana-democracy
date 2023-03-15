@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
+import { clearWithSeeds, Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -11,7 +11,8 @@ interface ProposalStore extends State {
     getState: (connection: Connection, region: number) => void;
     getLiveProps: (connection: Connection, state: RawState) => void;
     getClosedProps: (connection: Connection, state: RawState) => void;
-    hasSigned: (connection: Connection, region: number, id: number, pk: PublicKey, sigAddress: PublicKey) => Promise<boolean>
+    hasSigned: (connection: Connection, region: number, id: number, pk: PublicKey, sigAddress: PublicKey) => Promise<boolean>;
+    clearLiveProps: (region: number) => void;
 }
 
 const useProposalStore = create<ProposalStore>((set, _get) => ({
@@ -105,6 +106,10 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         }
 
         return false
+    },
+    clearLiveProps: (region) => {
+        clearWithSeeds(Programs.Petitions, ["d", region])
+        clearWithSeeds(Programs.Petitions, ["liveprops", region])
     }
 }));
 

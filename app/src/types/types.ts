@@ -48,6 +48,11 @@ export function setWithSeeds(program: Programs, seeds: any[], value) {
     }))
 }
 
+export function clearWithSeeds(program: Programs, seeds: any[]) {
+    seeds.splice(0, 0, program)
+    localStorage.removeItem(JSON.stringify(seeds))
+}
+
 export async function useIDL(id: PublicKey, provider: AnchorProvider): Promise<Idl> {
     let idl = localStorage.getItem("idl" + id.toString())
 

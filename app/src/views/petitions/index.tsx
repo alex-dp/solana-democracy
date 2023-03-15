@@ -13,7 +13,7 @@ export const PetitionsView: FC = ({ }) => {
 
   const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
-  const { regionList, getRegions, regStates, getRegStates } = useActiveRegionsStore()
+  const { regionList, getRegions, clearRegions, regStates, getRegStates } = useActiveRegionsStore()
 
   const wallet = useWallet();
 
@@ -35,7 +35,7 @@ export const PetitionsView: FC = ({ }) => {
       if (!regionList) getRegions(connection)
       else getRegStates(connection, regionList)
     }
-  }, [connection, getRegions, regionList, getRegStates, regStates])
+  }, [connection, regionList, regStates])
 
   const createRegion = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -77,6 +77,8 @@ export const PetitionsView: FC = ({ }) => {
       signature: signature,
     });
     notify({ type: 'success', message: `Region ${desc} has been listed!`, txid: signature });
+    clearRegions()
+    getRegions(connection)
   }, [connection, regionList])
 
   return (
