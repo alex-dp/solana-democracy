@@ -17,6 +17,7 @@ type CardProps = {
     expiry: number, //unix timestamp
     closed: boolean,
     signatures: number,
+    single?: boolean
 };
 
 const PetitionCard = ({
@@ -28,6 +29,7 @@ const PetitionCard = ({
     expiry, //unix timestamp
     closed,
     signatures,
+    single
 }: CardProps) => {
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
@@ -51,6 +53,11 @@ const PetitionCard = ({
     const programID = new PublicKey(PETITION_PROGRAM)
 
     const sign = useCallback(async () => {
+
+        if (!wallet.connected) {
+            notify({ type: "info", message: "Please connect your wallet" })
+            return
+        }
 
         if (!gatewayToken) {
             requestGatewayToken()
@@ -109,13 +116,16 @@ const PetitionCard = ({
             <div className="card-body">
                 <div className="flex flex-row place-content-between">
                     <p className="card-title w-fit">{title}</p>
-                    <Link href={`/petitions/${region}/${id}`}>
-                        <button className="btn btn-square">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.25 42.7q-1.6 0-2.775-1.175Q5.3 40.35 5.3 38.75V9.25q0-1.65 1.175-2.825Q7.65 5.25 9.25 5.25h13.7v4H9.25v29.5h29.5v-13.7h4v13.7q0 1.6-1.175 2.775Q40.4 42.7 38.75 42.7Zm10.5-11.65L17 28.25l19-19H25.95v-4h16.8v16.8h-4v-10Z" />
-                            </svg>
-                        </button>
-                    </Link>
+                    {
+                        !single &&
+                        <Link href={`/petitions/${region}/${id}`}>
+                            <button className="btn btn-square">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.25 42.7q-1.6 0-2.775-1.175Q5.3 40.35 5.3 38.75V9.25q0-1.65 1.175-2.825Q7.65 5.25 9.25 5.25h13.7v4H9.25v29.5h29.5v-13.7h4v13.7q0 1.6-1.175 2.775Q40.4 42.7 38.75 42.7Zm10.5-11.65L17 28.25l19-19H25.95v-4h16.8v16.8h-4v-10Z" />
+                                </svg>
+                            </button>
+                        </Link>
+                    }
                 </div>
                 <a href={link.toString()} className="underline">info ↗️</a>
                 {signatures} signature{signatures != 1 && "s"}
@@ -126,7 +136,6 @@ const PetitionCard = ({
                         closed ?
                             <button className="btn btn-disabled">closed</button>
                             :
-                            wallet.connected &&
                             <button className="btn btn-active btn-primary gap-2" onClick={sign}>
                                 Sign
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48"><path d="M4 48v-6.35h40V48Zm3.95-11.65v-6.8L26.7 10.8l6.85 6.85-18.75 18.7Zm27.65-20.8L28.8 8.7l4.25-4.3q.6-.65 1.35-.675.75-.025 1.5.675l3.9 3.9q.7.7.7 1.5t-.6 1.45Z" /></svg>

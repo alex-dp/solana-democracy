@@ -38,9 +38,9 @@ export const InitializeAccount: FC = () => {
 
         const idl = await useIDL(programID, getProvider())
 
-        if (!wallet.publicKey) {
-            notify({ type: 'error', message: 'Please connect your wallet' });
-            return;
+        if (!wallet.connected) {
+            notify({ type: "info", message: "Please connect your wallet" })
+            return
         }
 
         let pda = PublicKey.findProgramAddressSync(

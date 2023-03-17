@@ -40,6 +40,11 @@ export const Mint = ({ info }: MintProps) => {
 
     const onClick = useCallback(async () => {
 
+        if (!wallet.connected) {
+            notify({ type: "info", message: "Please connect your wallet" })
+            return
+        }
+
         if (!gatewayToken) {
             requestGatewayToken()
             return
@@ -53,11 +58,6 @@ export const Mint = ({ info }: MintProps) => {
         }
 
         let idl = await useIDL(programID, getProvider())
-
-        if (!wallet.publicKey) {
-            notify({ type: 'error', message: 'Please connect your wallet' });
-            return;
-        }
 
         let provider: AnchorProvider = null
 

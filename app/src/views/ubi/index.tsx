@@ -20,7 +20,7 @@ export const UBIView = () => {
 
   useEffect(() => {
     if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
-  }, [connection])
+  }, [connection, wallet.connected])
 
   return (
 
@@ -54,18 +54,16 @@ export const UBIView = () => {
             </button>
           </Link>
 
-          {
-            wallet.connected &&
-            <GatewayProvider
-              wallet={wallet}
-              gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
-              connection={connection}
-              options={{ autoShowModal: false }}>
+          <GatewayProvider
+            wallet={wallet}
+            gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
+            connection={connection}
+            options={{ autoShowModal: false }}>
 
-              {!initialized && !info ? <InitializeAccount /> : <Mint info={info} />}
+            {!initialized && !info ? <InitializeAccount /> : <Mint info={info} />}
 
-            </GatewayProvider>
-          }
+          </GatewayProvider>
+
           <Swap />
 
         </div>

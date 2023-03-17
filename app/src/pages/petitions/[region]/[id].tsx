@@ -66,7 +66,7 @@ const RegionPage: NextPage = () => {
                                 connection={connection}
                                 cluster={"mainnet"}
                                 options={{ autoShowModal: false }}>
-                                <PetitionCard {...proposal} />
+                                <PetitionCard {...proposal} single={true} />
                             </GatewayProvider>
                         }
                     </div>
