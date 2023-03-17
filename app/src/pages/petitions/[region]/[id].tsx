@@ -31,14 +31,14 @@ const RegionPage: NextPage = () => {
             propID = router.query.id
         }
 
-        if (regionID != null && !state) {
+        if (regionID != null && (!state || Number(regionID.toString()) != state?.region)) {
             getState(connection, Number(regionID.toString()))
         }
 
-        if (regionID != null && !proposal) {
+        if (regionID != null && (!proposal || Number(propID.toString()) != proposal?.id)) {
             getProposal(connection, Number(regionID.toString()), Number(propID.toString()))
         }
-    }, [router.isReady, proposal, state])
+    }, [router.isReady, proposal, state, router.query])
 
     return (
         <div>
