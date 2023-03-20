@@ -1,6 +1,7 @@
 import { useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, BN, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
@@ -32,6 +33,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps, clearLiveProps } = useProposalStore()
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
+    const { setVisible } = useWalletModal();
 
     const provider = getProvider()
 
@@ -55,7 +57,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         e.preventDefault()
 
         if (!wallet.connected) {
-            notify({ type: "info", message: "Please connect your wallet" })
+            setVisible(true)
             return
         }
 

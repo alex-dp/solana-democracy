@@ -1,5 +1,6 @@
 import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { OSS } from "components/OSS";
 import RegionRow from "components/petition/RegionRow";
@@ -28,6 +29,8 @@ export const PetitionsView: FC = ({ }) => {
 
   const provider = getProvider()
 
+  const { setVisible } = useWalletModal();
+
   const programID = new PublicKey(PETITION_PROGRAM)
 
   useEffect(() => {
@@ -41,7 +44,7 @@ export const PetitionsView: FC = ({ }) => {
     e.preventDefault()
 
     if (!wallet.connected) {
-      notify({ type: "info", message: "Please connect your wallet" })
+      setVisible(true)
       return
     }
 
@@ -85,7 +88,7 @@ export const PetitionsView: FC = ({ }) => {
     notify({ type: 'success', message: `Region ${desc} has been listed!`, txid: signature });
     clearRegions()
     getRegions(connection)
-  }, [connection, regionList])
+  }, [connection, regionList, wallet])
 
   return (
     <div className="md:hero mx-auto p-4">

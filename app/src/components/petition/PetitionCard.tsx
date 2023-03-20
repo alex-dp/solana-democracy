@@ -1,6 +1,7 @@
 import { useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -35,6 +36,8 @@ const PetitionCard = ({
 
     const { hasSigned } = useProposalStore();
 
+    const { setVisible } = useWalletModal();
+
     const wallet = useWallet();
 
     const getProvider = () => {
@@ -55,7 +58,7 @@ const PetitionCard = ({
     const sign = useCallback(async () => {
 
         if (!wallet.connected) {
-            notify({ type: "info", message: "Please connect your wallet" })
+            setVisible(true)
             return
         }
 

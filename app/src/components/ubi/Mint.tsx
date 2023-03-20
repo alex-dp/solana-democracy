@@ -12,6 +12,7 @@ import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedToken
 import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
 import useUBIInfoStore from 'stores/useUBIInfoStore';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 
 const { SystemProgram } = web3;
 
@@ -27,6 +28,8 @@ export const Mint = ({ info }: MintProps) => {
 
     const { gatewayToken, requestGatewayToken } = useGateway();
 
+    const { setVisible } = useWalletModal();
+
     const { getInfo } = useUBIInfoStore();
 
     const getProvider = () => {
@@ -41,7 +44,7 @@ export const Mint = ({ info }: MintProps) => {
     const onClick = useCallback(async () => {
 
         if (!wallet.connected) {
-            notify({ type: "info", message: "Please connect your wallet" })
+            setVisible(true)
             return
         }
 
@@ -155,7 +158,7 @@ export const Mint = ({ info }: MintProps) => {
             notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
         }
 
-    }, [wallet.publicKey, connection]);
+    }, [wallet, connection]);
 
     return (
 

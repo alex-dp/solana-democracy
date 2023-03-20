@@ -16,6 +16,7 @@ import {
 } from "@solana/spl-token";
 
 import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 
 const { SystemProgram } = web3;
 
@@ -24,6 +25,8 @@ const programID = new PublicKey(UBI_PROGRAM);
 export const InitializeAccount: FC = () => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const wallet = useWallet()
+
+    const { setVisible } = useWalletModal();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -39,7 +42,7 @@ export const InitializeAccount: FC = () => {
         const idl = await useIDL(programID, getProvider())
 
         if (!wallet.connected) {
-            notify({ type: "info", message: "Please connect your wallet" })
+            setVisible(true)
             return
         }
 
@@ -130,7 +133,7 @@ export const InitializeAccount: FC = () => {
 
         }
 
-    }, [wallet.publicKey, connection]);
+    }, [wallet, connection]);
 
     return (
         <button
