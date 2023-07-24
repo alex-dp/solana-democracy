@@ -111,6 +111,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         notify({ type: 'success', message: 'Your petition has been recorded!', txid: signature });
         clearLiveProps(state.region)
         getState(connection, state.region)
+        getLiveProps(connection, state)
     }, [gatewayToken, gatewayStatus, connection, wallet])
 
     let date = new Date()

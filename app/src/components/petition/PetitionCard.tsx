@@ -5,6 +5,7 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
 import { useCallback } from "react";
+import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
@@ -31,6 +32,8 @@ const PetitionCard = ({
     signatures,
     single
 }: CardProps) => {
+    const { clearLiveProps, getState, getLiveProps, state } = useProposalStore()
+
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 
     const { setVisible } = useWalletModal();
@@ -84,7 +87,7 @@ const PetitionCard = ({
         const program = new Program(idl, PETITION_PROGRAM, provider)
 
         let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
-        let state = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
+        let stateAddr = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
 
         let tx = new Transaction();
         tx.add(
@@ -92,7 +95,7 @@ const PetitionCard = ({
                 proposal: propAddress[0],
                 signature: sigAddress[0],
                 gatewayToken: gatewayToken.publicKey,
-                regionalState: state[0],
+                regionalState: stateAddr[0],
                 userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
                 systemProgram: SystemProgram.programId
@@ -111,6 +114,10 @@ const PetitionCard = ({
             signature: signature,
         });
         notify({ type: 'success', message: 'Petition signed successfully!', txid: signature });
+
+        clearLiveProps(region)
+        getState(connection, region)
+        getLiveProps(connection, state)
     }, [wallet, connection, gatewayToken, gatewayStatus])
 
     return (
@@ -150,4 +157,3 @@ const PetitionCard = ({
 };
 
 export default PetitionCard;
-
