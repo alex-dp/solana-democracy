@@ -1,12 +1,12 @@
 [package]
-name = "solana-ubi"
+name = "solana-fundraisers"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "solana_ubi"
+name = "solana_fundraisers"
 
 [features]
 no-entrypoint = []
@@ -17,6 +17,3 @@ default = []
 
 [dependencies]
 anchor-lang = "0.25.0"
-anchor-spl = "0.25.0"
-anchor-derive-accounts = {version = "0.25.0" }
-solana-gateway = "0.2.2"

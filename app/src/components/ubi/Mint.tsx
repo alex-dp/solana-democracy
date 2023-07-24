@@ -116,7 +116,6 @@ export const Mint = ({ info }: MintProps) => {
 
         const program = new Program(idl, programID, provider)
 
-
         let signature: TransactionSignature = '';
         try {
 

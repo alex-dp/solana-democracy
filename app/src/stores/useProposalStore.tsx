@@ -11,7 +11,6 @@ interface ProposalStore extends State {
     getState: (connection: Connection, region: number) => void;
     getLiveProps: (connection: Connection, state: RawState) => void;
     getClosedProps: (connection: Connection, state: RawState) => void;
-    hasSigned: (connection: Connection, region: number, id: number, pk: PublicKey, sigAddress: PublicKey) => Promise<boolean>;
     clearLiveProps: (region: number) => void;
 }
 
@@ -92,20 +91,6 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         set((s) => {
             s.liveProps = cp.object
         })
-    },
-    hasSigned: async (connection, region, id, pk, sigAddress) => {
-        let sig = getWithSeeds(Programs.Petitions, ["s", pk, region, id])
-
-        if (sig) return true
-
-        let sigAcc = await connection.getAccountInfo(sigAddress)
-
-        if (sigAcc) {
-            setWithSeeds(Programs.Petitions, ["s", pk, region, id], true)
-            return true
-        }
-
-        return false
     },
     clearLiveProps: (region) => {
         clearWithSeeds(Programs.Petitions, ["d", region])

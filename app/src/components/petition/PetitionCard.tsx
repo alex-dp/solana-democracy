@@ -5,7 +5,6 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
 import { useCallback } from "react";
-import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
@@ -33,8 +32,6 @@ const PetitionCard = ({
     single
 }: CardProps) => {
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
-
-    const { hasSigned } = useProposalStore();
 
     const { setVisible } = useWalletModal();
 
@@ -75,7 +72,9 @@ const PetitionCard = ({
 
         let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], programID)
 
-        if (hasSigned(connection, region, id, wallet.publicKey, sigAddress[0])) {
+        let sigAcc = await connection.getAccountInfo(sigAddress[0])
+
+        if (sigAcc != null) {
             notify({ type: "error", message: "You have already signed this petition" })
             return
         }

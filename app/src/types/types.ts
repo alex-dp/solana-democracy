@@ -32,7 +32,7 @@ export function expired(o: Expirable<any>) {
 
 export function getWithSeeds(program: Programs, seeds: any[]) {
     seeds.splice(0, 0, program)
-    return JSON.parse(localStorage.getItem(JSON.stringify(seeds)),)
+    return JSON.parse(localStorage.getItem(JSON.stringify(seeds)))
 }
 
 export function setWithSeeds(program: Programs, seeds: any[], value) {
