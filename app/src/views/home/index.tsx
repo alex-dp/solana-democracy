@@ -7,11 +7,11 @@ export const HomeView = () => {
     <div className='md:hero mx-auto p-4'>
       <div className="md:hero-content flex flex-col">
 
-        <h1 className="text-center text-5xl md:pl-12 font-bold text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-purple-600 py-8">
-          Solana Democracy Suite
+        <h1 className="text-center text-5xl md:pl-12 font-bold text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-purple-600 pt-8 pb-4">
+          Argon Suite
         </h1>
-        <h4 className="md:w-full text-2xl md:text-4xl text-center text-slate-300 my-2">
-          <p>Community-funded tools for sociopolitical purposes</p>
+        <h4 className="md:w-full text-2xl md:text-4xl text-center text-slate-300 mb-2">
+          <p>Community-funded open source tools for direct democracy on Solana</p>
           <OSS />
         </h4>
 
