@@ -43,10 +43,10 @@ const RegionPage: NextPage = () => {
     return (
         <div>
             <Head>
-                <title>Petition | Solana Democracy Suite</title>
+                <title>Petition | Argon Suite</title>
                 <meta
                     name="description"
-                    content="Petition | Solana Democracy Suite"
+                    content="Petition | Argon Suite"
                 />
             </Head>
             <div className="md:hero mx-auto p-4">

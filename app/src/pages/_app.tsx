@@ -13,7 +13,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
-        <title>Solana Democracy Suite</title>
+        <title>Argon Suite</title>
       </Head>
 
       <ContextProvider>
