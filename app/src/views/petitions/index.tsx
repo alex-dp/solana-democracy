@@ -93,9 +93,9 @@ export const PetitionsView: FC = ({ }) => {
   return (
     <div className="md:hero mx-auto p-4">
       <div className="hero-content flex flex-col">
-        <h1 className="text-center text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-[#c53fe9ff] to-blue-600 py-8">
-          Petitions
-        </h1>
+        <p className="pt-8 pb-4 mx-auto">
+          <img src='argonpetitions.svg' className='h-16' />
+        </p>
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
           <Link href={`/`}>
