@@ -23,7 +23,7 @@ export const AppBar: FC = () => {
           <div className="hidden sm:inline w-22 h-22 md:p-2 ml-4">
             <Link href="https://argonsuite.org" target="_blank" rel="noopener noreferrer" passHref className="text-secondary hover:text-white">
               <div className='flex flex-row place-content-center'>
-                <img src="argon.svg" className='h-36' />
+                <img src="argon.svg" className='h-24' />
               </div>
             </Link>
           </div>
