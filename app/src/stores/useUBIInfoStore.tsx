@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, UBI_PROGRAM } from 'types/types';
+import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, UBI_PROGRAM, clearWithSeeds } from 'types/types';
 
 const programID = new PublicKey(UBI_PROGRAM);
 
@@ -8,6 +8,7 @@ interface UBIInfoStore extends State {
     info: RawUBIInfo;
     initialized: boolean;
     getInfo: (connection: Connection, pk: PublicKey) => void;
+    clearInfo: (pk: PublicKey) => void;
 }
 
 const useUBIInfoStore = create<UBIInfoStore>((set, _get) => ({
@@ -36,6 +37,9 @@ const useUBIInfoStore = create<UBIInfoStore>((set, _get) => ({
             else s.initialized = false
         })
     },
+    clearInfo: (pk) => {
+        clearWithSeeds(Programs.UBI, ["ubi_info3", pk.toString()])
+    }
 }));
 
 export default useUBIInfoStore;

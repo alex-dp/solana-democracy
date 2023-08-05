@@ -30,7 +30,7 @@ export const Mint = ({ info }: MintProps) => {
 
     const { setVisible } = useWalletModal();
 
-    const { getInfo } = useUBIInfoStore();
+    const { getInfo, clearInfo } = useUBIInfoStore();
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -153,6 +153,7 @@ export const Mint = ({ info }: MintProps) => {
             });
 
             notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
+            clearInfo(wallet.publicKey)
             getInfo(connection, wallet.publicKey)
         } catch (error) {
             notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
