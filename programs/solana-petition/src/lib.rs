@@ -4,6 +4,7 @@ use std::str::FromStr;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
 use solana_gateway::Gateway;
+use anchor_spl::token::{self, Mint, Transfer, TokenAccount};
 
 declare_id!("E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8");
 
@@ -18,7 +19,7 @@ fn resize<'info>(account: &mut AccountInfo<'info>, size_diff: i16, payer: &mut A
     if size_diff == 0 { return (); }
     let rent = Rent::get().unwrap();
     let new_size = (account.data_len() as i16 + size_diff) as usize;
-    let new_minimum_balance = rent.minimum_balance(new_size);
+    let new_minimum_balance = rent.minimum_balance(new_size.clone());
 
     let lamports_diff = new_minimum_balance.saturating_sub(account.lamports());
     invoke(
@@ -54,9 +55,9 @@ pub mod solana_petition {
 
         resize(&mut active_regions.to_account_info(), size_of::<u8>() as i16, user_auth, &mut sp.to_account_info());
 
-        active_regions.list.push(acc.region);
+        active_regions.list.push(acc.region.clone());
 
-        gk_link.region = acc.region;
+        gk_link.region = acc.region.clone();
         Ok(())
     }
 
@@ -73,7 +74,7 @@ pub mod solana_petition {
         let user_auth = &mut ctx.accounts.user_authority;
         let sp = &mut ctx.accounts.system_program;
 
-        proposal.id = state.last_id + 1;
+        proposal.id = &state.last_id + 1;
         proposal.creator = *user_auth.key;
         proposal.title = title;
         proposal.link = link;
@@ -83,8 +84,17 @@ pub mod solana_petition {
         proposal.signatures = 0;
 
         resize(&mut state.to_account_info(), size_of::<u32>() as i16,user_auth, &mut sp.to_account_info());
-        state.live_proposals.push(proposal.id);
-        state.last_id = proposal.id;
+        state.live_proposals.push(proposal.id.clone());
+        state.last_id = proposal.id.clone();
+
+        let cpi_accounts = Transfer {
+            from: ctx.accounts.owner_isc.to_account_info(),
+            to: ctx.accounts.platform_isc.to_account_info(),
+            authority: user_auth.clone(),
+        };
+        let cpi_program = ctx.accounts.token_program.clone();
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        token::transfer(cpi_ctx, 5 * 1000000)?;
 
         Ok(())
     }
@@ -115,7 +125,7 @@ pub mod solana_petition {
             None,
         ).is_ok() {
             true => {
-                proposal.signatures = proposal.signatures + 1;
+                proposal.signatures = &proposal.signatures + 1;
                 return Ok(())
             }
             false => { panic!("cannot verify token") }
@@ -129,7 +139,7 @@ pub mod solana_petition {
         prop.closed = true;
 
         state.live_proposals.retain(|x| x != &prop.id);
-        state.closed_proposals.push(prop.id);
+        state.closed_proposals.push(prop.id.clone());
         Ok(())
     }
 }
@@ -220,6 +230,19 @@ pub struct CreateProposal <'info> {
     /// CHECK: x
     #[account(mut, address = Pubkey::from_str(FEE_ADDRESS).ok().unwrap())]
     pub platform_fee_account: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub owner_isc: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub platform_isc: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub isc_mint: Account<'info, Mint>,
+
+    /// CHECK: x
+    #[account(constraint = token_program.key == &token::ID)]
+    pub token_program: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
 

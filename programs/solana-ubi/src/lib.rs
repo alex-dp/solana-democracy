@@ -10,14 +10,14 @@ const INITIAL_CAP: u128 = 20__000_000_000__000_000_000;
 
 declare_id!("EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd");
 
-pub fn rate(cap_left: u128) -> u64 {
-    if cap_left == 0 {
+pub fn rate(cap_left: &u128) -> u64 {
+    if *cap_left == 0 {
         return 20_000_000_000;
     }
     // 1B    + 19B        e^ (c_left/c_i)
     // 10**9 + 19*10**9 * e**(fraction_cap_left)
     1_000_000_000_u64
-        + ((19_000_000_000_f64) * (2.73_f64.powf((cap_left as f64 / INITIAL_CAP as f64) as f64)))
+        + ((19_000_000_000_f64) * (2.73_f64.powf((cap_left.clone() as f64 / INITIAL_CAP as f64) as f64)))
             as u64
 }
 
@@ -35,7 +35,7 @@ pub mod solana_ubi {
 
         // variable rate starts at ~50 tok per day (9 decimal places)
         // daily rate * secs elapsed / secs in a day
-        let amount = rate(state.cap_left) * (now_ts - ubi_info.last_issuance).div(86400) as u64;
+        let amount = rate(&state.cap_left) * (&now_ts - &ubi_info.last_issuance).div(86400) as u64;
 
         let seeds = &[MINTER.as_bytes(), &[255]];
         let signer = &[&seeds[..]];
@@ -46,7 +46,7 @@ pub mod solana_ubi {
         };
         let cpi_program = ctx.accounts.token_program.clone();
         let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-        token::mint_to(cpi_ctx, amount)?;
+        token::mint_to(cpi_ctx, amount.clone())?;
 
         ubi_info.last_issuance = now_ts;
         state.cap_left = state.cap_left.saturating_sub(amount as u128);
