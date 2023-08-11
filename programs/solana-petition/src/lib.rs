@@ -1,12 +1,12 @@
-use anchor_lang::{prelude::*};
-use std::mem::size_of;
-use std::str::FromStr;
+use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program::invoke;
 use anchor_lang::solana_program::system_instruction;
+use anchor_spl::token::{self, Mint, TokenAccount, Transfer};
 use solana_gateway::Gateway;
-use anchor_spl::token::{self, Mint, Transfer, TokenAccount};
+use std::mem::size_of;
+use std::str::FromStr;
 
-declare_id!("E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8");
+declare_id!("78CbaxW47AoFLNqMPQNMUMSYhtbpGJA2pfdXHUExxz6o");
 
 const STATE: &str = "d";
 const PROPOSAL: &str = "p";
@@ -14,9 +14,18 @@ const SIGNATURE: &str = "s";
 const REGIONS: &str = "r";
 
 const FEE_ADDRESS: &str = "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv";
+const ISC_MINT: &str = "J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD";
+const PLATFORM_ISC: &str = "FKaxZ2sxmkQBTTqyPoWsRP6CiEHRotMppcis6zewdzoM";
 
-fn resize<'info>(account: &mut AccountInfo<'info>, size_diff: i16, payer: &mut AccountInfo<'info>, system_program: &mut AccountInfo<'info>) {
-    if size_diff == 0 { return (); }
+fn resize<'info>(
+    account: &mut AccountInfo<'info>,
+    size_diff: i16,
+    payer: &mut AccountInfo<'info>,
+    system_program: &mut AccountInfo<'info>,
+) {
+    if size_diff == 0 {
+        return ();
+    }
     let rent = Rent::get().unwrap();
     let new_size = (account.data_len() as i16 + size_diff) as usize;
     let new_minimum_balance = rent.minimum_balance(new_size.clone());
@@ -24,12 +33,9 @@ fn resize<'info>(account: &mut AccountInfo<'info>, size_diff: i16, payer: &mut A
     let lamports_diff = new_minimum_balance.saturating_sub(account.lamports());
     invoke(
         &system_instruction::transfer(payer.key, account.key, lamports_diff),
-        &[
-            payer.clone(),
-            account.clone(),
-            system_program.clone(),
-        ],
-    ).unwrap();
+        &[payer.clone(), account.clone(), system_program.clone()],
+    )
+    .unwrap();
 
     account.realloc(new_size, false).unwrap();
 }
@@ -46,14 +52,22 @@ pub mod solana_petition {
         let sp = &mut ctx.accounts.system_program;
         let gk_link = &mut ctx.accounts.gk_link;
 
-        acc.region = match active_regions.list.last() { None => {0} Some(x) => {x + 1} };
+        acc.region = match active_regions.list.last() {
+            None => 0,
+            Some(x) => x + 1,
+        };
         acc.description = description;
         acc.live_proposals = vec![];
         acc.closed_proposals = vec![];
         acc.gatekeeper = gk.key.clone();
         acc.last_id = 0;
 
-        resize(&mut active_regions.to_account_info(), size_of::<u8>() as i16, user_auth, &mut sp.to_account_info());
+        resize(
+            &mut active_regions.to_account_info(),
+            size_of::<u8>() as i16,
+            user_auth,
+            &mut sp.to_account_info(),
+        );
 
         active_regions.list.push(acc.region.clone());
 
@@ -61,14 +75,20 @@ pub mod solana_petition {
         Ok(())
     }
 
-    pub fn initialize_reg_list(ctx:Context<IRL>) -> Result<()> {
+    pub fn initialize_reg_list(ctx: Context<IRL>) -> Result<()> {
         let acc = &mut ctx.accounts.active_regions;
 
         acc.list = vec![];
         Ok(())
     }
 
-    pub fn create_proposal(ctx: Context<CreateProposal>, region: u8, title: String, link: String, expiry: i64) -> Result<()> {
+    pub fn create_proposal(
+        ctx: Context<CreateProposal>,
+        region: u8,
+        title: String,
+        link: String,
+        expiry: i64,
+    ) -> Result<()> {
         let proposal = &mut ctx.accounts.proposal;
         let state = &mut ctx.accounts.regional_state;
         let user_auth = &mut ctx.accounts.user_authority;
@@ -83,7 +103,12 @@ pub mod solana_petition {
         proposal.closed = false;
         proposal.signatures = 0;
 
-        resize(&mut state.to_account_info(), size_of::<u32>() as i16,user_auth, &mut sp.to_account_info());
+        resize(
+            &mut state.to_account_info(),
+            size_of::<u32>() as i16,
+            user_auth,
+            &mut sp.to_account_info(),
+        );
         state.live_proposals.push(proposal.id.clone());
         state.last_id = proposal.id.clone();
 
@@ -94,7 +119,7 @@ pub mod solana_petition {
         };
         let cpi_program = ctx.accounts.token_program.clone();
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-        token::transfer(cpi_ctx, 5 * 1000000)?;
+        token::transfer(cpi_ctx, 2 * 10_u64.pow(6))?;
 
         Ok(())
     }
@@ -110,10 +135,10 @@ pub mod solana_petition {
                 accounts: &mut CloseProposal {
                     creator: user_auth.to_owned(),
                     proposal: proposal.clone(),
-                    regional_state: state.clone()
+                    regional_state: state.clone(),
                 },
                 remaining_accounts: &[],
-                bumps: ctx.bumps
+                bumps: ctx.bumps,
             });
         }
 
@@ -123,12 +148,16 @@ pub mod solana_petition {
             &user_auth.key,
             &state.gatekeeper,
             None,
-        ).is_ok() {
+        )
+        .is_ok()
+        {
             true => {
                 proposal.signatures = &proposal.signatures + 1;
-                return Ok(())
+                return Ok(());
             }
-            false => { panic!("cannot verify token") }
+            false => {
+                panic!("cannot verify token")
+            }
         };
     }
 
@@ -198,7 +227,7 @@ pub struct IRL<'info> {
 
 #[derive(Accounts)]
 #[instruction(region: u8, title: String, link: String, expiry: i64)]
-pub struct CreateProposal <'info> {
+pub struct CreateProposal<'info> {
     #[account(
         init,
         payer = user_authority,
@@ -231,13 +260,23 @@ pub struct CreateProposal <'info> {
     #[account(mut, address = Pubkey::from_str(FEE_ADDRESS).ok().unwrap())]
     pub platform_fee_account: AccountInfo<'info>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        token::mint = isc_mint,
+        token::authority = user_authority,
+    )]
     pub owner_isc: Account<'info, TokenAccount>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        address = Pubkey::from_str(PLATFORM_ISC).ok().unwrap()
+    )]
     pub platform_isc: Account<'info, TokenAccount>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        address = Pubkey::from_str(ISC_MINT).ok().unwrap()
+    )]
     pub isc_mint: Account<'info, Mint>,
 
     /// CHECK: x
@@ -250,7 +289,7 @@ pub struct CreateProposal <'info> {
 }
 
 #[derive(Accounts)]
-pub struct SignProposal <'info> {
+pub struct SignProposal<'info> {
     #[account(
         mut,
         seeds = [PROPOSAL.as_bytes(), &proposal.region.to_be_bytes(), &proposal.id.to_be_bytes()],
@@ -286,7 +325,7 @@ pub struct SignProposal <'info> {
 }
 
 #[derive(Accounts)]
-pub struct CloseProposal <'info> {
+pub struct CloseProposal<'info> {
     /// CHECK: x
     #[account(signer, mut)]
     pub creator: AccountInfo<'info>,
@@ -316,7 +355,7 @@ pub struct State {
     region: u8,
     description: String,
     gatekeeper: Pubkey,
-    last_id: u32
+    last_id: u32,
 }
 
 impl State {
@@ -346,7 +385,7 @@ impl Proposal {
 
 #[account]
 pub struct ActiveRegions {
-    list: Vec<u8>
+    list: Vec<u8>,
 }
 
 impl ActiveRegions {
@@ -355,5 +394,5 @@ impl ActiveRegions {
 
 #[account]
 pub struct GKLink {
-    region: u8
+    region: u8,
 }

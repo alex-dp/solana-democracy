@@ -25,14 +25,18 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
             )
 
             let acc = await connection.getAccountInfo(pda[0])
-            regionList = new Expirable<RawActiveRegions>(Date.now() + 30 * 60 * 1000, ActiveRegionsLayout.decode(acc.data))
 
-            setWithSeeds(Programs.Petitions, ["r"], regionList)
+            if (acc) {
+                regionList = new Expirable<RawActiveRegions>(Date.now() + 30 * 60 * 1000, ActiveRegionsLayout.decode(acc.data))
+                setWithSeeds(Programs.Petitions, ["r"], regionList)
+            }
         }
 
-        set((s) => {
-            s.regionList = regionList.object
-        })
+        if (regionList) {
+            set((s) => {
+                s.regionList = regionList.object
+            })
+        }
     },
     getRegStates: async (connection, list) => {
 
@@ -54,9 +58,12 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
 
             setWithSeeds(Programs.Petitions, ["regstates"], regStates)
         }
-        set((s) => {
-            s.regStates = regStates
-        })
+
+        if (regStates) {
+            set((s) => {
+                s.regStates = regStates
+            })
+        }
     },
     clearRegions: () => {
         clearWithSeeds(Programs.Petitions, ["r"])

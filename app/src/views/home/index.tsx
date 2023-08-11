@@ -1,7 +1,10 @@
 import { OSS } from 'components/OSS';
 import { ProgramCard } from 'components/ProgramCard';
+import { clearAll } from 'types/types';
 
 export const HomeView = () => {
+
+  clearAll()
 
   return (
     <div className='md:hero mx-auto p-4'>

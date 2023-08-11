@@ -48,9 +48,37 @@ export const PetitionsView: FC = ({ }) => {
       return
     }
 
-    const idl = await useIDL(programID, provider)
+    const idl = await Program.fetchIdl(programID, provider)
 
     const program = new Program(idl, programID, provider)
+
+    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], programID)
+
+    let regs = await connection.getAccountInfo(regpda[0])
+
+    if (!regs) {
+      let tx = new Transaction();
+      tx.add(
+        await program.methods.initializeRegList().accounts({
+          userAuthority: wallet.publicKey,
+          activeRegions: regpda[0],
+          systemProgram: SystemProgram.programId
+        }).instruction()
+      );
+
+      let signature = await wallet.sendTransaction(tx, connection);
+
+      notify({ type: 'info', message: `Initializing program state...`, txid: signature });
+
+      const latestBlockHash = await connection.getLatestBlockhash();
+
+      await connection.confirmTransaction({
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        signature: signature,
+      });
+      notify({ type: 'success', message: `Region list created`, txid: signature });
+    }
 
     let regbuf = Buffer.from([0])
     regbuf.writeUInt8(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
@@ -59,7 +87,6 @@ export const PetitionsView: FC = ({ }) => {
     let gk = new PublicKey(e.target[1].value.toString())
 
     let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
-    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], programID)
     let gkLinkPda = PublicKey.findProgramAddressSync([gk.toBuffer()], programID)
 
     let tx = new Transaction();

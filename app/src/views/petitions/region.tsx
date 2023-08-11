@@ -1,14 +1,16 @@
 import { useGateway } from "@civic/solana-gateway-react";
 import { AnchorProvider, BN, Program } from "@project-serum/anchor";
+import { TOKEN_PROGRAM_ID, TokenAccountNotFoundError, TokenInvalidAccountOwnerError, getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
+import { GetISC } from "components/GetISC"
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
-import { PETITION_PROGRAM, useIDL } from "types/types";
+import { ISC_MINT, PETITION_PROGRAM, useIDL } from "types/types";
 import { notify } from "utils/notifications";
 
 type ViewProps = {
@@ -44,14 +46,18 @@ export const RegionView = ({ code, closed }: ViewProps) => {
     useEffect(() => {
 
         if (!fetchedAll) {
-            if (!state) getState(connection, code)
-            else if (!closed && liveProps.length != state.liveProps.length)
-                getLiveProps(connection, state)
-            else if (closedProps.length != state.closedProps.length)
-                getClosedProps(connection, state)
-            else fetchedAll = true;
+            if (!state || state.region != code) {
+                getState(connection, code)
+            } else if (state) {
+                if (!closed)
+                    getLiveProps(connection, state)
+                else
+                    getClosedProps(connection, state)
+
+                fetchedAll = true;
+            }
         }
-    }, [state, liveProps, closedProps])
+    }, [state])
 
     let addPetition = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -85,15 +91,36 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
         let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
 
+        let ata = await getAssociatedTokenAddress(
+            new PublicKey(ISC_MINT), // mint
+            wallet.publicKey, // owner
+            false // allow owner off curve
+        );
+
+        let a = null
+
+        try {
+            a = await getAccount(connection, ata);
+        } catch (error: unknown) {
+            if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
+                notify({ type: 'error', message: 'Please acquire at least 2 ISC for this transaction' });
+                return
+            }
+        }
+
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({
                 proposal: ppda[0],
                 regionalState: statepda[0],
                 gatewayToken: gatewayToken.publicKey,
-                userAuthority: "7KJGpvi9KdS6eFNwofcVqLQeqPTbUnGTcQShJzsqdqdv",
+                userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
                 systemProgram: SystemProgram.programId,
-                rent: SYSVAR_RENT_PUBKEY
+                rent: SYSVAR_RENT_PUBKEY,
+                ownerIsc: ata,
+                platformIsc: "FKaxZ2sxmkQBTTqyPoWsRP6CiEHRotMppcis6zewdzoM",
+                iscMint: ISC_MINT,
+                tokenProgram: TOKEN_PROGRAM_ID
             }).instruction()
         );
 
@@ -150,8 +177,9 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                 <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
 
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-                    <label className="modal-box" htmlFor="">
+                    <label className="modal-box text-center" htmlFor="">
                         <h3 className="text-lg font-bold my-6 text-center">Create a proposal</h3>
+
                         <form onSubmit={addPetition} className="flex flex-col">
                             <input type="text" placeholder="Title" className="input input-bordered w-full max-w-xs mt-6 mb-4 mx-auto" />
                             <input type="text" placeholder="URL" className="input input-bordered w-full max-w-xs my-4 mx-auto" />
@@ -159,11 +187,15 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                                 <span>Expiry</span>
                                 <input type="date" id="expiry" className="input input-bordered" min={minDate} />
                             </label>
-                            <button type="submit" className="btn btn-active btn-primary mx-auto my-4">
+
+                            <button type="submit" className="btn btn-active btn-primary mx-auto mt-4 gap-2">
                                 submit
+                                <div className="badge">2 ISC</div>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48"><path d="m24 40-2.1-2.15L34.25 25.5H8v-3h26.25L21.9 10.15 24 8l16 16Z" /></svg>
                             </button>
                         </form>
+
+                        <GetISC />
                     </label>
                 </label>
                 <div className="flex flex-wrap place-content-center">

@@ -32,12 +32,17 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
             )
 
             let acc = await connection.getAccountInfo(pda[0])
-            state = new Expirable(Date.now() + 1000 * 60 * 5, StateLayout.decode(acc.data))
-            setWithSeeds(Programs.Petitions, ["d", region], state)
+            if (acc) {
+                state = new Expirable(Date.now() + 1000 * 60 * 5, StateLayout.decode(acc.data))
+                setWithSeeds(Programs.Petitions, ["d", region], state)
+            }
         }
-        set((s) => {
-            s.state = state.object
-        })
+
+        if (state) {
+            set((s) => {
+                s.state = state.object
+            })
+        }
     },
     //TODO paging!!!!!!!!!!!!!
     getLiveProps: async (connection, state) => {
@@ -62,9 +67,11 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
             setWithSeeds(Programs.Petitions, ["liveprops", state.region], lp)
         }
 
-        set((s) => {
-            s.liveProps = lp.object
-        })
+        if (lp) {
+            set((s) => {
+                s.liveProps = lp.object
+            })
+        }
     },
     getClosedProps: async (connection, state) => {
         let cp: Expirable<RawProp[]> = getWithSeeds(Programs.Petitions, ["closedprops", state.region])

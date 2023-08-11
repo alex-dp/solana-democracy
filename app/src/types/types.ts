@@ -14,7 +14,8 @@ export enum Programs {
 export const
     UBI_MINT = "4HgYp2eiokKcqe5AVAxpwCsfUE5pwCNTiPXvpSxYnDi6",
     UBI_PROGRAM = "EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd",
-    PETITION_PROGRAM = "E7QHjboLzRXGS8DzEq6CzcpHk54gHzJYvaPpzhxhHBU8"
+    PETITION_PROGRAM = "78CbaxW47AoFLNqMPQNMUMSYhtbpGJA2pfdXHUExxz6o",
+    ISC_MINT = "J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD"
 
 export class Expirable<T> {
     expiration: number
@@ -51,6 +52,15 @@ export function setWithSeeds(program: Programs, seeds: any[], value) {
 export function clearWithSeeds(program: Programs, seeds: any[]) {
     seeds.splice(0, 0, program)
     localStorage.removeItem(JSON.stringify(seeds))
+}
+
+export function clearAll() {
+    let cleared = localStorage.getItem("cleared")
+
+    if (!cleared) {
+        localStorage.clear()
+        localStorage.setItem("cleared", "true")
+    }
 }
 
 export async function useIDL(id: PublicKey, provider: AnchorProvider): Promise<Idl> {

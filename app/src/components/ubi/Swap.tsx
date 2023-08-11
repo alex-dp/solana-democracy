@@ -17,4 +17,3 @@ export const Swap: FC = () => {
         </button>
     );
 };
-
