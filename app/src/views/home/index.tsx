@@ -29,7 +29,6 @@ export const HomeView = () => {
           <ProgramCard destination="/referenda" title="Referenda" description="Approve or reject a proposal" button="Coming Soon" disabled={true} />
           <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" button="Coming Soon" disabled={true} />
           <ProgramCard destination="/elections" title="Elections" description="Community-funded verifiable elections" button="Coming Soon" disabled={true} />
-
         </div>
       </div>
     </div>
