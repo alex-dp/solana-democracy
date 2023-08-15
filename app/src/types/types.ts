@@ -15,6 +15,7 @@ export const
     UBI_MINT = "4HgYp2eiokKcqe5AVAxpwCsfUE5pwCNTiPXvpSxYnDi6",
     UBI_PROGRAM = "EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd",
     PETITION_PROGRAM = "78CbaxW47AoFLNqMPQNMUMSYhtbpGJA2pfdXHUExxz6o",
+    FUNDRAISER_PROGRAM = "CpJFii61AfWzCec86EGNX784hR7wbGT6KzRXGjMeK6nH",
     ISC_MINT = "J9BcrQfX4p9D1bvLzRNCbMDv8f44a9LFdeqNE4Yk2WMD"
 
 export class Expirable<T> {

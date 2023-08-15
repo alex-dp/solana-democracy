@@ -4,7 +4,7 @@ use anchor_lang::solana_program::system_instruction;
 use anchor_spl::token::{self, Mint, TokenAccount, Transfer};
 use std::mem::size_of;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("CpJFii61AfWzCec86EGNX784hR7wbGT6KzRXGjMeK6nH");
 
 const FUNDS: &str = "funds";
 const FUND: &str = "fund";
