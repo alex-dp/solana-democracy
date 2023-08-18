@@ -2,7 +2,6 @@ import { AnchorProvider, Program } from "@project-serum/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { OSS } from "components/OSS";
 import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
 import { FC, FormEvent, useCallback, useEffect } from "react";
@@ -133,7 +132,6 @@ export const PetitionsView: FC = ({ }) => {
             </button>
           </Link>
           Active regions
-          <OSS />
         </h4>
 
         <label htmlFor="my-modal-4" className="btn btn-active">

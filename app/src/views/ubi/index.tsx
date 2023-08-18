@@ -8,7 +8,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { GatewayProvider } from '@civic/solana-gateway-react';
 import Link from 'next/link';
-import { OSS } from 'components/OSS';
 
 export const UBIView = () => {
 
@@ -34,7 +33,6 @@ export const UBIView = () => {
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
           Global unconditional income secured by Civic
-          <OSS />
         </h4>
 
         <div className="flex flex-wrap place-content-center">

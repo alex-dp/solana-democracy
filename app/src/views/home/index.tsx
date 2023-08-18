@@ -1,4 +1,3 @@
-import { OSS } from 'components/OSS';
 import { ProgramCard } from 'components/ProgramCard';
 import { clearAll } from 'types/types';
 
@@ -19,7 +18,6 @@ export const HomeView = () => {
         </p>
         <h4 className="md:w-full text-2xl md:text-4xl text-center text-slate-300 mb-2">
           <p>Community-funded open source tools for direct democracy on Solana</p>
-          <OSS />
         </h4>
 
         <div className="flex flex-wrap place-content-center">

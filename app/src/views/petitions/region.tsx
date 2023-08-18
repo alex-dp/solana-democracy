@@ -4,7 +4,6 @@ import { TOKEN_PROGRAM_ID, TokenAccountNotFoundError, TokenInvalidAccountOwnerEr
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
-import { OSS } from "components/OSS";
 import PetitionCard from "components/petition/PetitionCard";
 import { GetISC } from "components/GetISC"
 import Link from "next/link";
@@ -164,7 +163,6 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                         </button>
                     </Link>
                     {state?.description}
-                    <OSS />
                 </h4>
 
                 <label htmlFor="my-modal-4" className="btn btn-active mx-auto">
