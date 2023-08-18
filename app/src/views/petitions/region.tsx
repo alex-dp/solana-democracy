@@ -1,5 +1,5 @@
 import { useGateway } from "@civic/solana-gateway-react";
-import { AnchorProvider, BN, Program } from "@project-serum/anchor";
+import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID, TokenAccountNotFoundError, TokenInvalidAccountOwnerError, getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";

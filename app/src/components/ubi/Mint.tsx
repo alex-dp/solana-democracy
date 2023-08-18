@@ -5,9 +5,9 @@ import { notify } from "../../utils/notifications";
 
 import { Buffer } from 'buffer';
 import { PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, web3 } from '@project-serum/anchor';
+import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor';
 
-import { TOKEN_PROGRAM_ID } from '@project-serum/anchor/dist/cjs/utils/token';
+import { TOKEN_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token';
 import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
 import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';

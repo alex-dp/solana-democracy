@@ -33,7 +33,7 @@ export const AppBar: FC = () => {
         {/* Wallet & Settings */}
         <div className="navbar-end">
           <div className="hidden md:inline-flex align-items-center justify-items gap-6">
-            <div className='flex flex-row gap-4 w-fit my-auto'>
+            <div className='flex flex-row gap-6 w-fit my-auto'>
               <NavElement
                 label="Home"
                 href="/"

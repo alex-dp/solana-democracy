@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import * as borsh from "@project-serum/borsh"
-import { AnchorProvider, Idl, Program } from "@project-serum/anchor";
+import * as borsh from "@coral-xyz/borsh"
+import { AnchorProvider, Idl, Program } from "@coral-xyz/anchor";
 
 //TODO move utils to utils
 

@@ -1,5 +1,5 @@
 import { useGateway } from "@civic/solana-gateway-react";
-import { AnchorProvider, Program } from "@project-serum/anchor";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
