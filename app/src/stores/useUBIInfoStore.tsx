@@ -4,7 +4,7 @@ import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, UBI_PR
 
 const programID = new PublicKey(UBI_PROGRAM);
 
-interface UBIInfoStore extends State {
+interface UBIInfoStore {
     info: RawUBIInfo;
     initialized: boolean;
     getInfo: (connection: Connection, pk: PublicKey) => void;
@@ -26,16 +26,16 @@ const useUBIInfoStore = create<UBIInfoStore>((set, _get) => ({
         if (!info || Date.now() / 1000 > info?.lastIssuance + 24 * 60 * 60) {
             let acc = await connection.getAccountInfo(pda[0])
             if (acc) info = UBIInfoLayout.decode(acc.data)
+        } else if (info) {
+            setWithSeeds(Programs.UBI, ["ubi_info3", pk.toString()], info)
         }
 
-        set((s) => {
-            if (info) {
-                setWithSeeds(Programs.UBI, ["ubi_info3", pk.toString()], info)
-                s.info = info
-                s.initialized = true
-            }
-            else s.initialized = false
-        })
+        let data = info ? {
+            info: info,
+            initialized: true
+        } : { initialized: false }
+
+        set(data)
     },
     clearInfo: (pk) => {
         clearWithSeeds(Programs.UBI, ["ubi_info3", pk.toString()])

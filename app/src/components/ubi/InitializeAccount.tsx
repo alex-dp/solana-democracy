@@ -5,7 +5,7 @@ import { notify } from "../../utils/notifications";
 
 import { Buffer } from 'buffer';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor';
+import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
 
 import {
     createAssociatedTokenAccountInstruction,

@@ -1,10 +1,10 @@
-import create, { State } from 'zustand'
+import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { clearWithSeeds, Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
-interface ProposalStore extends State {
+interface ProposalStore {
     liveProps: RawProp[];
     closedProps: RawProp[];
     state: RawState;
@@ -39,8 +39,8 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         }
 
         if (state) {
-            set((s) => {
-                s.state = state.object
+            set({
+                state: state.object
             })
         }
     },
@@ -68,8 +68,8 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         }
 
         if (lp) {
-            set((s) => {
-                s.liveProps = lp.object
+            set({
+                liveProps: lp.object
             })
         }
     },
@@ -95,8 +95,8 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
             setWithSeeds(Programs.Petitions, ["closedprops", state.region], cp)
         }
 
-        set((s) => {
-            s.liveProps = cp.object
+        set({
+            liveProps: cp.object
         })
     },
     clearLiveProps: (region) => {

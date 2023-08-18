@@ -1,10 +1,10 @@
-import create, { State } from 'zustand'
+import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, setWithSeeds } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
-interface SingleProposalStore extends State {
+interface SingleProposalStore {
     proposal: RawProp;
     getProposal: (connection: Connection, region: number, id: number) => void;
 }
@@ -29,8 +29,8 @@ const useSingleProposalStore = create<SingleProposalStore>((set, _get) => ({
             setWithSeeds(Programs.Petitions, ["p", region, id], prop)
         }
 
-        set((s) => {
-            s.proposal = prop
+        set({
+            proposal: prop
         })
     }
 }));

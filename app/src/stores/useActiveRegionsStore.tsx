@@ -1,10 +1,10 @@
-import create, { State } from 'zustand'
+import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { ActiveRegionsLayout, clearWithSeeds, Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, RawActiveRegions, RawState, setWithSeeds, StateLayout } from 'types/types';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
-interface ActiveRegionsStore extends State {
+interface ActiveRegionsStore {
     regionList: RawActiveRegions;
     regStates: RawState[];
     getRegions: (connection: Connection) => void;
@@ -33,8 +33,8 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
         }
 
         if (regionList) {
-            set((s) => {
-                s.regionList = regionList.object
+            set({
+                regionList: regionList.object
             })
         }
     },
@@ -60,8 +60,8 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
         }
 
         if (regStates) {
-            set((s) => {
-                s.regStates = regStates
+            set({
+                regStates: regStates
             })
         }
     },
