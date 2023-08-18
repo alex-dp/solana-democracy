@@ -1,8 +1,8 @@
 {
-  "name": "solana-dapp-next",
+  "name": "argon-suite",
   "version": "0.2.0",
-  "author": "Solana Maintainers <maintainers@solana.foundation>",
-  "license": "MIT",
+  "author": "",
+  "license": "GPL-3.0",
   "private": false,
   "scripts": {
     "dev": "next dev",
