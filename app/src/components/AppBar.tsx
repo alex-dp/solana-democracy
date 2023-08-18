@@ -27,29 +27,29 @@ export const AppBar: FC = () => {
               </div>
             </Link>
           </div>
-
-          <WalletMultiButtonDynamic className="btn-ghost btn-sm relative flex md:hidden text-lg " />
         </div>
 
         {/* Nav Links */}
         {/* Wallet & Settings */}
         <div className="navbar-end">
           <div className="hidden md:inline-flex align-items-center justify-items gap-6">
-            <NavElement
-              label="Home"
-              href="/"
-              navigationStarts={() => setIsNavOpen(false)}
-            />
-            <NavElement
-              label="UBI"
-              href="/ubi"
-              navigationStarts={() => setIsNavOpen(false)}
-            />
-            <NavElement
-              label="Petitions"
-              href="/petitions"
-              navigationStarts={() => setIsNavOpen(false)}
-            />
+            <div className='flex flex-row gap-4 w-fit my-auto'>
+              <NavElement
+                label="Home"
+                href="/"
+                navigationStarts={() => setIsNavOpen(false)}
+              />
+              <NavElement
+                label="UBI"
+                href="/ubi"
+                navigationStarts={() => setIsNavOpen(false)}
+              />
+              <NavElement
+                label="Petitions"
+                href="/petitions"
+                navigationStarts={() => setIsNavOpen(false)}
+              />
+            </div>
             <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6 " />
           </div>
           <label
