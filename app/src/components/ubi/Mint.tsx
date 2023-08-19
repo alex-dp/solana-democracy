@@ -1,7 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction, TransactionSignature } from '@solana/web3.js';
 import { useCallback } from 'react';
-import { notify } from "../../utils/notifications";
 
 import { Buffer } from 'buffer';
 import { PublicKey } from '@solana/web3.js';
@@ -13,6 +12,7 @@ import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
 import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import useNotificationStore from 'stores/useNotificationStore';
 
 const { SystemProgram } = web3;
 
@@ -31,6 +31,8 @@ export const Mint = ({ info }: MintProps) => {
     const { setVisible } = useWalletModal();
 
     const { getInfo, clearInfo } = useUBIInfoStore();
+
+    const { notify } = useNotificationStore();
 
     const getProvider = () => {
         const provider = new AnchorProvider(

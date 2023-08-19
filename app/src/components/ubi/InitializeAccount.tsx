@@ -1,7 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, TransactionSignature } from '@solana/web3.js';
 import { FC, useCallback } from 'react';
-import { notify } from "../../utils/notifications";
 
 import { Buffer } from 'buffer';
 import { Connection, PublicKey } from '@solana/web3.js';
@@ -17,6 +16,7 @@ import {
 
 import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import useNotificationStore from 'stores/useNotificationStore';
 
 const { SystemProgram } = web3;
 
@@ -27,6 +27,8 @@ export const InitializeAccount: FC = () => {
     const wallet = useWallet()
 
     const { setVisible } = useWalletModal();
+
+    const { notify } = useNotificationStore();
 
     const getProvider = () => {
         const provider = new AnchorProvider(

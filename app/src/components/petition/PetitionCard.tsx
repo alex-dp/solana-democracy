@@ -5,9 +5,9 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import Link from "next/link";
 import { useCallback } from "react";
+import useNotificationStore from "stores/useNotificationStore";
 import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
-import { notify } from "utils/notifications";
 
 type CardProps = {
     id: number,
@@ -33,6 +33,8 @@ const PetitionCard = ({
     single
 }: CardProps) => {
     const { clearLiveProps, getState, getLiveProps, state } = useProposalStore()
+
+    const { notify } = useNotificationStore();
 
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
 

@@ -1,4 +1,4 @@
-import create, { State } from 'zustand'
+import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, UBI_PROGRAM, clearWithSeeds } from 'types/types';
 

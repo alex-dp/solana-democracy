@@ -10,7 +10,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { ISC_MINT, PETITION_PROGRAM, useIDL } from "types/types";
-import { notify } from "utils/notifications";
+import useNotificationStore from "stores/useNotificationStore";
 
 type ViewProps = {
     code: number,
@@ -35,6 +35,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps, clearLiveProps } = useProposalStore()
     const { gatewayToken, gatewayStatus, requestGatewayToken } = useGateway();
     const { setVisible } = useWalletModal();
+    const { notify } = useNotificationStore();
 
     const provider = getProvider()
 

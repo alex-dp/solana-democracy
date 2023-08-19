@@ -12,9 +12,9 @@ import {
 import { Cluster, clusterApiUrl } from '@solana/web3.js';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
-import { notify } from "../utils/notifications";
 import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
 import dynamic from "next/dynamic";
+import useNotificationStore from 'stores/useNotificationStore';
 
 const ReactUIWalletModalProviderDynamic = dynamic(
     async () =>
@@ -27,6 +27,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { networkConfiguration } = useNetworkConfiguration();
     const network = networkConfiguration as WalletAdapterNetwork;
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    const { notify } = useNotificationStore();
 
     const wallets = useMemo(
         () => [

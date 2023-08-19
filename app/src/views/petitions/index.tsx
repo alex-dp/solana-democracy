@@ -6,14 +6,16 @@ import RegionRow from "components/petition/RegionRow";
 import Link from "next/link";
 import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
+import useNotificationStore from "stores/useNotificationStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
-import { notify } from "utils/notifications";
 
 export const PetitionsView: FC = ({ }) => {
 
   const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
   const { regionList, getRegions, clearRegions, regStates, getRegStates } = useActiveRegionsStore()
+
+  const { notify } = useNotificationStore();
 
   const wallet = useWallet();
 

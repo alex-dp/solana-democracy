@@ -3,15 +3,13 @@ import {
   CheckCircleIcon,
   InformationCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline'
-import { XIcon } from '@heroicons/react/solid'
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 import useNotificationStore from '../stores/useNotificationStore'
 import { useNetworkConfiguration } from 'contexts/NetworkConfigurationProvider';
 
 const NotificationList = () => {
-  const { notifications, set: setNotificationStore } = useNotificationStore(
-    (s) => s
-  )
+  const { notifications, remove } = useNotificationStore()
 
   return (
     <div
@@ -27,13 +25,7 @@ const NotificationList = () => {
               description={n.description}
               txid={n.txid}
               onHide={() => {
-                setNotificationStore((state: any) => {
-                  const reversedIndex = notifications.length - 1 - idx;
-                  state.notifications = [
-                    ...notifications.slice(0, reversedIndex),
-                    ...notifications.slice(reversedIndex + 1),
-                  ];
-                });
+                remove(idx)
               }}
             />
           ))
@@ -101,7 +93,7 @@ const Notification = ({ type, message, description, txid, onHide }) => {
               className={`bg-bkg-2 default-transition rounded-md inline-flex text-fgd-3 hover:text-fgd-4 focus:outline-none`}
             >
               <span className={`sr-only`}>Close</span>
-              <XIcon className="h-5 w-5" />
+              <XMarkIcon className='h-5 w-5' />
             </button>
           </div>
         </div>
