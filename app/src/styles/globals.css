@@ -11,7 +11,9 @@ body {
   background-image: radial-gradient(circle farthest-side at 50% 100%, rgba(147, 51, 234, 0.6),
       rgba(126, 34, 206, 0.4) 36%,
       rgba(107, 33, 168, 0.2) 55%,
-      rgba(88, 28, 135, 0))
+      rgba(88, 28, 135, 0));
+  background-attachment: fixed;
+  /* background-repeat: repeat-y; */
 }
 
 a {
@@ -26,15 +28,6 @@ a {
 /* example: override wallet button style */
 .wallet-adapter-button:not([disabled]):hover {
   background-color: #707070;
-}
-
-.container {
-  position: absolute;
-  width: 50%;
-  height: 300px;
-  left: 50%;
-  top: 100px;
-  margin: 0 0 0 -25%
 }
 
 .content-center {

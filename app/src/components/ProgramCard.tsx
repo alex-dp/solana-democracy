@@ -16,7 +16,7 @@ export const ProgramCard = ({ title, description, destination, button, disabled 
                 <p>{description}</p>
                 <Link href={destination} onClick={(e) => { if (disabled) e.preventDefault() }}>
                     <div className="card-actions justify-end">
-                        <button className="btn gap-2" disabled={disabled}>
+                        <button className="btn gap-2 mt-4" disabled={disabled}>
                             {button}
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
                                 <path d="m24 40-2.1-2.15L34.25 25.5H8v-3h26.25L21.9 10.15 24 8l16 16Z" />

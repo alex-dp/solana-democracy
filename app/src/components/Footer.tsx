@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { FC } from 'react';
 export const Footer: FC = () => {
     return (
-        <footer className="flex flex-row place-content-start fixed bottom-0 bg-transparent text-indigo-50 w-screen z-50">
+        <footer className="flex flex-row place-content-start fixed bottom-0 bg-transparent w-screen z-50">
             <Link href="https://github.com/alex-dp/solana-democracy" target='_blank'>
                 <button className='btn m-2 gap-2'>
                     source
