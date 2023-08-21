@@ -81,12 +81,12 @@ pub mod solana_fundraisers {
         fund.mint_addr = token_mint.key();
         fund.next_partition = 1;
         fund.points_per_user = ppu;
-        fund.info = info;
+        fund.information = info;
 
         first_partition.creator = *signer.key;
         first_partition.recipient_owner = fp_rec_owner;
         first_partition.recipient_token_addr = fp_rec_token;
-        first_partition.info = partition_info;
+        first_partition.information = partition_info;
 
         Ok(())
     }
@@ -106,7 +106,7 @@ pub mod solana_fundraisers {
             &mut sp.to_account_info(),
         );
 
-        let id = fund.next_partition;
+        let id = fund.next_partition.clone();
         fund.partitions.push(id);
         fund.points.push(0);
         fund.next_partition += 1;
@@ -114,7 +114,44 @@ pub mod solana_fundraisers {
         partition.creator = signer.key();
         partition.recipient_owner = recipient_owner.key();
         partition.recipient_token_addr = recipient_token_account.key();
-        partition.info = info;
+        partition.information = info;
+
+        Ok(())
+    }
+
+    pub fn mark_completed(
+        ctx: Context<MarkCompleted>,
+        fund_id: u16,
+        partition_id: u16,
+    ) -> Result<()> {
+        let fund = &mut ctx.accounts.fund;
+
+        let idx = fund.partitions.binary_search(&partition_id).unwrap();
+        fund.partitions.remove(idx.clone());
+        fund.points.remove(idx);
+
+        fund.completed.push(partition_id);
+
+        Ok(())
+    }
+
+    pub fn edit_info(
+        ctx: Context<EditInfo>,
+        fund_id: u16,
+        partition_id: u16,
+        new_info: String,
+    ) -> Result<()> {
+        let partition = &mut ctx.accounts.partition;
+        let sp = &ctx.accounts.system_program;
+        let signer = &mut ctx.accounts.signer;
+
+        resize(
+            &mut partition.to_account_info(),
+            (new_info.len() - partition.information.len()) as i16,
+            signer,
+            &mut sp.to_account_info());
+
+        partition.information = new_info;
 
         Ok(())
     }
@@ -204,7 +241,7 @@ pub mod solana_fundraisers {
         let distribution = &mut ctx.accounts.distribution;
 
         distribution.mint_addr = fund.mint_addr;
-        distribution.total = amount;
+        distribution.total = amount.clone();
         distribution.recipients = fund.partitions.clone();
         distribution.points = fund.points.clone();
         distribution.done = Vec::with_capacity(fund.partitions.len());
@@ -232,10 +269,10 @@ pub mod solana_fundraisers {
         let idx = fund.partitions.binary_search(&partition_id).unwrap();
 
         let amount = match fund.equal {
-            true => distribution.total / fund.partitions.len() as u64,
+            true => distribution.total.clone() / fund.partitions.len() as u64,
             false => {
-                distribution.total / fund.points.iter().sum::<u16>() as u64
-                    * *fund.points.get(idx).unwrap() as u64
+                distribution.total.clone() / fund.points.iter().sum::<u16>() as u64
+                    * (fund.points.get(idx.clone()).unwrap().clone()) as u64
             }
         };
 
@@ -320,7 +357,7 @@ pub struct MakePartition<'info> {
     mut,
     seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
     bump,
-    constraint = !fund.locked
+    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true }
     )]
     pub fund: Account<'info, Fund>,
     #[account(
@@ -340,6 +377,54 @@ pub struct MakePartition<'info> {
     token::authority = recipient_owner
     )]
     pub recipient_token_account: Account<'info, TokenAccount>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(fund_id: u16, partition_id: u16)]
+pub struct MarkCompleted<'info> {
+    ///CHECK: x
+    #[account(signer, mut)]
+    pub signer: AccountInfo<'info>,
+    #[account(
+    mut,
+    seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
+    bump,
+    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true }
+    )]
+    pub fund: Account<'info, Fund>,
+    #[account(
+    mut,
+    seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
+    bump,
+    constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator)
+    )]
+    pub partition: Account<'info, Partition>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(fund_id: u16, partition_id: u16, info: String)]
+pub struct EditInfo<'info> {
+    ///CHECK: x
+    #[account(signer, mut)]
+    pub signer: AccountInfo<'info>,
+    #[account(
+    mut,
+    seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
+    bump,
+    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true }
+    )]
+    pub fund: Account<'info, Fund>,
+    #[account(
+    mut,
+    seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
+    bump,
+    constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator)
+    )]
+    pub partition: Account<'info, Partition>,
 
     pub system_program: Program<'info, System>,
 }
@@ -493,7 +578,7 @@ pub struct Donate<'info> {
     init,
     seeds = [DIST.as_bytes(), &fund_id.to_be_bytes()],
     bump,
-    space = 8 + Distribution::MIN_SIZE,
+    space = 8 + Distribution::MIN_SIZE + Distribution::ELEMENT_SIZE * fund.partitions.len(),
     payer = signer
     )]
     pub distribution: Account<'info, Distribution>,
@@ -604,11 +689,12 @@ pub struct Fund {
     points_per_user: u8,
     partitions: Vec<u16>,
     points: Vec<u16>,
-    info: String,
+    completed: Vec<u16>,
+    information: String,
 }
 
 impl Fund {
-    pub const MIN_SIZE: usize = 32 + 32 + 1 + 1 + 1 + 2 + 1 + (4 + 2) + (4 + 2) + 4;
+    pub const MIN_SIZE: usize = 32 + 32 + 1 + 1 + 1 + 2 + 1 + (4 + 2) + (4 + 2) + (4) + 4;
 }
 
 #[account]
@@ -616,11 +702,11 @@ pub struct Partition {
     creator: Pubkey,
     recipient_owner: Pubkey,
     recipient_token_addr: Pubkey,
-    info: String,
+    information: String,
 }
 
 impl Partition {
-    pub const MIN_SIZE: usize = 32 + 32 + 32 + 16 + 4;
+    pub const MIN_SIZE: usize = 32 + 32 + 32 + 4;
 }
 
 #[account]
@@ -634,7 +720,7 @@ pub struct Distribution {
 
 impl Distribution {
     pub const MIN_SIZE: usize = 32 + 8 + 4 + 4 + 4;
-    pub const ELEMENT_SIZE: usize = 3;
+    pub const ELEMENT_SIZE: usize = 2 + 2 + 1;
 }
 
 #[account]
