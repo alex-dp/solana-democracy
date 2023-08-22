@@ -11,6 +11,7 @@ const Home: NextPage = (props) => {
           name="description"
           content="a suite of programs for direct democracy on Solana"
         />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
       <HomeView />
     </div>
