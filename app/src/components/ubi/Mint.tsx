@@ -146,7 +146,7 @@ export const Mint = ({ info }: MintProps) => {
                 signature: signature,
             });
 
-            notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
+            notify({ type: 'success', message: 'You have successfully minted some ARGON. Come back in 24 hours!', txid: signature });
             clearInfo(wallet.publicKey)
             getInfo(connection, wallet.publicKey)
         } catch (error) {
