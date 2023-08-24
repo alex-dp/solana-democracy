@@ -12,7 +12,7 @@ export const HomeView = () => {
       <div className="md:hero-content flex flex-col">
 
         <div className="mx-auto">
-          <Spline style={{ margin: -100 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
+          <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
         </div>
 
         <p className="py-4 mx-auto">

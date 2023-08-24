@@ -25,7 +25,7 @@ export const AppBar: FC = () => {
               <div className='flex flex-row place-content-center'>
                 {/* <img src="/token.svg" className='h-12' /> */}
                 <div className="mx-auto">
-                  <Spline style={{ margin: -100 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
+                  <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
                 </div>
                 <img src="/argontype.svg" className='h-6 mx-8 my-auto' />
               </div>
