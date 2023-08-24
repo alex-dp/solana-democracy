@@ -25,6 +25,7 @@
     "@solana/wallet-adapter-react-ui": "*",
     "@solana/wallet-adapter-wallets": "*",
     "@solana/web3.js": "*",
+    "@splinetool/react-spline": "^2.2.6",
     "@tailwindcss/typography": "^0.5.9",
     "daisyui": "^3.5.1",
     "date-fns": "^2.29.3",

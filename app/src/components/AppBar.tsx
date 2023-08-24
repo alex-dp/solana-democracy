@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import React, { useState } from "react";
 import { useAutoConnect } from '../contexts/AutoConnectProvider';
 import NavElement from './nav-element';
+import Spline from '@splinetool/react-spline';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -22,7 +23,10 @@ export const AppBar: FC = () => {
           <div className="hidden sm:inline w-22 h-22 md:p-2 ml-4">
             <Link href="https://argonsuite.org">
               <div className='flex flex-row place-content-center'>
-                <img src="/token.svg" className='h-12' />
+                {/* <img src="/token.svg" className='h-12' /> */}
+                <div className="mx-auto">
+                  <Spline style={{ margin: -100 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
+                </div>
                 <img src="/argontype.svg" className='h-6 mx-8 my-auto' />
               </div>
             </Link>

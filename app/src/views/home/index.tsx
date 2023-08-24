@@ -1,4 +1,6 @@
+import Spline from '@splinetool/react-spline';
 import { ProgramCard } from 'components/ProgramCard';
+import { Ref, useEffect, useRef } from 'react';
 import { clearAll } from 'types/types';
 
 export const HomeView = () => {
@@ -9,9 +11,9 @@ export const HomeView = () => {
     <div className='md:hero mx-auto p-4'>
       <div className="md:hero-content flex flex-col">
 
-        {/* <p className="mx-auto">
-          <img src="token.svg" className='h-16' />
-        </p> */}
+        <div className="mx-auto">
+          <Spline style={{ margin: -100 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
+        </div>
 
         <p className="py-4 mx-auto">
           <img src="argontype.svg" className='h-8' />
