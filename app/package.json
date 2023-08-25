@@ -28,6 +28,7 @@
     "@splinetool/react-spline": "^2.2.6",
     "@splinetool/runtime": "^0.9.427",
     "@tailwindcss/typography": "^0.5.9",
+    "@vercel/analytics": "^1.0.2",
     "daisyui": "^3.5.1",
     "date-fns": "^2.29.3",
     "immer": "^10.0.2",
