@@ -15,6 +15,31 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
     <>
       <Head>
         <title>Argon Suite</title>
+
+        <meta name="application-name" content="Argon Suite" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Argon Suite" />
+        <meta name="description" content="Direct democracy on Solana" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#FFFFFF" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#000000" />
+
+        <link rel="apple-touch-icon" href="/icon.svg" />
+
+        <link rel="icon" type="image/png" href="/icon.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="mask-icon" href="/icon.svg" color="#8321C5" />
+        <link rel="shortcut icon" href="/icon.svg" />
+
+        <meta property="og:type" content="Solana Dapp" />
+        <meta property="og:title" content="Argon Suite" />
+        <meta property="og:description" content="Direct democracy on Solana" />
+        <meta property="og:site_name" content="Argon Suite" />
+        <meta property="og:url" content="https://argonsuite.org" />
+        <meta property="og:image" content="https://argonsuite.org/icon.svg" />
       </Head>
 
       <ContextProvider>
