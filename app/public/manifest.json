@@ -4,9 +4,9 @@
     "icons": [
         {
             "src": "/icon.svg",
-            "sizes": "32x32 64x64 128x128 256x256 512x512 1024x1024",
-            "type": "image/png",
-            "purpose": "any maskable"
+            "sizes": "32x32 64x64 128x128 256x256 512x512 1024x1024 48x48 72x72 96x96",
+            "type": "image/svg+xml",
+            "purpose": "any"
         }
     ],
     "theme_color": "#8321C5",
