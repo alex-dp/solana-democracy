@@ -3,13 +3,13 @@
     "short_name": "Argon",
     "icons": [
         {
-            "src": "/icon.svg",
+            "src": "./icon.svg",
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any"
         },
         {
-            "src": "/icon.png",
+            "src": "./icon.png",
             "sizes": "any",
             "type": "image/png",
             "purpose": "any"
