@@ -7,6 +7,12 @@
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any"
+        },
+        {
+            "src": "/icon.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any"
         }
     ],
     "theme_color": "#8321C5",
