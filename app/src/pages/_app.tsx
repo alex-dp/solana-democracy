@@ -32,8 +32,8 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <link rel="icon" type="image/svg+xml" href="/public/icon.svg" />
         <link rel="icon" type="image/png" href="/public/icon.png" />
         <link rel="manifest" href="/public/manifest.json" />
-        <link rel="mask-icon" href="/public/icon.svg" color="#8321C5" />
-        <link rel="shortcut icon" href="/public/icon.svg" />
+        <link rel="mask-icon" type="image/svg+xml" href="/public/icon.svg" color="#FFFFFF" />
+        <link rel="shortcut icon" type="image/svg+xml" href="/public/icon.svg" />
 
         <meta property="og:type" content="Solana Dapp" />
         <meta property="og:title" content="Argon Suite" />
