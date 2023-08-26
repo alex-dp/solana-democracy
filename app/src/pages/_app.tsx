@@ -27,13 +27,13 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="theme-color" content="#000000" />
 
-        <link rel="apple-touch-icon" href="/public/icon.svg" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
 
-        <link rel="icon" type="image/svg+xml" href="/public/icon.svg" />
-        <link rel="icon" type="image/png" href="/public/icon.png" />
-        <link rel="manifest" href="/public/manifest.json" />
-        <link rel="mask-icon" type="image/svg+xml" href="/public/icon.svg" color="#FFFFFF" />
-        <link rel="shortcut icon" type="image/svg+xml" href="/public/icon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="icon" type="image/png" href="/icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="mask-icon" type="image/svg+xml" href="/icon.svg" color="#FFFFFF" />
+        <link rel="shortcut icon" type="image/svg+xml" href="/icon.svg" />
 
         <meta property="og:type" content="Solana Dapp" />
         <meta property="og:title" content="Argon Suite" />
