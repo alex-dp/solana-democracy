@@ -16,6 +16,7 @@ const Home: NextPage = (props) => {
         <link rel="apple-touch-icon" href="/icon.png" />
 
         <link rel="shortcut icon" type="image/png" href="/icon.png" />
+        <a rel="me" href="https://discuss.systems/@alexdp">Mastodon</a>
       </Head>
       <HomeView />
     </div>
