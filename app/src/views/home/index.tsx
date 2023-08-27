@@ -9,7 +9,7 @@ export const HomeView = () => {
 
   return (
     <div className='md:hero mx-auto p-4'>
-      <link rel="me" href="https://discuss.systems/@alexdp" />
+      <link rel="me" href="https://social.boom.army/@alexdp" />
       <div className="md:hero-content flex flex-col">
 
         <div className="mx-auto">

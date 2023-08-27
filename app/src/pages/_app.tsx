@@ -34,7 +34,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <link rel="mask-icon" type="image/png" href="/icon.png" color="#FFFFFF" />
         <link rel="shortcut icon" type="image/png" href="/icon.png" />
 
-        <link rel="me" href="https://discuss.systems/@alexdp" />
+        <link rel="me" href="https://social.boom.army/@alexdp" />
       </Head>
 
       <ContextProvider>
