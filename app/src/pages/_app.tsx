@@ -33,6 +33,8 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <link rel="manifest" href="/manifest.json" />
         <link rel="mask-icon" type="image/png" href="/icon.png" color="#FFFFFF" />
         <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+        <link rel="me" href="https://discuss.systems/@alexdp" />
       </Head>
 
       <ContextProvider>
