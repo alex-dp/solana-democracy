@@ -23,7 +23,7 @@ type MintProps = {
     info: RawUBIInfo
 }
 
-export const Mint = ({ info }: MintProps) => {
+export const Mint = ({ info: info_prop }: MintProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const wallet = useWallet();
 
@@ -31,7 +31,7 @@ export const Mint = ({ info }: MintProps) => {
 
     const { setVisible } = useWalletModal();
 
-    const { getInfo, clearInfo } = useUBIInfoStore();
+    const { getInfo, clearInfo, info } = useUBIInfoStore();
 
     const { notify } = useNotificationStore();
 
@@ -56,8 +56,8 @@ export const Mint = ({ info }: MintProps) => {
             return
         }
 
-        if (Date.now() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
-            let hDiff = Math.ceil((Number(info.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
+        if (Date.now() / 1000 < Number(info_prop.lastIssuance) + 24 * 3600) {
+            let hDiff = Math.ceil((Number(info_prop.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
             notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 ? "s" : ""}` })
             return
         }
@@ -153,7 +153,7 @@ export const Mint = ({ info }: MintProps) => {
             notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
         }
 
-    }, [wallet, connection]);
+    }, [wallet, connection, info]);
 
     return (
 
