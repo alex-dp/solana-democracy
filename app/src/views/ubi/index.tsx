@@ -8,10 +8,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { GatewayProvider } from '@civic/solana-gateway-react';
 import Link from 'next/link';
+import { InfoCard } from 'components/ubi/InfoCard';
+import { findIssuance } from 'utils/ubi';
+import { web3 } from '@coral-xyz/anchor';
 
 export const UBIView = () => {
 
-  const { info, initialized, getInfo } = useUBIInfoStore();
+  const { info, initialized, getInfo, state, getState, supply, getSupply } = useUBIInfoStore();
 
   const wallet = useWallet();
 
@@ -19,7 +22,9 @@ export const UBIView = () => {
 
   useEffect(() => {
     if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
-  }, [connection, wallet.connected])
+    if (!state) getState(connection)
+    if (!supply) getSupply(connection)
+  }, [connection, wallet.connected, state, supply])
 
   return (
 
@@ -35,7 +40,7 @@ export const UBIView = () => {
           Global unconditional income secured by Civic
         </h4>
 
-        <div className="flex flex-wrap place-content-center">
+        <div className="flex flex-row place-content-center">
 
           <Link href={`/`}>
             <button className="btn btn-square m-2">
@@ -58,6 +63,8 @@ export const UBIView = () => {
           <Swap />
 
         </div>
+
+        <InfoCard supply={supply ? supply : 0} issuance={state ? findIssuance(state.capLeft) : 0} />
       </div>
     </div >
 

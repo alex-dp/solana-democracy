@@ -13,10 +13,22 @@ export function getUbiInfoAddress(user: PublicKey) {
     return findWithSeeds(seeds)
 }
 
+export function getUbiStateAddress() {
+    let seeds = [Buffer.from("state1")]
+    return findWithSeeds(seeds)
+}
+
 export async function getUserToken(user: PublicKey) {
     return await getAssociatedTokenAddress(
         new PublicKey(UBI_MINT),
         user,
         false
     );
+}
+
+export function findIssuance(cap: number) {
+    let smCap = cap / Math.pow(10, 15)
+    let rate = 1 + 19 * Math.exp(smCap / 20_000)
+
+    return Math.trunc(rate)
 }
