@@ -31,11 +31,11 @@ export const InfoCard = ({ supply, issuance }: CardProps) => {
                             </tr>
                             <tr>
                                 <th>Supply</th>
-                                <td>{supply!= 0?supply: "loading..."}</td>
+                                <td>{supply != 0 ? supply : "loading..."}</td>
                             </tr>
                             <tr>
                                 <th>Daily issuance</th>
-                                <td>~{issuance != 0 ? issuance : "loading..."} ARGON</td>
+                                <td>~{issuance != 0 ? "~" + issuance + " ARGON" : "loading..."}</td>
                             </tr>
                             <tr>
                                 <th>Explorer</th>
