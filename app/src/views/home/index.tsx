@@ -20,7 +20,7 @@ export const HomeView = () => {
           <img src="argontype.svg" className='h-8' />
         </p>
         <h4 className="md:w-full text-2xl md:text-4xl text-center text-slate-300 mb-2">
-          <p>Community-funded open source tools for direct democracy on Solana</p>
+          <p>Libre tools for direct democracy on Solana</p>
         </h4>
 
         <div className="flex flex-wrap place-content-center">
