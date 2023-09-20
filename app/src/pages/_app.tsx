@@ -35,6 +35,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <link rel="shortcut icon" type="image/png" href="/icon.png" />
 
         <link rel="me" href="https://mastodon.social/@alexdp" />
+        <link rel="me" href="https://kolektiva.social/@alexdp" />
       </Head>
 
       <ContextProvider>
