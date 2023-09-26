@@ -18,9 +18,14 @@ export const HomeView = () => {
           <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
         </div>
 
+        <h1 className='hidden'>argon</h1>
+        <h2 className='hidden'>libre tools for direct democracy on solana</h2>
+        <h3 className='hidden'>see what programs are available below or connect your wallet from the top right corner</h3>
+
         <p className="py-4 mx-auto">
           <img src="argontype.svg" className='h-8' />
         </p>
+
         <h4 className="md:w-full text-2xl md:text-4xl text-center text-slate-300 mb-2">
           <p>Libre tools for direct democracy on Solana</p>
         </h4>

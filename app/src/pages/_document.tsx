@@ -16,7 +16,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          <noscript>
+          <noscript style={null}>
             Please enable JavaScript in your browser. Source available <a href='https://github.com/alex-dp/solana-democracy'>here</a>
           </noscript>
         </body>
