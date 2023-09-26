@@ -14,11 +14,11 @@ class MyDocument extends Document {
           <link rel="shortcut icon" href="/favicon.ico" />
         </Head>
         <body>
-          <Main />
-          <NextScript />
           <noscript style={null}>
             Please enable JavaScript in your browser. Source available <a href='https://github.com/alex-dp/solana-democracy'>here</a>
           </noscript>
+          <Main />
+          <NextScript />
         </body>
       </Html>
     );
