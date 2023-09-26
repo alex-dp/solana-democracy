@@ -12,7 +12,7 @@ export const HomeView = () => {
       <link rel="me" href="https://mastodon.social/@alexdp" />
       <link rel="me" href="https://kolektiva.social/@alexdp" />
 
-      <div className="md:hero-content flex flex-col">
+      <div className="md:hero-content flex flex-col" role='main'>
 
         <div className="mx-auto">
           <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
