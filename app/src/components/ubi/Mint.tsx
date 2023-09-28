@@ -13,6 +13,7 @@ import { useGateway } from '@civic/solana-gateway-react';
 import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
+import { getUbiInfoAddress, getUserToken } from 'utils/ubi';
 
 const { SystemProgram } = web3;
 
@@ -22,7 +23,7 @@ type MintProps = {
     info: RawUBIInfo
 }
 
-export const Mint = ({ info }: MintProps) => {
+export const Mint = ({ info: info_prop }: MintProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const wallet = useWallet();
 
@@ -30,7 +31,7 @@ export const Mint = ({ info }: MintProps) => {
 
     const { setVisible } = useWalletModal();
 
-    const { getInfo, clearInfo } = useUBIInfoStore();
+    const { getInfo, clearInfo, info } = useUBIInfoStore();
 
     const { notify } = useNotificationStore();
 
@@ -55,8 +56,8 @@ export const Mint = ({ info }: MintProps) => {
             return
         }
 
-        if (Date.now() / 1000 < Number(info.lastIssuance) + 24 * 3600) {
-            let hDiff = Math.ceil((Number(info.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
+        if (Date.now() / 1000 < Number(info_prop.lastIssuance) + 24 * 3600) {
+            let hDiff = Math.ceil((Number(info_prop.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
             notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 ? "s" : ""}` })
             return
         }
@@ -74,11 +75,7 @@ export const Mint = ({ info }: MintProps) => {
             programID
         )
 
-        let ata = await getAssociatedTokenAddress(
-            new PublicKey(UBI_MINT), // mint
-            wallet.publicKey, // owner
-            false // allow owner off curve
-        );
+        let ata = await getUserToken(wallet.publicKey)
 
         let a = null
 
@@ -120,10 +117,7 @@ export const Mint = ({ info }: MintProps) => {
         let signature: TransactionSignature = '';
         try {
 
-            let pda = PublicKey.findProgramAddressSync(
-                [Buffer.from("ubi_info3"), wallet.publicKey.toBuffer()],
-                programID
-            )
+            let pda = getUbiInfoAddress(wallet.publicKey)
 
             let transaction = new Transaction().add(
                 await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
@@ -131,7 +125,7 @@ export const Mint = ({ info }: MintProps) => {
                     ubiMint: UBI_MINT,
                     userAuthority: wallet.publicKey,
                     ubiTokenAccount: ata,
-                    ubiInfo: pda[0],
+                    ubiInfo: pda,
                     state: "BfNHs2d373sCcxw5MjNmgLgQCEoFHM3Hv8XpEvqePLjD",
                     gatewayToken: gatewayToken.publicKey,
                     tokenProgram: TOKEN_PROGRAM_ID,
@@ -152,14 +146,14 @@ export const Mint = ({ info }: MintProps) => {
                 signature: signature,
             });
 
-            notify({ type: 'success', message: 'You have successfully minted some NUBI. Come back in 24 hours!', txid: signature });
+            notify({ type: 'success', message: 'You have successfully minted some ARGON. Come back in 24 hours!', txid: signature });
             clearInfo(wallet.publicKey)
             getInfo(connection, wallet.publicKey)
         } catch (error) {
             notify({ type: 'error', message: `Transaction failed!`, description: error?.message, txid: signature });
         }
 
-    }, [wallet, connection]);
+    }, [wallet, connection, info]);
 
     return (
 

@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import React, { useState } from "react";
 import { useAutoConnect } from '../contexts/AutoConnectProvider';
 import NavElement from './nav-element';
+import Spline from '@splinetool/react-spline';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -14,18 +15,25 @@ export const AppBar: FC = () => {
   const { setAutoConnect } = useAutoConnect();
   const [isNavOpen, setIsNavOpen] = useState(false);
 
+  setAutoConnect(true)
+
   return (
     <div>
       {/* NavBar / Header */}
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start align-items-center">
-          <div className="hidden sm:inline w-22 h-22 md:p-2 ml-4">
+          <div className="hidden sm:inline w-22 h-22 md:p-2 ml-10">
             <Link href="https://argonsuite.org">
               <div className='flex flex-row place-content-center'>
-                <img src="/token.svg" className='h-12' />
+                <div className="mx-auto">
+                  <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
+                </div>
                 <img src="/argontype.svg" className='h-6 mx-8 my-auto' />
               </div>
             </Link>
+          </div>
+          <div className='w-fit h-fit md:hidden'>
+            <WalletMultiButtonDynamic className="btn-ghost btn-sm relative flex text-lg " />
           </div>
         </div>
 
@@ -54,7 +62,7 @@ export const AppBar: FC = () => {
           </div>
           <label
             htmlFor="my-drawer"
-            className="btn-gh items-center justify-between md:hidden mr-5"
+            className="btn-ghost items-center justify-between md:hidden mr-5"
             onClick={() => setIsNavOpen(!isNavOpen)}>
             <div className="HAMBURGER-ICON space-y-2.5 ml-5">
               <div className={`h-0.5 w-8 bg-purple-600 ${isNavOpen ? 'hidden' : ''}`} />

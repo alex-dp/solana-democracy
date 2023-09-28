@@ -9,11 +9,14 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html lang='en'>
         <Head>
           <link rel="shortcut icon" href="/favicon.ico" />
         </Head>
         <body>
+          <noscript style={null}>
+            Please enable JavaScript in your browser. Source available <a href='https://github.com/alex-dp/solana-democracy'>here</a>
+          </noscript>
           <Main />
           <NextScript />
         </body>

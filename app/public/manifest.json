@@ -1,0 +1,17 @@
+{
+    "name": "Argon Suite",
+    "short_name": "Argon",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "theme_color": "#8321C5",
+    "background_color": "#000000",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait"
+}

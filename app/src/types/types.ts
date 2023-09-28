@@ -80,9 +80,19 @@ export interface RawUBIInfo {
     lastIssuance: number;
 }
 
+export interface RawUBIState {
+    buffer: number;
+    capLeft: number;
+}
+
 export const UBIInfoLayout = borsh.struct<RawUBIInfo>([
     borsh.i64('buffer'),
     borsh.i64('lastIssuance')
+])
+
+export const UBIStateLayout = borsh.struct<RawUBIState>([
+    borsh.i64('buffer'),
+    borsh.u128('capLeft')
 ])
 
 export interface RawProp {

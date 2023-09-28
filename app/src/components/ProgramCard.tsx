@@ -10,7 +10,7 @@ type CardProps = {
 
 export const ProgramCard = ({ title, description, destination, button, disabled }: CardProps) => {
     return (
-        <div className="card rounded-2xl border-2 border-purple-500 w-72 m-6 bg-base-100 shadow-xl">
+        <div className="card rounded-2xl border-2 border-purple-500 w-72 m-4 bg-base-100 shadow-xl">
             <div className="card-body">
                 <h2 className="card-title">{title}</h2>
                 <p>{description}</p>
