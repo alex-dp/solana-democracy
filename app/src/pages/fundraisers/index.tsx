@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { FundraisersView } from "../../views/fundraisers";
 
-const Home: NextPage = (props) => {
+const Fundraisers: NextPage = (props) => {
   return (
     <div>
       <Head>
@@ -17,4 +17,4 @@ const Home: NextPage = (props) => {
   );
 };
 
-export default Home;
+export default Fundraisers;
