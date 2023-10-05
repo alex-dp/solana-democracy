@@ -57,6 +57,12 @@ export const AppBar: FC = () => {
                 href="/petitions"
                 navigationStarts={() => setIsNavOpen(false)}
               />
+
+              <NavElement
+                label="Mirrors"
+                href="/mirrors"
+                navigationStarts={() => setIsNavOpen(false)}
+              />
             </div>
             <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6 " />
           </div>

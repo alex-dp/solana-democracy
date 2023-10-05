@@ -40,6 +40,12 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
               href="/petitions"
             />
           </li>
+          <li>
+            <NavElement
+              label="Mirrors"
+              href="/mirrors"
+            />
+          </li>
         </ul>
       </div>
     </div>
