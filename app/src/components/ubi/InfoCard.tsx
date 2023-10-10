@@ -8,7 +8,7 @@ type CardProps = {
 
 export const InfoCard = ({ supply, issuance }: CardProps) => {
     return (
-        <div className="card rounded-2xl border-2 border-purple-500 w-96 bg-base-100 shadow-xl">
+        <div className="card max-w-full w-fit rounded-xl border-2 border-purple-500 w-96 bg-base-100 shadow-xl">
             <div className="card-body">
                 <h2 className="card-title w-fit mx-auto">Token info</h2>
 
