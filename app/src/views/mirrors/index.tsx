@@ -4,8 +4,8 @@ export const MirrorsView = () => {
 
     return (
 
-        <div className='md:hero mx-auto p-4 apply-gradient'>
-            <div className="hero-content flex flex-col place-content-center">
+        <div className='w-screen min-h-screen apply-gradient'>
+            <div className="hero-content flex flex-col mx-auto w-fit">
 
                 <p className="pt-8 pb-4 mx-auto">
                     <img src='argonmir.svg' className='h-16' />
