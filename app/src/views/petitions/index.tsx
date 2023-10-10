@@ -136,7 +136,7 @@ export const PetitionsView: FC = ({ }) => {
           Active regions
         </h4>
 
-        <label htmlFor="my-modal-4" className="btn btn-active">
+        <label htmlFor="my-modal-4" className="btn btn-active border-2 border-purple-700">
           Create new region
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
             <path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z" />
