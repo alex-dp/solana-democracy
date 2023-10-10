@@ -22,7 +22,7 @@ export const AppBar: FC = () => {
       {/* NavBar / Header */}
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start align-items-center">
-          <div className="hidden sm:inline w-22 h-22 md:p-2 ml-10">
+          <div className="hidden md:inline w-22 h-22 md:p-2 ml-10">
             <Link href="https://argonsuite.org">
               <div className='flex flex-row place-content-center'>
                 <div className="mx-auto">
