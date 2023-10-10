@@ -68,18 +68,14 @@ export const AppBar: FC = () => {
           </div>
           <label
             htmlFor="my-drawer"
-            className="btn-ghost items-center justify-between md:hidden mr-5"
+            className="btn btn-square p-4 btn-lg bg-transparent mx-4 md:hidden"
             onClick={() => setIsNavOpen(!isNavOpen)}>
-            <div className="HAMBURGER-ICON space-y-2.5 ml-5">
-              <div className={`h-0.5 w-8 bg-purple-600 ${isNavOpen ? 'hidden' : ''}`} />
-              <div className={`h-0.5 w-8 bg-purple-600 ${isNavOpen ? 'hidden' : ''}`} />
-              <div className={`h-0.5 w-8 bg-purple-600 ${isNavOpen ? 'hidden' : ''}`} />
-            </div>
-            <div className={`absolute block h-0.5 w-8 animate-pulse bg-purple-600 ${isNavOpen ? "" : "hidden"}`}
-              style={{ transform: "rotate(45deg)" }}>
-            </div>
-            <div className={`absolute block h-0.5 w-8 animate-pulse bg-purple-600 ${isNavOpen ? "" : "hidden"}`}
-              style={{ transform: "rotate(135deg)" }}>
+
+
+            <div className="space-y-2.5">
+              <div className={`h-0.5 w-6 bg-white`} />
+              <div className={`h-0.5 w-6 bg-white`} />
+              <div className={`h-0.5 w-6 bg-white`} />
             </div>
           </label>
         </div>
