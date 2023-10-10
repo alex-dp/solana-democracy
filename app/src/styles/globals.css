@@ -24,6 +24,10 @@ a {
   text-decoration: none;
 }
 
+th {
+  text-align: right;
+}
+
 * {
   box-sizing: border-box;
 }
