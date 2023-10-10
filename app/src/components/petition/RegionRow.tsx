@@ -10,8 +10,8 @@ const RegionRow = ({
 }: RowProps) => {
 
     return (
-        <div className="flex flex-row gap-6 place-content-center">
-            <div className="uppercase font-bold">{description}</div>
+        <div className="flex flex-row gap-6">
+            <div className="uppercase font-bold my-auto">{description}</div>
             <Link href={"/petitions/" + code.toString()}>
                 <button className="btn btn-active btn-primary gap-2">
                     Explore
