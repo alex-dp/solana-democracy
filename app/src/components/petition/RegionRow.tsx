@@ -11,7 +11,7 @@ const RegionRow = ({
 
     return (
         <div className="">
-            {description}
+            <div className="capitalize font-bold">{description}</div>
             <Link href={"/petitions/" + code.toString()}>
                 <button className="btn btn-active btn-primary ml-6 gap-2">
                     Explore
