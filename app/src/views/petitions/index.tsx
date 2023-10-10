@@ -122,7 +122,7 @@ export const PetitionsView: FC = ({ }) => {
     <div className="md:hero mx-auto p-4">
       <div className="hero-content flex flex-col">
         <p className="pt-8 pb-4 mx-auto">
-          <img src='argonpetitions.svg' className='h-16' />
+          <img src='/argonpetitions.svg' className='h-16' />
         </p>
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
@@ -145,7 +145,7 @@ export const PetitionsView: FC = ({ }) => {
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
         <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-          <label className="modal-box" htmlFor="">
+          <label className="modal-box rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
             <h3 className="text-lg font-bold my-6 text-center">Create a new region</h3>
             <form onSubmit={createRegion} className="flex flex-col">
               <input type="text" placeholder="Description" className="input input-bordered w-full max-w-xs mt-6 mb-4 mx-auto" />

@@ -18,7 +18,6 @@ type CardProps = {
     expiry: number, //unix timestamp
     closed: boolean,
     signatures: number,
-    single?: boolean
 };
 
 const PetitionCard = ({
@@ -30,7 +29,6 @@ const PetitionCard = ({
     expiry, //unix timestamp
     closed,
     signatures,
-    single
 }: CardProps) => {
     const { clearLiveProps, getState, getLiveProps, state } = useProposalStore()
 
@@ -123,26 +121,26 @@ const PetitionCard = ({
     }, [wallet, connection, gatewayToken, gatewayStatus])
 
     return (
-        <div className="card rounded-2xl w-96 m-6 bg-base-100 shadow-xl">
+        <div className="card rounded-xl max-w-2xl w-fit h-fit m-6 bg-base-100 shadow-xl">
             <div className="card-body">
-                <div className="flex flex-row place-content-between">
-                    <p className="card-title w-fit">{title}</p>
-                    {
-                        !single &&
-                        <Link href={`/petitions/${region}/${id}`}>
-                            <button className="btn btn-square">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.25 42.7q-1.6 0-2.775-1.175Q5.3 40.35 5.3 38.75V9.25q0-1.65 1.175-2.825Q7.65 5.25 9.25 5.25h13.7v4H9.25v29.5h29.5v-13.7h4v13.7q0 1.6-1.175 2.775Q40.4 42.7 38.75 42.7Zm10.5-11.65L17 28.25l19-19H25.95v-4h16.8v16.8h-4v-10Z" />
-                                </svg>
-                            </button>
-                        </Link>
-                    }
-                </div>
+
+                <p className="card-title w-fit">{title}</p>
+
                 <a href={link.toString()} className="underline">info ↗️</a>
+
                 {signatures} signature{signatures != 1 && "s"}
+
                 <br />
+
                 {closed ? "expired" : "expiring"} on {new Date(expiry * 1000).toDateString()}
+
                 <div className="card-actions justify-end">
+                    <Link href={`/petitions/${region}/${id}`}>
+                        <button className="btn btn-square">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 -960 960 960">
+                                <path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5T638-672L356-508q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Zm0-600ZM240-480Zm480 280Z" />                            </svg>
+                        </button>
+                    </Link>
                     {
                         closed ?
                             <button className="btn btn-disabled">closed</button>

@@ -176,7 +176,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                 <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
 
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-                    <label className="modal-box text-center" htmlFor="">
+                    <label className="modal-box text-center rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
                         <h3 className="text-lg font-bold my-6 text-center">Create a proposal</h3>
 
                         <form onSubmit={addPetition} className="flex flex-col">
