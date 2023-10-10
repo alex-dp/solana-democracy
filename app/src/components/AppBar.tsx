@@ -45,37 +45,32 @@ export const AppBar: FC = () => {
               <NavElement
                 label="Home"
                 href="/"
-                navigationStarts={() => setIsNavOpen(false)}
               />
               <NavElement
                 label="UBI"
                 href="/ubi"
-                navigationStarts={() => setIsNavOpen(false)}
               />
               <NavElement
                 label="Petitions"
                 href="/petitions"
-                navigationStarts={() => setIsNavOpen(false)}
               />
 
               <NavElement
                 label="Mirrors"
                 href="/mirrors"
-                navigationStarts={() => setIsNavOpen(false)}
               />
             </div>
             <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6 " />
           </div>
           <label
             htmlFor="my-drawer"
-            className="btn btn-square p-4 btn-lg bg-transparent mx-4 md:hidden"
-            onClick={() => setIsNavOpen(!isNavOpen)}>
+            className="btn btn-square p-4 border-0 btn-lg bg-transparent mx-4 md:hidden">
 
 
             <div className="space-y-2.5">
-              <div className={`h-0.5 w-6 bg-white`} />
-              <div className={`h-0.5 w-6 bg-white`} />
-              <div className={`h-0.5 w-6 bg-white`} />
+              <div className={`h-0.5 w-8 bg-white`} />
+              <div className={`h-0.5 w-8 bg-white`} />
+              <div className={`h-0.5 w-8 bg-white`} />
             </div>
           </label>
         </div>

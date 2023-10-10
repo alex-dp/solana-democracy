@@ -16,29 +16,29 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay gap-6"></label>
 
-        <ul className="p-4 overflow-y-auto menu w-80 h-full border-r-2 border-white bg-base-100 gap-10 sm:flex items-center">
+        <ul className="overflow-y-auto menu w-80 h-full border-r-2 border-white bg-base-100 gap-10 sm:flex items-center">
           <li>
-            <img className="h-12 my-20" src='/argontype.svg' />
+            <img className="h-12 mt-12" src='/argontype.svg' />
           </li>
-          <li>
+          <li className='w-full'>
             <NavElement
               label="Home"
               href="/"
             />
           </li>
-          <li>
+          <li className='w-full'>
             <NavElement
               label="UBI"
               href="/ubi"
             />
           </li>
-          <li>
+          <li className='w-full'>
             <NavElement
               label="Petitions"
               href="/petitions"
             />
           </li>
-          <li>
+          <li className='w-full'>
             <NavElement
               label="Mirrors"
               href="/mirrors"
