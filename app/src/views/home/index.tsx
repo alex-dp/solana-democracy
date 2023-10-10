@@ -8,7 +8,7 @@ export const HomeView = () => {
   clearAll()
 
   return (
-    <div className='md:hero mx-auto p-4'>
+    <div className='md:hero mx-auto p-4 apply-gradient'>
       <link rel="me" href="https://mastodon.social/@alexdp" />
       <link rel="me" href="https://kolektiva.social/@alexdp" />
 

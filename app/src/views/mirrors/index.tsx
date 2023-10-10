@@ -4,7 +4,7 @@ export const MirrorsView = () => {
 
     return (
 
-        <div className='md:hero mx-auto p-4'>
+        <div className='md:hero mx-auto p-4 apply-gradient'>
             <div className="hero-content flex flex-col place-content-center">
 
                 <p className="pt-8 pb-4 mx-auto">

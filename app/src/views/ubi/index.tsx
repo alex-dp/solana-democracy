@@ -28,8 +28,8 @@ export const UBIView = () => {
 
   return (
 
-    <div className='md:hero mx-auto p-4'>
-      <div className="hero-content flex flex-col place-content-center">
+    <div className='apply-gradient min-h-screen w-screen place-content-evenly'>
+      <div className="flex flex-col mx-auto">
 
         <p className="pt-8 pb-4 mx-auto">
           <img src='argonubi.svg' className='h-16' />
@@ -64,7 +64,9 @@ export const UBIView = () => {
 
         </div>
 
-        <InfoCard supply={supply ? supply : 0} issuance={state ? findIssuance(state.capLeft) : 0} />
+        <div className='mx-auto mt-4'>
+          <InfoCard supply={supply ? supply : 0} issuance={state ? findIssuance(state.capLeft) : 0} />
+        </div>
       </div>
     </div >
 

@@ -15,12 +15,12 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
         {children}
       </div>
       {/* SideBar / Drawer */}
-      <div className="drawer-side">
+      <div className="drawer-side h-full">
         <label htmlFor="my-drawer" className="drawer-overlay gap-6"></label>
 
         <ul className="p-4 overflow-y-auto menu w-80 bg-base-100 gap-10 sm:flex items-center">
           <li>
-            <Text variant="heading" className='font-extrabold tracking-tighter text-center text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-fuchsia-500 mt-10'>Menu</Text>
+            <img className="h-12" src='/argontype.svg'/>
           </li>
           <li>
             <NavElement

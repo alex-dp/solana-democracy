@@ -119,8 +119,8 @@ export const PetitionsView: FC = ({ }) => {
   }, [connection, regionList, wallet])
 
   return (
-    <div className="md:hero mx-auto p-4">
-      <div className="hero-content flex flex-col">
+    <div className="apply-gradient w-screen min-h-screen">
+      <div className="flex flex-col mx-auto">
         <p className="pt-8 pb-4 mx-auto">
           <img src='/argonpetitions.svg' className='h-16' />
         </p>
@@ -136,7 +136,7 @@ export const PetitionsView: FC = ({ }) => {
           Active regions
         </h4>
 
-        <label htmlFor="my-modal-4" className="btn btn-active border-2 border-purple-700">
+        <label htmlFor="my-modal-4" className="btn btn-active border-2 border-purple-700 w-fit mx-auto my-2">
           Create new region
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
             <path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z" />
@@ -158,7 +158,7 @@ export const PetitionsView: FC = ({ }) => {
           </label>
         </label>
 
-        {regStates?.map((v, i) => <RegionRow description={v.description} code={v.region} key={i} />)}
+        {regStates?.map((v, i) => <div className="mx-auto my-2"><RegionRow description={v.description} code={v.region} key={i} /></div>)}
 
       </div>
     </div >
