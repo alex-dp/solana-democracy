@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import useNotificationStore from "stores/useNotificationStore";
 import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
+import { getPropAddress, getSigAddress, getStateAddress } from "utils/petitions";
 
 type CardProps = {
     id: number,
@@ -67,13 +68,7 @@ const PetitionCard = ({
             return
         }
 
-        let idbuf = Buffer.alloc(4)
-        idbuf.writeInt32BE(id)
-
-        let regbuf = Buffer.alloc(1)
-        regbuf.writeUInt8(region)
-
-        let sigAddress = PublicKey.findProgramAddressSync([Buffer.from("s"), wallet.publicKey.toBuffer(), regbuf, idbuf], programID)
+        let sigAddress = getSigAddress(wallet.publicKey, region, id)
 
         let sigAcc = await connection.getAccountInfo(sigAddress[0])
 
@@ -86,8 +81,8 @@ const PetitionCard = ({
 
         const program = new Program(idl, PETITION_PROGRAM, provider)
 
-        let propAddress = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
-        let stateAddr = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
+        let propAddress = getPropAddress(region, id)
+        let stateAddr = getStateAddress(region)
 
         let tx = new Transaction();
         tx.add(

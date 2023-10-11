@@ -1,16 +1,11 @@
 import { PublicKey } from "@solana/web3.js";
 import { FUNDRAISER_PROGRAM } from "types/types";
+import { get2buf } from "utils";
 
 let fundraiserPk = new PublicKey(FUNDRAISER_PROGRAM)
 
 function findWithSeeds(seeds: (Uint8Array | Buffer)[]) {
     return PublicKey.findProgramAddressSync(seeds, fundraiserPk)[0]
-}
-
-function get2buf(n: number) {
-    let buf = Buffer.alloc(2)
-    buf.writeUint16BE(n)
-    return buf
 }
 
 export function getFundListAddress() {

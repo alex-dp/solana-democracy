@@ -11,6 +11,8 @@ import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { ISC_MINT, PETITION_PROGRAM, useIDL } from "types/types";
 import useNotificationStore from "stores/useNotificationStore";
+import { getPropAddress, getStateAddress } from "utils/petitions";
+import { stat } from "fs";
 
 type ViewProps = {
     code: number,
@@ -80,16 +82,10 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         let link = e.target[1].value
         let expiry = Date.parse(e.target[2].value) / 1000
 
-        let idbuf = Buffer.alloc(4)
-        idbuf.writeInt32BE(state.lastId + 1)
-
-        let regbuf = Buffer.alloc(1)
-        regbuf.writeUInt8(state.region)
-
         let tx = new Transaction()
 
-        let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
-        let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
+        let ppda = getPropAddress(state.region, state.lastId + 1)
+        let statepda = getStateAddress(state.region)
 
         let ata = await getAssociatedTokenAddress(
             new PublicKey(ISC_MINT), // mint
@@ -110,8 +106,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({
-                proposal: ppda[0],
-                regionalState: statepda[0],
+                proposal: ppda,
+                regionalState: statepda,
                 gatewayToken: gatewayToken.publicKey,
                 userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",

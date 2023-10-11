@@ -8,6 +8,7 @@ import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
 import useNotificationStore from "stores/useNotificationStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
+import { getGKLinkAddress, getRegListAddress, getStateAddress } from "utils/petitions";
 
 export const PetitionsView: FC = ({ }) => {
 
@@ -53,16 +54,16 @@ export const PetitionsView: FC = ({ }) => {
 
     const program = new Program(idl, programID, provider)
 
-    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], programID)
+    let regpda = getRegListAddress()
 
-    let regs = await connection.getAccountInfo(regpda[0])
+    let regs = await connection.getAccountInfo(regpda)
 
     if (!regs) {
       let tx = new Transaction();
       tx.add(
         await program.methods.initializeRegList().accounts({
           userAuthority: wallet.publicKey,
-          activeRegions: regpda[0],
+          activeRegions: regpda,
           systemProgram: SystemProgram.programId
         }).instruction()
       );
@@ -81,23 +82,20 @@ export const PetitionsView: FC = ({ }) => {
       notify({ type: 'success', message: `Region list created`, txid: signature });
     }
 
-    let regbuf = Buffer.from([0])
-    regbuf.writeUInt8(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
-
     let desc = e.target[0].value.toString()
     let gk = new PublicKey(e.target[1].value.toString())
 
-    let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
-    let gkLinkPda = PublicKey.findProgramAddressSync([gk.toBuffer()], programID)
+    let statepda = getStateAddress(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
+    let gkLinkPda = getGKLinkAddress(gk)
 
     let tx = new Transaction();
     tx.add(
       await program.methods.initializeRegion(desc).accounts({
-        state: statepda[0],
+        state: statepda,
         userAuthority: wallet.publicKey,
-        activeRegions: regpda[0],
+        activeRegions: regpda,
         gatekeeper: gk,
-        gkLink: gkLinkPda[0],
+        gkLink: gkLinkPda,
         systemProgram: SystemProgram.programId
       }).instruction()
     );

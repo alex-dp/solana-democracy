@@ -26,6 +26,16 @@ const numberToCurrencyString = (number: number) =>
  */
 const clamp = (current, min, max) => Math.min(Math.max(current, min), max);
 
+export function getnbuf(s: number, n: number) {
+    let buf = Buffer.alloc(s)
+    buf.writeUint16BE(n)
+    return buf
+}
+
+export function get2buf(n: number) {
+    return getnbuf(2, n)
+}
+
 export {
     cn,
     formatDate,

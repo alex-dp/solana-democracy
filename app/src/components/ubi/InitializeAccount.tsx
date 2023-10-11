@@ -17,6 +17,7 @@ import {
 import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
+import { getUbiInfoAddress } from 'utils/ubi';
 
 const { SystemProgram } = web3;
 
@@ -48,12 +49,9 @@ export const InitializeAccount: FC = () => {
             return
         }
 
-        let pda = PublicKey.findProgramAddressSync(
-            [Buffer.from("ubi_info3"), wallet.publicKey.toBytes()],
-            programID
-        )
+        let pda = getUbiInfoAddress(wallet.publicKey)
 
-        let info_raw = await connection.getAccountInfo(pda[0])
+        let info_raw = await connection.getAccountInfo(pda)
 
         let signature: TransactionSignature = '';
 
@@ -75,7 +73,7 @@ export const InitializeAccount: FC = () => {
 
                 transaction.add(
                     await program.methods.initializeAccount().accounts({
-                        ubiInfo: pda[0],
+                        ubiInfo: pda,
                         userAuthority: wallet.publicKey,
                         systemProgram: SystemProgram.programId,
                         platformFeeAccount: new PublicKey("DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv")
