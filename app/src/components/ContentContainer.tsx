@@ -16,7 +16,7 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay gap-6"></label>
 
-        <ul className="overflow-y-auto menu w-80 h-full border-r-2 border-white bg-base-100 gap-10 sm:flex items-center">
+        <ul className="overflow-auto menu w-80 min-h-full border-r-2 border-white bg-base-100 gap-10 sm:flex items-center">
           <li>
             <img className="h-12 mt-12" src='/argontype.svg' />
           </li>
