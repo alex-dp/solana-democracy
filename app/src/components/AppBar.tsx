@@ -1,8 +1,7 @@
 import { FC } from 'react';
 import Link from "next/link";
 import dynamic from 'next/dynamic';
-import React, { useState } from "react";
-import { useAutoConnect } from '../contexts/AutoConnectProvider';
+import React from "react";
 import NavElement from './nav-element';
 import Spline from '@splinetool/react-spline';
 
@@ -12,10 +11,6 @@ const WalletMultiButtonDynamic = dynamic(
 );
 
 export const AppBar: FC = () => {
-  const { setAutoConnect } = useAutoConnect();
-  const [isNavOpen, setIsNavOpen] = useState(false);
-
-  setAutoConnect(true)
 
   return (
     <div>

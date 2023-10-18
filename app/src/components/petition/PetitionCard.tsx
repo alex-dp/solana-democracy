@@ -70,7 +70,7 @@ const PetitionCard = ({
 
         let sigAddress = getSigAddress(wallet.publicKey, region, id)
 
-        let sigAcc = await connection.getAccountInfo(sigAddress[0])
+        let sigAcc = await connection.getAccountInfo(sigAddress)
 
         if (sigAcc != null) {
             notify({ type: "error", message: "You have already signed this petition" })
@@ -87,10 +87,10 @@ const PetitionCard = ({
         let tx = new Transaction();
         tx.add(
             await program.methods.signProposal().accounts({
-                proposal: propAddress[0],
-                signature: sigAddress[0],
+                proposal: propAddress,
+                signature: sigAddress,
                 gatewayToken: gatewayToken.publicKey,
-                regionalState: stateAddr[0],
+                regionalState: stateAddr,
                 userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
                 systemProgram: SystemProgram.programId

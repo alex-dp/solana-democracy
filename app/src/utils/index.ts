@@ -28,7 +28,7 @@ const clamp = (current, min, max) => Math.min(Math.max(current, min), max);
 
 export function getnbuf(s: number, n: number) {
     let buf = Buffer.alloc(s)
-    buf.writeUint16BE(n)
+    buf.writeIntBE(n, 0, s)
     return buf
 }
 

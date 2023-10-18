@@ -13,7 +13,7 @@ import { useGateway } from '@civic/solana-gateway-react';
 import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
-import { getUbiInfoAddress, getUserToken } from 'utils/ubi';
+import { getMintSignerAddress, getUbiInfoAddress, getUserToken } from 'utils/ubi';
 
 const { SystemProgram } = web3;
 
@@ -70,10 +70,7 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             provider = getProvider()
         } catch (error) { console.log(error) }
 
-        let mint_signer = PublicKey.findProgramAddressSync(
-            [Buffer.from("minter")],
-            programID
-        )
+        let mint_signer = getMintSignerAddress()
 
         let ata = await getUserToken(wallet.publicKey)
 
@@ -121,7 +118,7 @@ export const Mint = ({ info: info_prop }: MintProps) => {
 
             let transaction = new Transaction().add(
                 await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
-                    mintSigner: mint_signer[0],
+                    mintSigner: mint_signer,
                     ubiMint: UBI_MINT,
                     userAuthority: wallet.publicKey,
                     ubiTokenAccount: ata,
