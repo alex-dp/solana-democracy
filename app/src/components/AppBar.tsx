@@ -3,7 +3,6 @@ import Link from "next/link";
 import dynamic from 'next/dynamic';
 import React from "react";
 import NavElement from './nav-element';
-import Spline from '@splinetool/react-spline';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -16,15 +15,10 @@ export const AppBar: FC = () => {
     <div>
       {/* NavBar / Header */}
       <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
-        <div className="navbar-start align-items-center">
-          <div className="hidden md:inline w-22 h-22 md:p-2">
+        <div className="navbar-start">
+          <div className="hidden md:inline md:p-2 my-auto ml-4">
             <Link href="https://argonsuite.org">
-              <div className='flex flex-row place-items-center gap-6'>
-                <div className="">
-                  <Spline style={{ margin: -120 }} scene="https://prod.spline.design/4I6X2r7IWIX3Ep0R/scene.splinecode" />
-                </div>
-                <img src="/argontype.svg" className='h-6' />
-              </div>
+              <img src="/argontype.svg" className='h-6' />
             </Link>
           </div>
           <div className='w-fit h-fit md:hidden'>
@@ -34,7 +28,7 @@ export const AppBar: FC = () => {
 
         {/* Nav Links */}
         {/* Wallet & Settings */}
-        <div className="navbar-end">
+        <div className="navbar-center">
           <div className="hidden md:inline-flex place-items-center justify-items gap-6 max-w-full">
             <div className='flex flex-row gap-6 my-auto bg-black p-4 max-w-2/3 rounded-full overflow-auto'>
               <NavElement
@@ -46,7 +40,7 @@ export const AppBar: FC = () => {
                 label="UBI"
                 href="/ubi"
               />
-              
+
               <NavElement
                 label="Petitions"
                 href="/petitions"
@@ -57,7 +51,12 @@ export const AppBar: FC = () => {
                 href="/mirrors"
               />
             </div>
-            <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6" />
+          </div>
+        </div>
+
+        <div className='navbar-end'>
+          <div className='hidden md:inline'>
+          <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6" />
           </div>
 
           <label
@@ -69,7 +68,6 @@ export const AppBar: FC = () => {
               <div className={`h-0.5 w-8 bg-white`} />
             </div>
           </label>
-
         </div>
       </div>
     </div>
