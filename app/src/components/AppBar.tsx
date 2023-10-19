@@ -21,7 +21,7 @@ export const AppBar: FC = () => {
               <img src="/argontype.svg" className='h-6' />
             </Link>
           </div>
-          <div className='w-fit h-fit md:hidden'>
+          <div className='md:hidden'>
             <WalletMultiButtonDynamic className="btn-ghost btn-sm relative flex text-lg" />
           </div>
         </div>
