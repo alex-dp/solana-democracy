@@ -11,7 +11,7 @@ export const GetISC: FC = () => {
 
     return (
         <button
-            className="m-2 btn border-2 border-purple-600 gap-3"
+            className="btn border-2 border-purple-600 gap-3"
             onClick={onClick}>
             <img src='/isc.png' className='w-6 h-6 rounded-full border-2 border-white'></img> get ISC from Jupiter
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">

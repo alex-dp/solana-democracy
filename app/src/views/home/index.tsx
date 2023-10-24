@@ -33,15 +33,15 @@ export const HomeView = () => {
           <p>Libre tools for direct democracy on Solana</p>
         </h4>
 
-        <div className="flex flex-wrap place-content-center">
+        <div className="flex flex-wrap place-content-center lg:px-32 xl:px-40">
 
-          <ProgramCard destination="/ubi" title="UBI" description="Universal Basic Income" button="Launch" disabled={false} />
-          <ProgramCard destination="/petitions" title="Petitions" description="Global petitions now available" button="Explore" disabled={false} />
-          <ProgramCard destination="/referenda" title="Referenda" description="Approve or reject a proposal" button="Coming Soon" disabled={true} />
-          <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" button="Coming Soon" disabled={true} />
-          <ProgramCard destination="/elections" title="Chair Elections" description="Fill a seat by asking voters to rank candidates" button="Coming Soon" disabled={true} />
-          <ProgramCard destination="/census" title="Census Tools" description="Measure preference by sorting or on a scale" button="Coming Soon" disabled={true} />
-          <ProgramCard destination="/selections" title="Council Selections" description="Randomly sample a council" button="Coming Soon" disabled={true} />
+          <ProgramCard destination="/ubi" title="UBI" description="Universal Basic Income" disabled={false} />
+          <ProgramCard destination="/petitions" title="Petitions" description="Global petitions now available" disabled={false} />
+          <ProgramCard destination="/referenda" title="Referenda" description="Approve or reject a proposal" disabled={true} />
+          <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" disabled={true} />
+          <ProgramCard destination="/elections" title="Chair Elections" description="Fill a seat by asking voters to rank candidates" disabled={true} />
+          <ProgramCard destination="/census" title="Census Tools" description="Measure preference by sorting or on a scale" disabled={true} />
+          <ProgramCard destination="/selections" title="Council Selections" description="Randomly sample a council" disabled={true} />
         </div>
       </div>
     </div>

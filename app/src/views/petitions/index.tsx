@@ -152,12 +152,12 @@ export const PetitionsView: FC = ({ }) => {
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
         <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-          <label className="modal-box rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
-            <h3 className="text-lg font-bold my-6 text-center">Create a new region</h3>
-            <form onSubmit={createRegion} className="flex flex-col">
-              <input type="text" placeholder="Description" className="input input-bordered w-full max-w-xs mt-6 mb-4 mx-auto" />
-              <input type="text" placeholder="Gatekeeper network address" className="input input-bordered w-full max-w-xs my-4 mx-auto" />
-              <button type="submit" className="btn btn-active btn-primary mx-auto my-4">
+          <label className="modal-box rounded-xl w-2xl h-fit border-2 border-purple-600" htmlFor="">
+            <h3 className="text-lg font-bold text-center mb-4">Create a new region</h3>
+            <form onSubmit={createRegion} className="flex flex-col gap-4">
+              <input type="text" placeholder="Description" className="input input-bordered w-full max-w-xs mx-auto" />
+              <input type="text" placeholder="Gatekeeper network address" className="input input-bordered w-full max-w-xs mx-auto" />
+              <button type="submit" className="btn btn-active btn-primary mx-auto">
                 submit
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48"><path d="m24 40-2.1-2.15L34.25 25.5H8v-3h26.25L21.9 10.15 24 8l16 16Z" /></svg>
               </button>
