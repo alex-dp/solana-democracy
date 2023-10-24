@@ -17,8 +17,8 @@ type ViewProps = {
 export const FundView = ({}: ViewProps) => {
 
     return (
-      <div className='md:hero mx-auto p-4'>
-        <div className="md:hero-content flex flex-col">
+      <div className='w-screen min-h-screen apply-gradient'>
+        <div className="flex flex-col">
   
           {/* 
           AddUserPref, DestroyFund, Donate, MintInfo, AddPartition

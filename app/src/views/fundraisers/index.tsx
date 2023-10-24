@@ -5,8 +5,8 @@ import { MakeFund } from "components/fundraisers/MakeFund";
 export const FundraisersView = () => {
 
   return (
-    <div className='md:hero mx-auto p-4'>
-      <div className="md:hero-content flex flex-col">
+    <div className='w-screen min-h-screen apply-gradient'>
+      <div className="flex flex-col w-fit mx-auto">
         <Link href={`/`}>
           <button className="btn btn-square mr-4">
             <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
@@ -15,9 +15,9 @@ export const FundraisersView = () => {
           </button>
         </Link>
 
-        <Initialize/>
+        <Initialize />
 
-        <MakeFund/>
+        <MakeFund />
 
         {/* 
         build MakeFund button component to call function
