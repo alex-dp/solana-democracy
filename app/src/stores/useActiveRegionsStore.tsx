@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { ActiveRegionsLayout, clearWithSeeds, Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, RawActiveRegions, RawState, setWithSeeds, StateLayout } from 'types/types';
+import { getRegListAddress, getStateAddress } from 'utils/petitions';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -19,12 +20,9 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
         let regionList: Expirable<RawActiveRegions> = getWithSeeds(Programs.Petitions, ["r"])
 
         if (!regionList || expired(regionList)) {
-            let pda = PublicKey.findProgramAddressSync(
-                [Buffer.from("r")],
-                programID
-            )
+            let pda = getRegListAddress()
 
-            let acc = await connection.getAccountInfo(pda[0])
+            let acc = await connection.getAccountInfo(pda)
 
             if (acc) {
                 regionList = new Expirable<RawActiveRegions>(Date.now() + 30 * 60 * 1000, ActiveRegionsLayout.decode(acc.data))
@@ -43,14 +41,9 @@ const useActiveRegionsStore = create<ActiveRegionsStore>((set, _get) => ({
         let regStates: RawState[] = getWithSeeds(Programs.Petitions, ["regstates"])
 
         if (!regStates || regStates.length != list.list.length) {
-            let regbuf = Buffer.alloc(1)
 
             let adds = list.list.map((e) => {
-                regbuf.writeUInt8(e)
-                return PublicKey.findProgramAddressSync(
-                    [Buffer.from("d"), regbuf],
-                    programID
-                )[0]
+                return getStateAddress(e)
             })
 
             let accs = await connection.getMultipleAccountsInfo(adds)

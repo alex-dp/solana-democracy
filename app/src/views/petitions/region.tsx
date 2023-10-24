@@ -11,6 +11,8 @@ import { FormEvent, useCallback, useEffect } from "react";
 import useProposalStore from "stores/useProposalStore";
 import { ISC_MINT, PETITION_PROGRAM, useIDL } from "types/types";
 import useNotificationStore from "stores/useNotificationStore";
+import { getPropAddress, getStateAddress } from "utils/petitions";
+import { stat } from "fs";
 
 type ViewProps = {
     code: number,
@@ -80,16 +82,10 @@ export const RegionView = ({ code, closed }: ViewProps) => {
         let link = e.target[1].value
         let expiry = Date.parse(e.target[2].value) / 1000
 
-        let idbuf = Buffer.alloc(4)
-        idbuf.writeInt32BE(state.lastId + 1)
-
-        let regbuf = Buffer.alloc(1)
-        regbuf.writeUInt8(state.region)
-
         let tx = new Transaction()
 
-        let ppda = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)
-        let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
+        let ppda = getPropAddress(state.region, state.lastId + 1)
+        let statepda = getStateAddress(state.region)
 
         let ata = await getAssociatedTokenAddress(
             new PublicKey(ISC_MINT), // mint
@@ -110,8 +106,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
         tx.add(
             await program.methods.createProposal(state.region, title, link, new BN(expiry)).accounts({
-                proposal: ppda[0],
-                regionalState: statepda[0],
+                proposal: ppda,
+                regionalState: statepda,
                 gatewayToken: gatewayToken.publicKey,
                 userAuthority: wallet.publicKey,
                 platformFeeAccount: "DF9ni5SGuTy42UrfQ9X1RwcYQHZ1ZpCKUgG6fWjSLdiv",
@@ -146,8 +142,8 @@ export const RegionView = ({ code, closed }: ViewProps) => {
     let minDate = date.toISOString().slice(0, 10)
 
     return (
-        <div className="md:hero mx-auto p-4">
-            <div className="md:hero-content flex flex-col">
+        <div className="w-screen min-h-screen apply-gradient">
+            <div className="flex flex-col mx-auto">
                 <p className="pt-8 pb-4 mx-auto">
                     <img src='/argonpetitions.svg' className='h-16' />
                 </p>
@@ -166,7 +162,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                     {state?.description}
                 </h4>
 
-                <label htmlFor="my-modal-4" className="btn btn-active mx-auto">
+                <label htmlFor="my-modal-4" className="btn btn-active mx-auto border-2 border-purple-700 m-2">
                     Make a proposal
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
                         <path d="M22.5 36.3h3v-6.45H32v-3h-6.5v-6.5h-3v6.5H16v3h6.5ZM11 44q-1.2 0-2.1-.9Q8 42.2 8 41V7q0-1.2.9-2.1Q9.8 4 11 4h18.05L40 14.95V41q0 1.2-.9 2.1-.9.9-2.1.9Zm16.55-27.7V7H11v34h26V16.3ZM11 7v9.3V7v34V7Z" />
@@ -176,7 +172,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                 <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
 
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-                    <label className="modal-box text-center" htmlFor="">
+                    <label className="modal-box text-center rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
                         <h3 className="text-lg font-bold my-6 text-center">Create a proposal</h3>
 
                         <form onSubmit={addPetition} className="flex flex-col">

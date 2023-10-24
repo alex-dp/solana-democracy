@@ -18,6 +18,11 @@ export function getUbiStateAddress() {
     return findWithSeeds(seeds)
 }
 
+export function getMintSignerAddress() {
+    let seeds = [Buffer.from("minter")]
+    return findWithSeeds(seeds)
+}
+
 export async function getUserToken(user: PublicKey) {
     return await getAssociatedTokenAddress(
         new PublicKey(UBI_MINT),

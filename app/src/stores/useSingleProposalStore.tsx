@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, setWithSeeds } from 'types/types';
+import { getPropAddress } from 'utils/petitions';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -15,13 +16,7 @@ const useSingleProposalStore = create<SingleProposalStore>((set, _get) => ({
         let prop: RawProp = getWithSeeds(Programs.Petitions, ["p", region, id])
 
         if (!prop) {
-            let idbuf = Buffer.alloc(4)
-            let regbuf = Buffer.alloc(1)
-
-            idbuf.writeUInt32BE(id)
-            regbuf.writeUInt8(region)
-
-            let addr = PublicKey.findProgramAddressSync([Buffer.from("p"), regbuf, idbuf], programID)[0]
+            let addr = getPropAddress(region, id)
 
             let acc = await connection.getAccountInfo(addr)
             prop = PropLayout.decode(acc.data)

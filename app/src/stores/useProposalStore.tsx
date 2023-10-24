@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { clearWithSeeds, Expirable, expired, getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, RawState, setWithSeeds, StateLayout } from 'types/types';
+import { getPropAddress, getStateAddress } from 'utils/petitions';
 
 const programID = new PublicKey(PETITION_PROGRAM);
 
@@ -23,15 +24,10 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         let state: Expirable<RawState> = getWithSeeds(Programs.Petitions, ["d", region])
 
         if (!state || expired(state)) {
-            let regbuf = Buffer.alloc(1)
-            regbuf.writeUInt8(region)
 
-            let pda = PublicKey.findProgramAddressSync(
-                [Buffer.from("d"), regbuf],
-                programID
-            )
+            let pda = getStateAddress(region)
 
-            let acc = await connection.getAccountInfo(pda[0])
+            let acc = await connection.getAccountInfo(pda)
             if (acc) {
                 state = new Expirable(Date.now() + 1000 * 60 * 5, StateLayout.decode(acc.data))
                 setWithSeeds(Programs.Petitions, ["d", region], state)
@@ -49,16 +45,8 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         let lp: Expirable<RawProp[]> = getWithSeeds(Programs.Petitions, ["liveprops", state.region])
 
         if (!lp || expired(lp) || lp.object.length != state.liveProps.length) {
-            let idbuf = Buffer.alloc(4)
-            let regbuf = Buffer.alloc(1)
-
             let adds = state.liveProps.reverse().map((e) => {   //reverse: most recent first
-                idbuf.writeUInt32BE(e)
-                regbuf.writeUInt8(state.region)
-                return PublicKey.findProgramAddressSync(
-                    [Buffer.from("p"), regbuf, idbuf],
-                    programID
-                )[0]
+                return getPropAddress(state.region, e)
             })
 
             let accs = await connection.getMultipleAccountsInfo(adds)
@@ -77,16 +65,8 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         let cp: Expirable<RawProp[]> = getWithSeeds(Programs.Petitions, ["closedprops", state.region])
 
         if (!cp || expired(cp) || cp.object.length != state.closedProps.length) {
-            let idbuf = Buffer.alloc(4)
-            let regbuf = Buffer.alloc(1)
-
             let adds = state.closedProps.reverse().map((e) => {   //reverse: most recent first
-                idbuf.writeUInt32BE(e)
-                regbuf.writeUInt8(state.region)
-                return PublicKey.findProgramAddressSync(
-                    [Buffer.from("p"), regbuf, idbuf],
-                    programID
-                )[0]
+                return getPropAddress(state.region, e)
             })
 
             let accs = await connection.getMultipleAccountsInfo(adds)

@@ -8,6 +8,7 @@ import { FC, FormEvent, useCallback, useEffect } from "react";
 import useActiveRegionsStore from "stores/useActiveRegionsStore";
 import useNotificationStore from "stores/useNotificationStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
+import { getGKLinkAddress, getRegListAddress, getStateAddress } from "utils/petitions";
 
 export const PetitionsView: FC = ({ }) => {
 
@@ -53,16 +54,16 @@ export const PetitionsView: FC = ({ }) => {
 
     const program = new Program(idl, programID, provider)
 
-    let regpda = PublicKey.findProgramAddressSync([Buffer.from("r")], programID)
+    let regpda = getRegListAddress()
 
-    let regs = await connection.getAccountInfo(regpda[0])
+    let regs = await connection.getAccountInfo(regpda)
 
     if (!regs) {
       let tx = new Transaction();
       tx.add(
         await program.methods.initializeRegList().accounts({
           userAuthority: wallet.publicKey,
-          activeRegions: regpda[0],
+          activeRegions: regpda,
           systemProgram: SystemProgram.programId
         }).instruction()
       );
@@ -81,23 +82,20 @@ export const PetitionsView: FC = ({ }) => {
       notify({ type: 'success', message: `Region list created`, txid: signature });
     }
 
-    let regbuf = Buffer.from([0])
-    regbuf.writeUInt8(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
-
     let desc = e.target[0].value.toString()
     let gk = new PublicKey(e.target[1].value.toString())
 
-    let statepda = PublicKey.findProgramAddressSync([Buffer.from("d"), regbuf], programID)
-    let gkLinkPda = PublicKey.findProgramAddressSync([gk.toBuffer()], programID)
+    let statepda = getStateAddress(!regionList || regionList.list.length == 0 ? 0 : regionList.list[regionList.list.length - 1] + 1)
+    let gkLinkPda = getGKLinkAddress(gk)
 
     let tx = new Transaction();
     tx.add(
       await program.methods.initializeRegion(desc).accounts({
-        state: statepda[0],
+        state: statepda,
         userAuthority: wallet.publicKey,
-        activeRegions: regpda[0],
+        activeRegions: regpda,
         gatekeeper: gk,
-        gkLink: gkLinkPda[0],
+        gkLink: gkLinkPda,
         systemProgram: SystemProgram.programId
       }).instruction()
     );
@@ -119,10 +117,10 @@ export const PetitionsView: FC = ({ }) => {
   }, [connection, regionList, wallet])
 
   return (
-    <div className="md:hero mx-auto p-4">
-      <div className="hero-content flex flex-col">
+    <div className="apply-gradient w-screen min-h-screen">
+      <div className="flex flex-col mx-auto">
         <p className="pt-8 pb-4 mx-auto">
-          <img src='argonpetitions.svg' className='h-16' />
+          <img src='/argonpetitions.svg' className='h-16' />
         </p>
 
         <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
@@ -136,7 +134,16 @@ export const PetitionsView: FC = ({ }) => {
           Active regions
         </h4>
 
-        <label htmlFor="my-modal-4" className="btn btn-active">
+        <Link href="https://www.civic.com/pricing/" target="_blank" className="mx-auto my-1">
+          <button className="btn btn-xs">
+          inquire with civic regarding gatekeeper networks
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 48 48">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.25 42.7q-1.6 0-2.775-1.175Q5.3 40.35 5.3 38.75V9.25q0-1.65 1.175-2.825Q7.65 5.25 9.25 5.25h13.7v4H9.25v29.5h29.5v-13.7h4v13.7q0 1.6-1.175 2.775Q40.4 42.7 38.75 42.7Zm10.5-11.65L17 28.25l19-19H25.95v-4h16.8v16.8h-4v-10Z" />
+            </svg>
+          </button>
+        </Link>
+
+        <label htmlFor="my-modal-4" className="btn btn-active border-2 border-purple-700 w-fit mx-auto my-2">
           Create new region
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
             <path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z" />
@@ -145,7 +152,7 @@ export const PetitionsView: FC = ({ }) => {
 
         <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
         <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-          <label className="modal-box" htmlFor="">
+          <label className="modal-box rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
             <h3 className="text-lg font-bold my-6 text-center">Create a new region</h3>
             <form onSubmit={createRegion} className="flex flex-col">
               <input type="text" placeholder="Description" className="input input-bordered w-full max-w-xs mt-6 mb-4 mx-auto" />
@@ -158,7 +165,7 @@ export const PetitionsView: FC = ({ }) => {
           </label>
         </label>
 
-        {regStates?.map((v, i) => <RegionRow description={v.description} code={v.region} key={i} />)}
+        {regStates?.map((v, i) => <div className="mx-auto my-2"><RegionRow description={v.description} code={v.region} key={i} /></div>)}
 
       </div>
     </div >
