@@ -1,45 +1,30 @@
 import { create } from "zustand";
 
+type Notif = {
+  type?: string
+  message: string
+  description?: string
+  txid?: string
+}
+
 interface NotificationStore {
-  notifications: Array<{
-    type: string
-    message: string
-    description?: string
-    txid?: string
-  }>,
-  notify: (newNotif: {
-    type?: string
-    message: string
-    description?: string
-    txid?: string
-  }) => void,
-  remove: (idx: number) => void
+  notif: Notif,
+  notify: (newNotif: Notif) => void,
+  remove: () => void,
 }
 
 const useNotificationStore = create<NotificationStore>((set, get) => ({
-  notifications: [],
-  notify: (newNotif: {
-    type?: string
-    message: string
-    description?: string
-    txid?: string
-  }) => {
+  notif: null,
+  notify: (newNotif: Notif) => {
     set({
-      notifications: [
-        ...get().notifications,
-        { type: 'success', ...newNotif },
-      ]
+      notif: { type: 'success', ...newNotif }  
     })
   },
-  remove: (idx) => {
-    const reversedIndex = get().notifications.length - 1 - idx
+  remove: () => {
     set({
-      notifications: [
-        ...get().notifications.slice(0, reversedIndex),
-        ...get().notifications.slice(reversedIndex + 1),
-      ]
+      notif: null
     })
-  }
+  },
 }))
 
 export default useNotificationStore

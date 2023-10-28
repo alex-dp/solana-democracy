@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   CheckCircleIcon,
   InformationCircleIcon,
@@ -9,27 +9,20 @@ import useNotificationStore from '../stores/useNotificationStore'
 import { useNetworkConfiguration } from 'contexts/NetworkConfigurationProvider';
 
 const NotificationList = () => {
-  const { notifications, remove } = useNotificationStore()
+  const { notif, remove } = useNotificationStore()
 
   return (
-    <div
-      className={`z-20 fixed inset-0 flex items-end pointer-events-none`}
-    >
+    <div className={`z-[10000] fixed inset-0 flex items-end pointer-events-none`}>
       <div className={`flex flex-col w-full`}>
-        {
-          notifications.map((n, idx) => (
-            <Notification
-              key={idx}
-              type={n.type}
-              message={n.message}
-              description={n.description}
-              txid={n.txid}
+          {notif && <Notification
+              type={notif.type}
+              message={notif.message}
+              description={notif.description}
+              txid={notif.txid}
               onHide={() => {
-                remove(idx)
+                remove()
               }}
-            />
-          ))
-        }
+            />}
       </div>
     </div>
   );
@@ -55,13 +48,10 @@ const Notification = ({ type, message, description, txid, onHide }) => {
       <div className={`p-4`}>
         <div className={`flex items-center`}>
           <div className={`flex-shrink-0`}>
-            {type === 'success' ? (
-              <CheckCircleIcon className={`h-8 w-8 mr-1 text-green`} />
-            ) : null}
+            {(!type || type === 'success') && <CheckCircleIcon className={`h-8 w-8 mr-1 text-green`} />}
             {type === 'info' && <InformationCircleIcon className={`h-8 w-8 mr-1 text-red`} />}
-            {type === 'error' && (
-              <XCircleIcon className={`h-8 w-8 mr-1`} />
-            )}
+            {type === 'error' && <XCircleIcon className={`h-8 w-8 mr-1`} />}
+            {type === 'loading' && <span className="loading loading-spinner loading-lg"></span>}
           </div>
           <div className="ml-2 w-0 flex-1">
             <div className={`font-bold text-fgd-1`}>{message}</div>

@@ -8,7 +8,9 @@ import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
 import { useIDL, FUNDRAISER_PROGRAM } from '../../types/types';
 
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-
+import useNotificationStore from 'stores/useNotificationStore';
+import { getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
+import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 
 const programID = new PublicKey(FUNDRAISER_PROGRAM);
 
@@ -16,10 +18,6 @@ const programID = new PublicKey(FUNDRAISER_PROGRAM);
 export const MakeFund = () => {
     const connection = new Connection("https://api.devnet.solana.com")
     const wallet = useWallet();
-
-
-    const { setVisible } = useWalletModal();
-
 
     const getProvider = () => {
         const provider = new AnchorProvider(
@@ -30,22 +28,33 @@ export const MakeFund = () => {
         return provider;
     };
 
+    const { setVisible } = useWalletModal();
+
+    const { notify } = useNotificationStore();
+
     let addFund = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        let i = 0
-
-        while(e.target[i]){
-            console.log(e.target[i].value)
-            i++
-        }
-
-    }, [])
-
-    const onClick = useCallback(async () => {
-
         if (!wallet.connected) {
             setVisible(true)
+            return
+        }
+
+        let data = new Map<String, any>()
+
+        for(let i=0;e.target[i].id;i++) {
+            let target = e.target[i]
+            data.set(target.id, target.type == "checkbox" ? target.checked : target.value)
+        }
+
+        let obj = Object.fromEntries(data.entries())
+
+        let ata = getAssociatedTokenAddressSync(new PublicKey(obj.mint), new PublicKey(obj.recipient_pk), false)
+
+        try {
+            await getAccount(connection, ata)
+        } catch {
+            notify({type: "error", message: "Recipient has no token account for mint"})
             return
         }
 
@@ -57,7 +66,42 @@ export const MakeFund = () => {
             provider = getProvider()
         } catch (error) { console.log(error) }
 
-    }, [wallet, connection]);
+        const program = new Program(idl, programID, provider)
+
+        let transaction = new Transaction().add(
+            await program.methods.makeFund(
+                0,
+                !obj.public,
+                obj.fund_url,
+                obj.partition_url,
+                obj.fund_name,
+                obj.partition_name).accounts({
+                    signer: wallet.publicKey,
+                    liveFunds: getFundListAddress(),
+                    fund: getFundAddress(0),
+                    tokenMint: new PublicKey(obj.mint),
+                    firstPartition: getPartitionAddress(0, 0),
+                    fpRecOwner: new PublicKey(obj.recipient_pk),
+                    fpRecToken: ata,
+                    systemProgram: web3.SystemProgram.programId
+            }).instruction()
+        );
+
+        let signature = await wallet.sendTransaction(transaction, connection);
+
+        notify({ type: 'loading', message: `Creating fund "${obj.fund_name}"`, txid: signature });
+
+        const latestBlockHash = await connection.getLatestBlockhash();
+
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature,
+        });
+
+        notify({ message: `Fund "${obj.fund_name}" created`, txid: signature });
+
+    }, [wallet, connection])
 
     return (
 
@@ -76,14 +120,14 @@ export const MakeFund = () => {
                     <h3 className="text-lg font-bold text-center mb-4">Make a fund</h3>
 
                     <form onSubmit={addFund} className="flex flex-col gap-4">
-                        <input type="text" placeholder="Name of the fund" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input type="text" placeholder="Receivable mint address" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='fund_name' type="text" placeholder="Name of the fund" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='fund_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='mint' type="text" placeholder="Receivable mint address" className="input input-bordered w-full max-w-xs mx-auto" />
 
                         <div className="form-control">
                             <label className="label cursor-pointer input input-bordered w-full max-w-xs mx-auto">
                                 <span className="label-text">Allow others to make partitions</span>
-                                <input type="checkbox" className="checkbox" />
+                                <input id='public' type="checkbox" className="checkbox" />
                             </label>
                         </div>
 
@@ -93,9 +137,9 @@ export const MakeFund = () => {
                             <div className='h-[1px] w-20 bg-white'/>
                         </div>
 
-                        <input type="text" placeholder="Name" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input type="text" placeholder="Recipient's public key" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='partition_name' type="text" placeholder="Name" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='partition_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='recipient_pk' type="text" placeholder="Recipient's public key" className="input input-bordered w-full max-w-xs mx-auto" />
 
                         <button type="submit" className="btn btn-active btn-primary mx-auto gap-2">
                             submit

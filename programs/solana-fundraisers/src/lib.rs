@@ -47,8 +47,6 @@ pub mod solana_fundraisers {
         ctx: Context<MakeFund>,
         fund_id: u16,
         private: bool,
-        fp_rec_owner: Pubkey,
-        fp_rec_token: Pubkey,
         info: String,
         partition_info: String,
         name: String,
@@ -70,7 +68,7 @@ pub mod solana_fundraisers {
         live_funds.funds.push(fund_id);
         live_funds.next_fund += 1;
 
-        fund.creator = *signer.key;
+        fund.creator = signer.key();
         fund.partitions.push(0);
         fund.private = private;
         fund.locked = false;
@@ -79,9 +77,9 @@ pub mod solana_fundraisers {
         fund.information = info;
         fund.name = name;
 
-        first_partition.creator = *signer.key;
-        first_partition.recipient_owner = fp_rec_owner;
-        first_partition.recipient_token_addr = fp_rec_token;
+        first_partition.creator = signer.key();
+        first_partition.recipient_owner = ctx.accounts.fp_rec_owner.key();
+        first_partition.recipient_token_addr = ctx.accounts.fp_rec_token.key();
         first_partition.information = partition_info;
         first_partition.name = partition_name;
 
@@ -277,6 +275,15 @@ pub struct MakeFund<'info> {
     payer = signer
     )]
     pub first_partition: Account<'info, Partition>,
+    ///CHECK: x
+    #[account(mut)]
+    pub fp_rec_owner: AccountInfo<'info>,
+    #[account(
+    mut,
+    token::mint = token_mint,
+    token::authority = fp_rec_owner
+    )]
+    pub fp_rec_token: Account<'info, TokenAccount>,
     pub system_program: Program<'info, System>,
 }
 

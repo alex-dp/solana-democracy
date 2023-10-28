@@ -62,22 +62,12 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             return
         }
 
-        let idl = await useIDL(programID, getProvider())
-
-        let provider: AnchorProvider = null
-
-        try {
-            provider = getProvider()
-        } catch (error) { console.log(error) }
-
         let mint_signer = getMintSignerAddress()
 
         let ata = await getUserToken(wallet.publicKey)
 
-        let a = null
-
         try {
-            a = await getAccount(connection, ata);
+            await getAccount(connection, ata);
         } catch (error: unknown) {
             if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
                 try {
@@ -109,6 +99,14 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             }
         }
 
+        let idl = await useIDL(programID, getProvider())
+
+        let provider: AnchorProvider = null
+
+        try {
+            provider = getProvider()
+        } catch (error) { console.log(error) }
+
         const program = new Program(idl, programID, provider)
 
         let signature: TransactionSignature = '';
@@ -133,7 +131,7 @@ export const Mint = ({ info: info_prop }: MintProps) => {
 
             signature = await wallet.sendTransaction(transaction, connection);
 
-            notify({ type: 'info', message: 'Minting in progress', txid: signature });
+            notify({ type: 'loading', message: 'Minting in progress', txid: signature });
 
             const latestBlockHash = await connection.getLatestBlockhash();
 
@@ -143,7 +141,7 @@ export const Mint = ({ info: info_prop }: MintProps) => {
                 signature: signature,
             });
 
-            notify({ type: 'success', message: 'You have successfully minted some ARGON. Come back in 24 hours!', txid: signature });
+            notify({ message: 'You have successfully minted some ARGON. Come back in 24 hours!', txid: signature });
             clearInfo(wallet.publicKey)
             getInfo(connection, wallet.publicKey)
         } catch (error) {

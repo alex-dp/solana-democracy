@@ -65,12 +65,15 @@ export function clearAll() {
 }
 
 export async function useIDL(id: PublicKey, provider: AnchorProvider): Promise<Idl> {
-    let idl = localStorage.getItem("idl" + id.toString())
 
-    if (idl) return JSON.parse(idl)
+    localStorage.removeItem("idl" + id.toString())
+    let idl: Expirable<Idl> = JSON.parse(localStorage.getItem("idl" + id.toString()))
+
+
+    if (idl && !expired(idl)) return idl.object
     else {
         let fetchedIdl = await Program.fetchIdl(id, provider)
-        localStorage.setItem("idl" + id.toString(), JSON.stringify(fetchedIdl))
+        localStorage.setItem("idl" + id.toString(), JSON.stringify(new Expirable(Date.now() + 1000 * 60 * 10, fetchedIdl)))
         return fetchedIdl
     }
 }
