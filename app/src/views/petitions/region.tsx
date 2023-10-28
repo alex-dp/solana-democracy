@@ -162,9 +162,9 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                     {state?.description}
                 </h4>
 
-                <label htmlFor="my-modal-4" className="btn btn-active mx-auto border-2 border-purple-700 m-2">
+                <label htmlFor="my-modal-4" className="btn btn-active mx-auto border-2 border-purple-700 m-2 gap-2">
                     Make a proposal
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48">
                         <path d="M22.5 36.3h3v-6.45H32v-3h-6.5v-6.5h-3v6.5H16v3h6.5ZM11 44q-1.2 0-2.1-.9Q8 42.2 8 41V7q0-1.2.9-2.1Q9.8 4 11 4h18.05L40 14.95V41q0 1.2-.9 2.1-.9.9-2.1.9Zm16.55-27.7V7H11v34h26V16.3ZM11 7v9.3V7v34V7Z" />
                     </svg>
                 </label>
@@ -172,18 +172,18 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                 <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
 
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
-                    <label className="modal-box text-center rounded-xl max-w-2xl w-fit h-fit border-2 border-purple-600" htmlFor="">
-                        <h3 className="text-lg font-bold my-6 text-center">Create a proposal</h3>
+                    <label className="modal-box text-center rounded-xl w-2xl h-fit border-2 border-purple-600" htmlFor="">
+                        <h3 className="text-lg font-bold text-center mb-4">Create a proposal</h3>
 
-                        <form onSubmit={addPetition} className="flex flex-col">
-                            <input type="text" placeholder="Title" className="input input-bordered w-full max-w-xs mt-6 mb-4 mx-auto" />
-                            <input type="text" placeholder="URL" className="input input-bordered w-full max-w-xs my-4 mx-auto" />
-                            <label className="input-group input-group-md w-full max-w-xs my-4 mx-auto place-content-center">
+                        <form onSubmit={addPetition} className="flex flex-col gap-4 mb-4">
+                            <input type="text" placeholder="Title" className="input input-bordered w-full max-w-xs mx-auto" />
+                            <input type="text" placeholder="URL" className="input input-bordered w-full max-w-xs mx-auto" />
+                            <label className="input-group input-group-md w-full max-w-xs mx-auto place-content-center">
                                 <span>Expiry</span>
                                 <input type="date" id="expiry" className="input input-bordered" min={minDate} />
                             </label>
 
-                            <button type="submit" className="btn btn-active btn-primary mx-auto mt-4 gap-2">
+                            <button type="submit" className="btn btn-active btn-primary mx-auto gap-2">
                                 submit
                                 <div className="badge">2 ISC</div>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 48 48"><path d="m24 40-2.1-2.15L34.25 25.5H8v-3h26.25L21.9 10.15 24 8l16 16Z" /></svg>

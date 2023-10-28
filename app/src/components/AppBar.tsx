@@ -14,10 +14,10 @@ export const AppBar: FC = () => {
   return (
     <div>
       {/* NavBar / Header */}
-      <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
+      <div className="navbar flex h-20 flex-row shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
         <div className="navbar-start">
           <div className="hidden md:inline md:p-2 my-auto ml-4">
-            <Link href="https://argonsuite.org">
+            <Link href="/">
               <img src="/argontype.svg" className='h-6' />
             </Link>
           </div>

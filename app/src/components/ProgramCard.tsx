@@ -4,7 +4,6 @@ type CardProps = {
     title: string,
     description: string,
     destination: string,
-    button: string,
     disabled: boolean
 }
 
