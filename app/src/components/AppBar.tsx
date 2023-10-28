@@ -46,6 +46,13 @@ export const AppBar: FC = () => {
                 href="/petitions"
               />
 
+              <li className='w-full'>
+                <NavElement
+                  label="Fundraisers"
+                  href="/fundraisers"
+                />
+              </li>
+
               <NavElement
                 label="Mirrors"
                 href="/mirrors"
@@ -56,7 +63,7 @@ export const AppBar: FC = () => {
 
         <div className='navbar-end'>
           <div className='hidden md:inline'>
-          <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6" />
+            <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-lg mr-6" />
           </div>
 
           <label
