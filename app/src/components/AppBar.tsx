@@ -46,12 +46,10 @@ export const AppBar: FC = () => {
                 href="/petitions"
               />
 
-              <li className='w-full'>
-                <NavElement
-                  label="Fundraisers"
-                  href="/fundraisers"
-                />
-              </li>
+              <NavElement
+                label="Fundraisers"
+                href="/fundraisers"
+              />
 
               <NavElement
                 label="Mirrors"
