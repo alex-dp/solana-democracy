@@ -1,3 +1,4 @@
+import { AnchorProvider } from '@coral-xyz/anchor';
 import { format } from 'date-fns';
 
 // Concatenates classes into a single className string
@@ -41,4 +42,13 @@ export {
     formatDate,
     numberToCurrencyString,
     clamp,
+};
+
+export const getProvider = (connection, wallet) => {
+    const provider = new AnchorProvider(
+        connection,
+        wallet,
+        AnchorProvider.defaultOptions()
+    );
+    return provider;
 };

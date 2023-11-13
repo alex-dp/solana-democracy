@@ -1,6 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::program::invoke;
-use anchor_lang::solana_program::system_instruction;
 use anchor_spl::token::{self, Mint, TokenAccount, Transfer};
 use std::mem::size_of;
 
@@ -12,30 +10,8 @@ const DIST: &str = "dist";
 const PARTITION: &str = "part";
 const ESCROW: &str = "esc";
 
-fn resize<'info>(
-    account: &mut AccountInfo<'info>,
-    size_diff: i16,
-    payer: &mut AccountInfo<'info>,
-    system_program: &mut AccountInfo<'info>,
-) {
-    if size_diff == 0 {
-        return ();
-    }
-    let rent = Rent::get().unwrap();
-    let new_size = (account.data_len() as i16 + size_diff) as usize;
-    let new_minimum_balance = rent.minimum_balance(new_size.clone());
-
-    let lamports_diff = new_minimum_balance.saturating_sub(account.lamports());
-    invoke(
-        &system_instruction::transfer(payer.key, account.key, lamports_diff),
-        &[payer.clone(), account.clone(), system_program.clone()],
-    )
-    .unwrap();
-
-    account.realloc(new_size, false).unwrap();
-}
-
 #[program]
+#[allow(unused_variables)]
 pub mod solana_fundraisers {
     use super::*;
 
@@ -57,14 +33,7 @@ pub mod solana_fundraisers {
         let fund = &mut ctx.accounts.fund;
         let token_mint = &ctx.accounts.token_mint;
         let first_partition = &mut ctx.accounts.first_partition;
-        let sp = &ctx.accounts.system_program;
 
-        resize(
-            &mut live_funds.to_account_info(),
-            size_of::<u16>() as i16,
-            signer,
-            &mut sp.to_account_info(),
-        );
         live_funds.funds.push(fund_id);
         live_funds.next_fund += 1;
 
@@ -92,14 +61,6 @@ pub mod solana_fundraisers {
         let partition = &mut ctx.accounts.partition;
         let recipient_owner = &ctx.accounts.recipient_owner;
         let recipient_token_account = &ctx.accounts.recipient_token_account;
-        let sp = &ctx.accounts.system_program;
-
-        resize(
-            &mut fund.to_account_info(),
-            2 * size_of::<u16>() as i16,
-            signer,
-            &mut sp.to_account_info(),
-        );
 
         let id = fund.next_partition.clone();
         fund.partitions.push(id);
@@ -136,15 +97,6 @@ pub mod solana_fundraisers {
         new_info: String,
     ) -> Result<()> {
         let partition = &mut ctx.accounts.partition;
-        let sp = &ctx.accounts.system_program;
-        let signer = &mut ctx.accounts.signer;
-
-        resize(
-            &mut partition.to_account_info(),
-            (new_info.len() - partition.information.len()) as i16,
-            signer,
-            &mut sp.to_account_info());
-
         partition.information = new_info;
 
         Ok(())
@@ -235,7 +187,7 @@ pub struct Initialize<'info> {
     pub signer: AccountInfo<'info>,
     #[account(
     init,
-    space = 8 + LiveFunds::MIN_SIZE,
+    space = 8 + LiveFunds::INIT_SPACE,
     seeds = [FUNDS.as_bytes()],
     bump,
     payer = signer
@@ -245,7 +197,12 @@ pub struct Initialize<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(fund_id: u16, info: String, partition_info: String, name: String, partition_name: String)]
+#[instruction(fund_id: u16,
+private: bool,
+info: String,
+partition_info: String,
+name: String,
+partition_name: String)]
 pub struct MakeFund<'info> {
     ///CHECK: x
     #[account(signer, mut)]
@@ -253,14 +210,17 @@ pub struct MakeFund<'info> {
     #[account(
     mut,
     seeds = [FUNDS.as_bytes()],
-    bump
+    bump,
+    realloc = live_funds.to_account_info().data_len() + size_of::<u16>(),
+    realloc::payer = signer,
+    realloc::zero = false
     )]
     pub live_funds: Account<'info, LiveFunds>,
     #[account(
     init,
     seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
     bump,
-    space = 8 + Fund::MIN_SIZE + info.len() + name.len(),
+    space = 8 + Fund::INIT_SPACE + size_of::<u16>() + info.len() + name.len(),
     payer = signer,
     constraint = fund_id == live_funds.next_fund
     )]
@@ -269,9 +229,9 @@ pub struct MakeFund<'info> {
     pub token_mint: Account<'info, Mint>,
     #[account(
     init,
-    seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &[0]],
+    seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &[0, 0]],
     bump,
-    space = 8 + Partition::MIN_SIZE + partition_info.len() + partition_name.len(),
+    space = 8 + Partition::INIT_SPACE + partition_info.len() + partition_name.len(),
     payer = signer
     )]
     pub first_partition: Account<'info, Partition>,
@@ -297,14 +257,17 @@ pub struct MakePartition<'info> {
     mut,
     seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
     bump,
-    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true }
+    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true },
+    realloc = fund.to_account_info().data_len() + size_of::<u16>(),
+    realloc::payer = signer,
+    realloc::zero = false
     )]
     pub fund: Account<'info, Fund>,
     #[account(
     init,
     seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
     bump,
-    space = 8 + Partition::MIN_SIZE + info.len() + name.len(),
+    space = 8 + Partition::INIT_SPACE + info.len() + name.len(),
     payer = signer
     )]
     pub partition: Account<'info, Partition>,
@@ -346,7 +309,7 @@ pub struct MarkCompleted<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(fund_id: u16, partition_id: u16, info: String)]
+#[instruction(fund_id: u16, partition_id: u16, new_info: String)]
 pub struct EditInfo<'info> {
     ///CHECK: x
     #[account(signer, mut)]
@@ -362,7 +325,10 @@ pub struct EditInfo<'info> {
     mut,
     seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
     bump,
-    constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator)
+    constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator),
+    realloc = partition.to_account_info().data_len() - partition.information.len() + new_info.len(),
+    realloc::payer = signer,
+    realloc::zero = false
     )]
     pub partition: Account<'info, Partition>,
 
@@ -442,7 +408,7 @@ pub struct Donate<'info> {
     init,
     seeds = [DIST.as_bytes(), &fund_id.to_be_bytes()],
     bump,
-    space = 8 + Distribution::MIN_SIZE + Distribution::ELEMENT_SIZE * fund.partitions.len(),
+    space = 8 + Distribution::INIT_SPACE + Distribution::ELEM_SIZE * fund.partitions.len(),
     payer = signer
     )]
     pub distribution: Account<'info, Distribution>,
@@ -533,54 +499,54 @@ pub struct UnlockFund<'info> {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct LiveFunds {
     next_fund: u16,
+    #[max_len(0)]
     funds: Vec<u16>,
 }
 
-impl LiveFunds {
-    pub const MIN_SIZE: usize = 2 + 4;
-}
-
 #[account]
+#[derive(InitSpace)]
 pub struct Fund {
+    #[max_len(0)]
     name: String,
     creator: Pubkey,
     mint_addr: Pubkey,
     locked: bool,
     private: bool,
     next_partition: u16,
+    #[max_len(0)]
     partitions: Vec<u16>,
+    #[max_len(0)]
     completed: Vec<u16>,
+    #[max_len(0)]
     information: String,
 }
 
-impl Fund {
-    pub const MIN_SIZE: usize = 4 + 32 + 32 + 1 + 1 + 2 + (4 + 2) + (4) + 4;
-}
-
 #[account]
+#[derive(InitSpace)]
 pub struct Partition {
+    #[max_len(0)]
     name: String,
     creator: Pubkey,
     recipient_owner: Pubkey,
     recipient_token_addr: Pubkey,
+    #[max_len(0)]
     information: String,
 }
 
-impl Partition {
-    pub const MIN_SIZE: usize = 4 + 32 + 32 + 32 + 4;
-}
-
 #[account]
+#[derive(InitSpace)]
 pub struct Distribution {
     mint_addr: Pubkey,
     total: u64,
+    #[max_len(0)]
     recipients: Vec<u16>,
+    #[max_len(0)]
     done: Vec<bool>,
 }
 
 impl Distribution {
-    pub const MIN_SIZE: usize = 32 + 8 + 4 + 4;
-    pub const ELEMENT_SIZE: usize = 2 + 1;
+    pub const ELEM_SIZE: usize = 2 + 1;
 }

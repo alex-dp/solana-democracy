@@ -2,7 +2,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Transaction, TransactionSignature } from '@solana/web3.js';
 import { FC, useCallback } from 'react';
 
-import { Buffer } from 'buffer';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
 
@@ -18,6 +17,7 @@ import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getUbiInfoAddress } from 'utils/ubi';
+import { getProvider } from 'utils';
 
 const { SystemProgram } = web3;
 
@@ -31,18 +31,15 @@ export const InitializeAccount: FC = () => {
 
     const { notify } = useNotificationStore();
 
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
-
     const onClick = useCallback(async () => {
 
-        const idl = await useIDL(programID, getProvider())
+        let provider: AnchorProvider = null
+
+        try {
+            provider = getProvider(connection, wallet)
+        } catch (error) { console.log(error) }
+
+        const idl = await useIDL(programID, provider)
 
         if (!wallet.connected) {
             setVisible(true)
@@ -67,7 +64,7 @@ export const InitializeAccount: FC = () => {
         if (!info_raw) {
             try {
 
-                const program = new Program(idl, programID, getProvider())
+                const program = new Program(idl, programID, provider)
 
                 let transaction = new Transaction();
 

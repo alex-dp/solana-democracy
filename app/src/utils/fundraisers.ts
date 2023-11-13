@@ -22,16 +22,6 @@ export function getPartitionAddress(fund_id: number, partition_id: number): Publ
     return findWithSeeds(seeds)
 }
 
-export function getPreferenceListAddress(user: PublicKey) {
-    let seeds = [Buffer.from("upl"), user.toBytes()]
-    return findWithSeeds(seeds)
-}
-
-export function getPreferenceAddress(user: PublicKey, fund_id: number) {
-    let seeds = [Buffer.from("user"), get2buf(fund_id), user.toBytes()]
-    return findWithSeeds(seeds)
-}
-
 export function getDistributionAddress(fund_id: number) {
     let seeds = [Buffer.from("dist"), get2buf(fund_id)]
     return findWithSeeds(seeds)

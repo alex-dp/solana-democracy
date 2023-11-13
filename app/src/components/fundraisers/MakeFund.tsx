@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction, TransactionSignature } from '@solana/web3.js';
-import { FormEvent, useCallback } from 'react';
+import { FormEvent, useCallback, useEffect } from 'react';
 
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
@@ -11,6 +11,8 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
 import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
+import { getProvider } from 'utils';
+import useFundraiserStore from 'stores/useFundraiserStore';
 
 const programID = new PublicKey(FUNDRAISER_PROGRAM);
 
@@ -19,18 +21,15 @@ export const MakeFund = () => {
     const connection = new Connection("https://api.devnet.solana.com")
     const wallet = useWallet();
 
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
-
     const { setVisible } = useWalletModal();
 
     const { notify } = useNotificationStore();
+
+    const {idList, getIdList} = useFundraiserStore()
+
+    useEffect(() => {
+        if(!idList) getIdList(connection)
+    }, [connection])
 
     let addFund = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -54,23 +53,23 @@ export const MakeFund = () => {
         try {
             await getAccount(connection, ata)
         } catch {
-            notify({type: "error", message: "Recipient has no token account for mint"})
+            notify({type: "error", message: `Recipient ${obj.partition_name} has no token account for mint`})
             return
         }
-
-        let idl = await useIDL(programID, getProvider())
 
         let provider: AnchorProvider = null
 
         try {
-            provider = getProvider()
+            provider = getProvider(connection, wallet)
         } catch (error) { console.log(error) }
+
+        let idl = await useIDL(programID, provider)
 
         const program = new Program(idl, programID, provider)
 
         let transaction = new Transaction().add(
             await program.methods.makeFund(
-                0,
+                idList.next_fund,
                 !obj.public,
                 obj.fund_url,
                 obj.partition_url,
@@ -78,16 +77,22 @@ export const MakeFund = () => {
                 obj.partition_name).accounts({
                     signer: wallet.publicKey,
                     liveFunds: getFundListAddress(),
-                    fund: getFundAddress(0),
+                    fund: getFundAddress(idList.next_fund),
                     tokenMint: new PublicKey(obj.mint),
-                    firstPartition: getPartitionAddress(0, 0),
+                    firstPartition: getPartitionAddress(idList.next_fund, 0),
                     fpRecOwner: new PublicKey(obj.recipient_pk),
                     fpRecToken: ata,
                     systemProgram: web3.SystemProgram.programId
             }).instruction()
         );
 
-        let signature = await wallet.sendTransaction(transaction, connection);
+        let signature = null
+
+        try {
+            signature = await wallet.sendTransaction(transaction, connection);
+        } catch (error) {
+            console.log(error)
+        }
 
         notify({ type: 'loading', message: `Creating fund "${obj.fund_name}"`, txid: signature });
 

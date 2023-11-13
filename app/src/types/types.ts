@@ -151,3 +151,41 @@ export const ActiveRegionsLayout = borsh.struct<RawActiveRegions>([
     borsh.i64('buffer'),
     borsh.vec<number>(borsh.u8(), 'list')
 ])
+
+export interface RawFundList {
+    buffer:number,
+    nextFund: number,
+    funds: number[],
+}
+
+export const FundListLayout = borsh.struct<RawFundList>([
+    borsh.i64("buffer"),
+    borsh.u16("next_fund"),
+    borsh.vec<number>(borsh.u16(), "funds")
+])
+
+export interface RawFund {
+    buffer: number;
+    name: String;
+    creator: PublicKey;
+    mintAddr: PublicKey;
+    locked: boolean;
+    private: boolean;
+    nextPartition: number;
+    partitions: number[];
+    completed: number[];
+    information: String;
+}
+
+export const FundLayout = borsh.struct<RawFund>([
+    borsh.i64("buffer"),
+    borsh.str("name"),
+    borsh.publicKey("creator"),
+    borsh.publicKey("mint_addr"),
+    borsh.bool("locked"),
+    borsh.bool("private"),
+    borsh.u16("next_partition"),
+    borsh.vec<number>(borsh.u16(), "partitions"),
+    borsh.vec<number>(borsh.u16(), "completed"),
+    borsh.str("information")
+])

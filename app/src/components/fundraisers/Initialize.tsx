@@ -10,6 +10,7 @@ import { useIDL, FUNDRAISER_PROGRAM } from '../../types/types';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getFundListAddress } from 'utils/fundraisers';
+import { getProvider } from 'utils';
 
 
 const programID = new PublicKey(FUNDRAISER_PROGRAM);
@@ -23,15 +24,6 @@ export const Initialize = () => {
 
     const { notify } = useNotificationStore();
 
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
-
     const onClick = useCallback(async () => {
 
         if (!wallet.connected) {
@@ -39,13 +31,13 @@ export const Initialize = () => {
             return
         }
 
-        let idl = await useIDL(programID, getProvider())
-
         let provider: AnchorProvider = null
 
         try {
-            provider = getProvider()
+            provider = getProvider(connection, wallet)
         } catch (error) { console.log(error) }
+
+        let idl = await useIDL(programID, provider)
 
         const program = new Program(idl, programID, provider)
 

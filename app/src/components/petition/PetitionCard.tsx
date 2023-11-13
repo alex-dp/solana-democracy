@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import useNotificationStore from "stores/useNotificationStore";
 import useProposalStore from "stores/useProposalStore";
 import { PETITION_PROGRAM, useIDL } from "types/types";
+import { getProvider } from "utils";
 import { getPropAddress, getSigAddress, getStateAddress } from "utils/petitions";
 
 type CardProps = {
@@ -41,18 +42,9 @@ const PetitionCard = ({
 
     const wallet = useWallet();
 
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
-
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
-    const provider = getProvider()
+    const provider = getProvider(connection, wallet)
 
     const programID = new PublicKey(PETITION_PROGRAM)
 

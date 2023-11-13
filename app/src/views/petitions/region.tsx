@@ -13,6 +13,7 @@ import { ISC_MINT, PETITION_PROGRAM, useIDL } from "types/types";
 import useNotificationStore from "stores/useNotificationStore";
 import { getPropAddress, getStateAddress } from "utils/petitions";
 import { stat } from "fs";
+import { getProvider } from "utils";
 
 type ViewProps = {
     code: number,
@@ -23,15 +24,6 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
     const wallet = useWallet();
 
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
-
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
 
     const { state, getState, liveProps, closedProps, getLiveProps, getClosedProps, clearLiveProps } = useProposalStore()
@@ -39,7 +31,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
     const { setVisible } = useWalletModal();
     const { notify } = useNotificationStore();
 
-    const provider = getProvider()
+    const provider = getProvider(connection, wallet)
 
     const programID = new PublicKey(PETITION_PROGRAM)
 

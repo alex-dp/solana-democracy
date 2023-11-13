@@ -14,6 +14,7 @@ import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getMintSignerAddress, getUbiInfoAddress, getUserToken } from 'utils/ubi';
+import { getProvider } from 'utils';
 
 const { SystemProgram } = web3;
 
@@ -34,15 +35,6 @@ export const Mint = ({ info: info_prop }: MintProps) => {
     const { getInfo, clearInfo, info } = useUBIInfoStore();
 
     const { notify } = useNotificationStore();
-
-    const getProvider = () => {
-        const provider = new AnchorProvider(
-            connection,
-            wallet,
-            AnchorProvider.defaultOptions()
-        );
-        return provider;
-    };
 
     const onClick = useCallback(async () => {
 
@@ -99,13 +91,13 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             }
         }
 
-        let idl = await useIDL(programID, getProvider())
-
         let provider: AnchorProvider = null
 
         try {
-            provider = getProvider()
+            provider = getProvider(connection, wallet)
         } catch (error) { console.log(error) }
+
+        let idl = await useIDL(programID, provider)
 
         const program = new Program(idl, programID, provider)
 

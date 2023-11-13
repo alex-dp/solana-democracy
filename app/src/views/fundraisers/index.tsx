@@ -1,8 +1,23 @@
 import Link from "next/link";
 import { Initialize } from "components/fundraisers/Initialize";
 import { MakeFund } from "components/fundraisers/MakeFund";
+import useFundraiserStore from "stores/useFundraiserStore";
+import { useEffect } from "react";
+import { Connection } from "@solana/web3.js";
+import FundListItem from "components/fundraisers/FundListItem";
 
 export const FundraisersView = () => {
+
+  const connection = new Connection("https://api.devnet.solana.com")
+
+  const {getFunds, liveFunds, getIdList, idList} = useFundraiserStore();
+
+  useEffect(() => {
+    if(!idList) getIdList(connection)
+    if(idList && idList.funds.length != liveFunds.length) {
+      getFunds(connection, idList.funds)
+    }
+  }, [idList, liveFunds])
 
   return (
     <div className='w-screen min-h-screen apply-gradient'>
@@ -19,13 +34,9 @@ export const FundraisersView = () => {
 
         <MakeFund />
 
-        {/* 
-        build MakeFund button component to call function
-        
-        list of funds: build useFundStore and use it to get accounts.
-
-        build FundListItem component
-        */}
+        {
+          liveFunds?.map((v, i) => <FundListItem fund={v} key={i}/>)
+        }
       </div>
     </div>
   );
