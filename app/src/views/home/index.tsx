@@ -41,7 +41,8 @@ export const HomeView = () => {
           <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" disabled={true} />
           <ProgramCard destination="/elections" title="Chair Elections" description="Fill a seat by asking voters to rank candidates" disabled={true} />
           <ProgramCard destination="/census" title="Census Tools" description="Measure preference by sorting or on a scale" disabled={true} />
-          <ProgramCard destination="/selections" title="Council Selections" description="Randomly sample a council" disabled={true} />
+          <ProgramCard destination="/sampling" title="Council Sampling" description="Randomly sample a council" disabled={true} />
+          <ProgramCard destination="/funds" title="Democratic Fund Management" description="Allocate salary by consensus" disabled={true} />
         </div>
       </div>
     </div>
