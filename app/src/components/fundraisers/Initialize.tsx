@@ -68,7 +68,7 @@ export const Initialize = () => {
     return (
 
         <button
-            className="px-8 m-2 btn btn-active btn-primary"
+            className="btn btn-active btn-primary btn-square"
             onClick={onClick}
         >
             <span>Initialize</span>

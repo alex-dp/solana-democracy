@@ -154,7 +154,7 @@ export const ActiveRegionsLayout = borsh.struct<RawActiveRegions>([
 
 export interface RawFundList {
     buffer:number,
-    nextFund: number,
+    next_fund: number,
     funds: number[],
 }
 
