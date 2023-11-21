@@ -66,9 +66,7 @@ export function clearAll() {
 
 export async function useIDL(id: PublicKey, provider: AnchorProvider): Promise<Idl> {
 
-    localStorage.removeItem("idl" + id.toString())
     let idl: Expirable<Idl> = JSON.parse(localStorage.getItem("idl" + id.toString()))
-
 
     if (idl && !expired(idl)) return idl.object
     else {
@@ -168,10 +166,10 @@ export interface RawFund {
     buffer: number;
     name: String;
     creator: PublicKey;
-    mintAddr: PublicKey;
+    mint_addr: PublicKey;
     locked: boolean;
     private: boolean;
-    nextPartition: number;
+    next_partition: number;
     partitions: number[];
     completed: number[];
     information: String;
@@ -188,4 +186,22 @@ export const FundLayout = borsh.struct<RawFund>([
     borsh.vec<number>(borsh.u16(), "partitions"),
     borsh.vec<number>(borsh.u16(), "completed"),
     borsh.str("information")
+])
+
+export interface RawPartition {
+    buffer: number,
+    name: String,
+    creator: PublicKey,
+    recipient_owner: PublicKey,
+    recipient_token_addr: PublicKey,
+    information: String,
+}
+
+export const PartitionLayout = borsh.struct<RawPartition>([
+    borsh.i64('buffer'),
+    borsh.str('name'),
+    borsh.publicKey('creator'),
+    borsh.publicKey('recipient_owner'),
+    borsh.publicKey('recipient_token_addr'),
+    borsh.str('information')
 ])

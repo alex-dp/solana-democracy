@@ -35,6 +35,7 @@ export const MakeFund = () => {
         if (e.target.checked && !wallet.connected) {
             setVisible(true)
             e.preventDefault()
+            e.target.checked = false
             return
         }
     }
@@ -133,9 +134,9 @@ export const MakeFund = () => {
                     <h3 className="text-lg font-bold text-center mb-4">Make a fund</h3>
 
                     <form onSubmit={addFund} className="flex flex-col gap-4">
-                        <input id='fund_name' type="text" placeholder="Name of the fund" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='fund_name' type="text" placeholder="Fund Name" className="input input-bordered w-full max-w-xs mx-auto" />
                         <input id='fund_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input id='mint' type="text" placeholder="Receivable mint address" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='mint' type="text" placeholder="Receivable Mint Address" className="input input-bordered w-full max-w-xs mx-auto" />
 
                         <div className="form-control">
                             <label className="label cursor-pointer input input-bordered w-full max-w-xs mx-auto">
@@ -146,13 +147,13 @@ export const MakeFund = () => {
 
                         <div className='flex flex-row w-full gap-4 place-content-center place-items-center'>
                             <div className='h-[1px] w-20 bg-white'/>
-                            <h3>First partition</h3>
+                            <h3>Info for the first participating project</h3>
                             <div className='h-[1px] w-20 bg-white'/>
                         </div>
 
-                        <input id='partition_name' type="text" placeholder="Name" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='partition_name' type="text" placeholder="Project Name" className="input input-bordered w-full max-w-xs mx-auto" />
                         <input id='partition_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input id='recipient_pk' type="text" placeholder="Recipient's public key" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='recipient_pk' type="text" placeholder="Recipient's Public Key" className="input input-bordered w-full max-w-xs mx-auto" />
 
                         <button type="submit" className="btn btn-active btn-primary mx-auto gap-2">
                             submit

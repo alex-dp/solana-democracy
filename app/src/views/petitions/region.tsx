@@ -35,6 +35,15 @@ export const RegionView = ({ code, closed }: ViewProps) => {
 
     const programID = new PublicKey(PETITION_PROGRAM)
 
+    let check = (e) => {
+        if (e.target.checked && !wallet.connected) {
+            setVisible(true)
+            e.preventDefault()
+            e.target.checked = false
+            return
+        }
+    }
+
     let fetchedAll = false
 
     useEffect(() => {
@@ -161,7 +170,7 @@ export const RegionView = ({ code, closed }: ViewProps) => {
                     </svg>
                 </label>
 
-                <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" />
+                <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" onChange={check}/>
 
                 <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
                     <label className="modal-box text-center rounded-xl w-2xl h-fit border-2 border-purple-600" htmlFor="">

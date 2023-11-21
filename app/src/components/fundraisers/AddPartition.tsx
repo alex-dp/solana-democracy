@@ -4,27 +4,31 @@ import { FormEvent, useCallback, useEffect } from 'react';
 
 import { PublicKey } from '@solana/web3.js';
 
-import { FUNDRAISER_PROGRAM } from '../../types/types';
+import { FUNDRAISER_PROGRAM, RawFund, useIDL } from '../../types/types';
 
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-
-const programID = new PublicKey(FUNDRAISER_PROGRAM);
+import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
+import useNotificationStore from 'stores/useNotificationStore';
+import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor';
+import { getProvider } from 'utils';
+import { getFundAddress, getPartitionAddress } from 'utils/fundraisers';
 
 type ButtonProps = {
-    fundID:number
+    fundID: number,
+    fund: RawFund
 }
 
+const programID = new PublicKey(FUNDRAISER_PROGRAM)
 
-export const AddPartition = (props:ButtonProps) => {
+export const AddPartition = (props: ButtonProps) => {
     const connection = new Connection("https://api.devnet.solana.com")
     const wallet = useWallet();
 
     const { setVisible, visible } = useWalletModal();
 
-    const modal_id = "ap-modal-" + props.fundID
+    const { notify } = useNotificationStore()
 
-    useEffect(() => {
-    }, [])
+    const modal_id = "ap-modal-" + props.fundID
 
     let addPartition = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -34,13 +38,76 @@ export const AddPartition = (props:ButtonProps) => {
             return
         }
 
+        let data = new Map<String, any>()
 
-    }, [])
+        for (let i = 0; e.target[i].id; i++) {
+            let target = e.target[i]
+            data.set(target.id, target.type == "checkbox" ? target.checked : target.value)
+        }
+
+        let obj = Object.fromEntries(data.entries())
+
+        console.log("fund", props.fund)
+
+        let ata = getAssociatedTokenAddressSync(props.fund.mint_addr, new PublicKey(obj.recipient_pk), false)
+
+        try {
+            await getAccount(connection, ata)
+        } catch {
+            notify({ type: "error", message: `Recipient ${obj.partition_name} has no token account for mint` })
+            return
+        }
+
+        let provider: AnchorProvider = null
+
+        try {
+            provider = getProvider(connection, wallet)
+        } catch (error) { console.log(error) }
+
+        let idl = await useIDL(programID, provider)
+
+        const program = new Program(idl, programID, provider)
+
+        let transaction = new Transaction().add(
+            await program.methods.makePartition(
+                props.fundID,
+                obj.partition_url,
+                obj.partition_name).accounts({
+                    signer: wallet.publicKey,
+                    fund: getFundAddress(props.fundID),
+                    partition: getPartitionAddress(props.fundID, props.fund.next_partition),
+                    recipientOwner: new PublicKey(obj.recipient_pk),
+                    recipientTokenAccount: ata,
+                    systemProgram: web3.SystemProgram.programId
+                }).instruction()
+        );
+
+        let signature = null
+
+        try {
+            signature = await wallet.sendTransaction(transaction, connection);
+        } catch (error) {
+            console.log(error)
+        }
+
+        notify({ type: 'loading', message: `Listing project "${obj.partition_name}"`, txid: signature });
+
+        const latestBlockHash = await connection.getLatestBlockhash();
+
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature,
+        });
+
+        notify({ message: `Project "${obj.partition_name}" created`, txid: signature });
+    }, [wallet, connection])
 
     let check = (e) => {
         if (e.target.checked && !wallet.connected) {
             setVisible(true)
             e.preventDefault()
+            e.target.checked = false
             return
         }
     }
@@ -60,11 +127,11 @@ export const AddPartition = (props:ButtonProps) => {
 
                         <div className='flex flex-row w-full gap-4 place-content-center place-items-center'>
                             <div className='h-[1px] w-20 bg-white' />
-                            <h3>Partition info</h3>
+                            <h3>Participate in "{props.fund.name}" with your project</h3>
                             <div className='h-[1px] w-20 bg-white' />
                         </div>
 
-                        <input id='partition_name' type="text" placeholder="Name" className="input input-bordered w-full max-w-xs mx-auto" />
+                        <input id='partition_name' type="text" placeholder="Project Name" className="input input-bordered w-full max-w-xs mx-auto" />
                         <input id='partition_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
                         <input id='recipient_pk' type="text" placeholder="Recipient's public key" className="input input-bordered w-full max-w-xs mx-auto" />
 

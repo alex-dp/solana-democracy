@@ -1,17 +1,20 @@
 import Link from "next/link";
-import { RawFund } from "types/types";
+import { RawFund, RawPartition } from "types/types";
 import { AddPartition } from "./AddPartition";
 import { Donate } from "./Donate";
-import { useRef } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 type RowProps = {
     fund: RawFund,
-    fundID: number
+    fundID: number,
+    partitions: RawPartition[]
 }
 
 const FundListItem = (props: RowProps) => {
 
     let fund = props.fund
+
+    const { wallet } = useWallet();
 
     return (
         <div className="flex flex-row gap-4 w-fit">
@@ -24,11 +27,13 @@ const FundListItem = (props: RowProps) => {
 
                 </label>
                 <ul className="menu dropdown-content z-[1] bg-black rounded-lg w-52 border-2 border-purple-700">
-                    {fund.partitions.map((v, i) => { return <li><a>{v}</a></li> })}
+                    {props.partitions?.map((v, i) => {
+                        return <li key={i}><a href={v.information.toString()}>{v.name}</a></li>
+                    })}
                 </ul>
             </div>
 
-            <AddPartition fundID={props.fundID}/>
+            {(!fund.private || (wallet.adapter.connected && wallet.adapter.publicKey == fund.creator)) &&  <AddPartition fundID={props.fundID} fund={fund} />}
             <Donate />
             <Link href={new URL(fund.information.toString())}>
                 <button className="btn gap-2 btn-sm my-2 btn-square">
