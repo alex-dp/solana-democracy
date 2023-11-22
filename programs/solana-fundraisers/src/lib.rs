@@ -178,7 +178,7 @@ pub mod solana_fundraisers {
         Ok(())
     }
 
-    pub fn unlock_fund(ctx: Context<UnlockFund>) -> Result<()> {
+    pub fn unlock_fund(ctx: Context<UnlockFund>, fund_id: u16) -> Result<()> {
         let fund = &mut ctx.accounts.fund;
         fund.locked = false;
 
@@ -511,20 +511,6 @@ pub struct UnlockFund<'info> {
     )]
     pub fund: Account<'info, Fund>,
     #[account(
-        mut,
-        token::mint = token_mint,
-        token::authority = escrow_signer,
-    )]
-    pub escrow_vault: Account<'info, TokenAccount>,
-    /// CHECK: x
-    #[account(
-        seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
-        bump,
-    )]
-    pub escrow_signer: AccountInfo<'info>,
-    #[account(mut, constraint = true)]
-    pub token_mint: Account<'info, Mint>,
-    #[account(
     mut,
     seeds = [DIST.as_bytes(), &fund_id.to_be_bytes()],
     bump,
@@ -586,9 +572,4 @@ pub struct Distribution {
 
 impl Distribution {
     pub const ELEM_SIZE: usize = 2 + 1;
-}
-
-#[account]
-pub struct Empty {
-
 }

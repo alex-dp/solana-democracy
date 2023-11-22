@@ -143,7 +143,34 @@ export const Donate = (props: ButtonProps) => {
             signature: signature,
         });
 
-        notify({ message: `Distributed to all recipients`, txid: signature });
+        notify({ type: 'loading', message: `Distributed to all recipients. Unlocking fund...`, txid: signature });
+
+        transaction = new Transaction().add(
+            await program.methods.unlockFund(
+                props.fundID).accounts({
+                    signer: wallet.publicKey,
+                    fund: getFundAddress(props.fundID),
+                    distribution: getDistributionAddress(props.fundID),
+                    systemProgram: web3.SystemProgram.programId
+                }).instruction()
+        );
+
+        try {
+            signature = await wallet.sendTransaction(transaction, connection);
+        } catch (error) {
+            console.log(error)
+            return
+        }
+
+        const latestBlockHash3 = await connection.getLatestBlockhash();
+
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash3.blockhash,
+            lastValidBlockHeight: latestBlockHash3.lastValidBlockHeight,
+            signature: signature,
+        });
+
+        notify({ message: `Fund unlocked`, txid: signature });
 
     }, [wallet, connection])
 
