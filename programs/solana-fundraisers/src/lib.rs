@@ -126,23 +126,25 @@ pub mod solana_fundraisers {
         Ok(())
     }
 
-    pub fn donate(ctx: Context<Donate>, amount: u64) -> Result<()> {
+    pub fn donate(ctx: Context<Donate>, fund_id: u16, amount: u64) -> Result<()> {
         let fund = &mut ctx.accounts.fund;
         let distribution = &mut ctx.accounts.distribution;
 
         distribution.mint_addr = fund.mint_addr;
         distribution.total = amount.clone();
         distribution.recipients = fund.partitions.clone();
-        distribution.done = Vec::with_capacity(fund.partitions.len());
+        distribution.done = vec![false; fund.partitions.len()];
 
         let cpi_program = ctx.accounts.token_program.to_account_info().clone();
         let cpi_accounts = Transfer {
             from: ctx.accounts.donor_token_account.to_account_info().clone(),
-            to: ctx.accounts.escrow.to_account_info().clone(),
+            to: ctx.accounts.escrow_vault.to_account_info().clone(),
             authority: ctx.accounts.signer.to_account_info().clone(),
         };
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
         token::transfer(cpi_ctx, amount)?;
+
+        fund.locked = true;
         Ok(())
     }
 
@@ -150,6 +152,7 @@ pub mod solana_fundraisers {
         ctx: Context<DistributeDonation>,
         fund_id: u16,
         partition_id: u16,
+        bump: u8
     ) -> Result<()> {
         let fund = &mut ctx.accounts.fund;
         let distribution = &mut ctx.accounts.distribution;
@@ -159,13 +162,16 @@ pub mod solana_fundraisers {
 
         let amount = distribution.total.clone() / fund.partitions.len() as u64;
 
+        let seeds = &[ESCROW.as_bytes(), &fund_id.to_be_bytes(), &[bump]];
+        let signer = &[&seeds[..]];
+
         let cpi_program = ctx.accounts.token_program.to_account_info().clone();
         let cpi_accounts = Transfer {
-            from: ctx.accounts.escrow.to_account_info().clone(),
+            from: ctx.accounts.escrow_vault.to_account_info().clone(),
             to: recipient.to_account_info().clone(),
-            authority: ctx.accounts.signer.to_account_info().clone(),
+            authority: ctx.accounts.escrow_signer.clone(),
         };
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
         token::transfer(cpi_ctx, amount)?;
 
         distribution.done[idx] = true;
@@ -244,6 +250,24 @@ pub struct MakeFund<'info> {
     token::authority = fp_rec_owner
     )]
     pub fp_rec_token: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        token::mint = token_mint,
+        token::authority = escrow_signer
+    )]
+    pub escrow_vault: Account<'info, TokenAccount>,
+    /// CHECK: x
+    #[account(
+        init,
+        seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
+        bump,
+        payer=signer,
+        space=8,
+    )]
+    pub escrow_signer: AccountInfo<'info>,
+    /// CHECK: x
+    #[account(constraint = token_program.key == &token::ID)]
+    pub token_program: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -381,7 +405,7 @@ pub struct DestroyFund<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(fund_id: u16)]
+#[instruction(fund_id: u16, amount: u64)]
 pub struct Donate<'info> {
     ///CHECK: x
     #[account(signer, mut)]
@@ -394,14 +418,17 @@ pub struct Donate<'info> {
     )]
     pub fund: Account<'info, Fund>,
     #[account(
-    init,
-    seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
-    bump,
-    payer = signer,
-    token::mint = token_mint,
-    token::authority = distribution
+        mut,
+        token::mint = token_mint,
+        token::authority = escrow_signer
     )]
-    pub escrow: Account<'info, TokenAccount>,
+    pub escrow_vault: Account<'info, TokenAccount>,
+    /// CHECK: x
+    #[account(
+        seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
+        bump,
+    )]
+    pub escrow_signer: AccountInfo<'info>,
     #[account(mut, address = fund.mint_addr)]
     pub token_mint: Account<'info, Mint>,
     #[account(
@@ -435,12 +462,17 @@ pub struct DistributeDonation<'info> {
     )]
     pub fund: Account<'info, Fund>,
     #[account(
-    mut,
-    seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
-    bump,
-    token::mint = token_mint
+        mut,
+        token::mint = token_mint,
+        token::authority = escrow_signer
     )]
-    pub escrow: Account<'info, TokenAccount>,
+    pub escrow_vault: Account<'info, TokenAccount>,
+    /// CHECK: x
+    #[account(
+        seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
+        bump,
+    )]
+    pub escrow_signer: AccountInfo<'info>,
     #[account(mut, address = fund.mint_addr)]
     pub token_mint: Account<'info, Mint>,
     #[account(mut, address = partition.recipient_token_addr)]
@@ -479,12 +511,17 @@ pub struct UnlockFund<'info> {
     )]
     pub fund: Account<'info, Fund>,
     #[account(
-    mut,
-    seeds = [],
-    bump,
-    close = signer
+        mut,
+        token::mint = token_mint,
+        token::authority = escrow_signer,
     )]
-    pub escrow: Account<'info, TokenAccount>,
+    pub escrow_vault: Account<'info, TokenAccount>,
+    /// CHECK: x
+    #[account(
+        seeds = [ESCROW.as_bytes(), &fund_id.to_be_bytes()],
+        bump,
+    )]
+    pub escrow_signer: AccountInfo<'info>,
     #[account(mut, constraint = true)]
     pub token_mint: Account<'info, Mint>,
     #[account(
@@ -549,4 +586,9 @@ pub struct Distribution {
 
 impl Distribution {
     pub const ELEM_SIZE: usize = 2 + 1;
+}
+
+#[account]
+pub struct Empty {
+
 }

@@ -16,6 +16,7 @@
     "@coral-xyz/anchor": "^0.28.1-beta.1",
     "@coral-xyz/borsh": "^0.28.0",
     "@heroicons/react": "^2.0.18",
+    "@metaplex-foundation/mpl-token-metadata": "^3.1.1",
     "@noble/ed25519": "^2.0.0",
     "@solana/buffer-layout": "^4.0.1",
     "@solana/buffer-layout-utils": "^0.2.0",

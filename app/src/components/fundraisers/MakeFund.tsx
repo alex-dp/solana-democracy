@@ -9,8 +9,8 @@ import { useIDL, FUNDRAISER_PROGRAM } from '../../types/types';
 
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
-import { getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
-import { getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
+import { getEscrowAddresses, getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
+import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { getProvider } from 'utils';
 import useFundraiserStore from 'stores/useFundraiserStore';
 
@@ -57,10 +57,11 @@ export const MakeFund = () => {
 
         let obj = Object.fromEntries(data.entries())
 
-        let ata = getAssociatedTokenAddressSync(new PublicKey(obj.mint), new PublicKey(obj.recipient_pk), false)
+        let partitionATA = getAssociatedTokenAddressSync(new PublicKey(obj.mint), new PublicKey(obj.recipient_pk), false)
+        let [signer, vault] = getEscrowAddresses(idList.next_fund, new PublicKey(obj.mint))
 
         try {
-            await getAccount(connection, ata)
+            await getAccount(connection, partitionATA)
         } catch {
             notify({type: "error", message: `Recipient ${obj.partition_name} has no token account for mint`})
             return
@@ -76,7 +77,18 @@ export const MakeFund = () => {
 
         const program = new Program(idl, programID, provider)
 
-        let transaction = new Transaction().add(
+        let transaction = new Transaction()
+
+        transaction.add(
+            createAssociatedTokenAccountInstruction(
+                wallet.publicKey, // payer
+                vault, // ata
+                signer, // owner
+                new PublicKey(obj.mint) // mint
+            )
+        );
+        
+        transaction.add(
             await program.methods.makeFund(
                 idList.next_fund,
                 !obj.public,
@@ -90,7 +102,10 @@ export const MakeFund = () => {
                     tokenMint: new PublicKey(obj.mint),
                     firstPartition: getPartitionAddress(idList.next_fund, 0),
                     fpRecOwner: new PublicKey(obj.recipient_pk),
-                    fpRecToken: ata,
+                    fpRecToken: partitionATA,
+                    escrowVault: vault,
+                    escrowSigner: signer,
+                    tokenProgram: TOKEN_PROGRAM_ID,
                     systemProgram: web3.SystemProgram.programId
             }).instruction()
         );

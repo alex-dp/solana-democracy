@@ -3,6 +3,7 @@ import { RawFund, RawPartition } from "types/types";
 import { AddPartition } from "./AddPartition";
 import { Donate } from "./Donate";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { getDistributionAddress, getFundAddress } from "utils/fundraisers";
 
 type RowProps = {
     fund: RawFund,
@@ -18,6 +19,7 @@ const FundListItem = (props: RowProps) => {
 
     return (
         <div className="flex flex-row gap-4 w-fit">
+            {fund.locked && "locked"}
             <div className="uppercase font-bold my-auto">{fund.name}</div>
 
             <div className="dropdown dropdown-hover">
@@ -26,15 +28,26 @@ const FundListItem = (props: RowProps) => {
                     <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z" /></svg>
 
                 </label>
-                <ul className="menu dropdown-content z-[1] bg-black rounded-lg w-52 border-2 border-purple-700">
+                <ul className="menu dropdown-content z-[1] bg-black rounded-lg border-2 border-purple-700 overflow-hidden">
                     {props.partitions?.map((v, i) => {
-                        return <li key={i}><a href={v.information.toString()}>{v.name}</a></li>
+                        return (
+                            <li key={i} className="">
+                                <a href={v.information.toString()}>
+                                    {v.name} (
+                                        {v.recipient_owner.toString().substring(0, 4)}
+                                        ...
+                                        {v.recipient_owner.toString().substring(40, 44)}
+                                        )
+                                </a>
+                            </li>
+                        )
                     })}
+                    <li>fund {getFundAddress(props.fundID).toString()}</li>
+                    <li>distr {getDistributionAddress(props.fundID).toString()}</li>
                 </ul>
             </div>
-
-            {(!fund.private || (wallet.adapter.connected && wallet.adapter.publicKey == fund.creator)) &&  <AddPartition fundID={props.fundID} fund={fund} />}
-            <Donate />
+            {(!fund.private || (wallet.adapter.connected && wallet.adapter.publicKey == fund.creator)) && <AddPartition fundID={props.fundID} fund={fund} />}
+            <Donate fundID={props.fundID} fund={fund} partitions={props.partitions} />
             <Link href={new URL(fund.information.toString())}>
                 <button className="btn gap-2 btn-sm my-2 btn-square">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 48 48">
