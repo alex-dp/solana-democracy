@@ -1,10 +1,7 @@
 import { create } from 'zustand'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { RawFund, FundLayout, FUNDRAISER_PROGRAM, FundListLayout, RawFundList, RawPartition, PartitionLayout } from 'types/types';
+import { Connection } from '@solana/web3.js'
+import { RawFund, FundLayout, FundListLayout, RawFundList, RawPartition, PartitionLayout } from 'types/types';
 import { getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
-import { Idl } from '@coral-xyz/anchor';
-
-const programID = new PublicKey(FUNDRAISER_PROGRAM);
 
 interface ProposalStore {
     idList: RawFundList
@@ -32,9 +29,7 @@ const useProposalStore = create<ProposalStore>((set, _get) => ({
         }
     },
     getFunds: async (connection, list) => {
-        let adds = list.map((e) => {
-            return getFundAddress(e)
-        })
+        let adds = list.map((e) => getFundAddress(e))
 
         connection.getMultipleAccountsInfo(adds).then((accs) => {
             set({

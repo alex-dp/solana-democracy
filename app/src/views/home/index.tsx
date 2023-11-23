@@ -1,7 +1,7 @@
 import Spline from '@splinetool/react-spline';
 import { ProgramCard } from 'components/ProgramCard';
 import { Ref, useEffect, useRef } from 'react';
-import { clearAll } from 'types/types';
+import { FUNDRAISER_PROGRAM, PETITION_PROGRAM, UBI_PROGRAM, clearAll } from 'types/types';
 
 export const HomeView = () => {
 
@@ -35,10 +35,10 @@ export const HomeView = () => {
 
         <div className="flex flex-wrap place-content-center lg:px-32 xl:px-40 lg:px-32 xl:px-40">
 
-          <ProgramCard destination="/ubi" title="UBI" description="Universal Basic Income" disabled={false} />
-          <ProgramCard destination="/petitions" title="Petitions" description="Global petitions now available" disabled={false} />
+          <ProgramCard destination="/ubi" title="UBI" description="Universal Basic Income" disabled={false} pid={UBI_PROGRAM}/>
+          <ProgramCard destination="/petitions" title="Petitions" description="Global petitions now available" disabled={false} pid={PETITION_PROGRAM}/>
+          <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" disabled={false} pid={FUNDRAISER_PROGRAM}/>
           <ProgramCard destination="/referenda" title="Referenda" description="Approve or reject a proposal" disabled={true} />
-          <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" disabled={true} />
           <ProgramCard destination="/elections" title="Chair Elections" description="Fill a seat by asking voters to rank candidates" disabled={true} />
           <ProgramCard destination="/census" title="Census Tools" description="Measure preference by sorting or on a scale" disabled={true} />
           <ProgramCard destination="/sampling" title="Council Sampling" description="Randomly sample a council" disabled={true} />

@@ -18,13 +18,13 @@ import { getProvider } from 'utils';
 
 const { SystemProgram } = web3;
 
-const programID = new PublicKey(UBI_PROGRAM);
-
 type MintProps = {
-    info: RawUBIInfo
+    ubiInfo: RawUBIInfo,
+    connection: Connection,
+    program: Program
 }
 
-export const Mint = ({ info: info_prop }: MintProps) => {
+export const Mint = (props: MintProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const wallet = useWallet();
 
@@ -48,8 +48,8 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             return
         }
 
-        if (Date.now() / 1000 < Number(info_prop.lastIssuance) + 24 * 3600) {
-            let hDiff = Math.ceil((Number(info_prop.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
+        if (Date.now() / 1000 < Number(props.ubiInfo.lastIssuance) + 24 * 3600) {
+            let hDiff = Math.ceil((Number(props.ubiInfo.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
             notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 ? "s" : ""}` })
             return
         }
@@ -91,23 +91,13 @@ export const Mint = ({ info: info_prop }: MintProps) => {
             }
         }
 
-        let provider: AnchorProvider = null
-
-        try {
-            provider = getProvider(connection, wallet)
-        } catch (error) { console.log(error) }
-
-        let idl = await useIDL(programID, provider)
-
-        const program = new Program(idl, programID, provider)
-
         let signature: TransactionSignature = '';
         try {
 
             let pda = getUbiInfoAddress(wallet.publicKey)
 
             let transaction = new Transaction().add(
-                await program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
+                await props.program.methods.mintToken(gatewayToken.gatekeeperNetworkAddress).accounts({
                     mintSigner: mint_signer,
                     ubiMint: UBI_MINT,
                     userAuthority: wallet.publicKey,

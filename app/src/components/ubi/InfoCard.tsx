@@ -38,7 +38,7 @@ export const InfoCard = ({ supply, issuance }: CardProps) => {
                 <td>{issuance != 0 ? "~" + issuance + " ARGON per wallet" : "loading..."}</td>
               </tr>
               <tr>
-                <th>Explorer</th>
+                <th>Token's Explorer Page</th>
                 <td>
                   <Link href="https://explorer.solana.com/address/4HgYp2eiokKcqe5AVAxpwCsfUE5pwCNTiPXvpSxYnDi6" target="_blank">
                     <button className="btn btn-sm btn-square">

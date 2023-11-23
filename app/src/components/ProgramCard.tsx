@@ -4,14 +4,26 @@ type CardProps = {
     title: string,
     description: string,
     destination: string,
-    disabled: boolean
+    disabled: boolean,
+    pid?: string
 }
 
-export const ProgramCard = ({ title, description, destination, disabled }: CardProps) => {
+export const ProgramCard = (props: CardProps) => {
+    let { title, description, destination, disabled, pid } = props
     return (
         <div className="card rounded-2xl border-2 border-purple-500 w-72 m-4 bg-base-100 shadow-xl">
             <div className="card-body">
-                <h2 className="card-title">{title}</h2>
+                <div className="flex flex-row place-content-between">
+                    <h2 className="card-title">{title}</h2>
+                    {
+                        pid &&
+                        <div className="tooltip" data-tip="View program in explorer">
+                            <Link href={"https://explorer.solana.com/address/" + pid}>
+                                <button className="btn btn-xs btn-circle btn-outline lowercase">i</button>
+                            </Link>
+                        </div>
+                    }
+                </div>
                 <p>{description}</p>
                 <Link href={destination} onClick={(e) => { if (disabled) e.preventDefault() }}>
                     <div className="card-actions justify-end">

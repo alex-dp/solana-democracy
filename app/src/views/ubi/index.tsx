@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { InitializeAccount } from 'components/ubi/InitializeAccount';
 import { Mint } from 'components/ubi/Mint';
@@ -10,65 +10,88 @@ import { GatewayProvider } from '@civic/solana-gateway-react';
 import Link from 'next/link';
 import { InfoCard } from 'components/ubi/InfoCard';
 import { findIssuance } from 'utils/ubi';
-import { web3 } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { UBI_PROGRAM, useIDL } from 'types/types';
+import { getProvider } from 'utils';
 
 export const UBIView = () => {
 
-  const { info, initialized, getInfo, state, getState, supply, getSupply } = useUBIInfoStore();
+    const { info, initialized, getInfo, state, getState, supply, getSupply } = useUBIInfoStore();
 
-  const wallet = useWallet();
+    const wallet = useWallet();
 
-  const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT)
+    const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT)
 
-  useEffect(() => {
-    if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
-    if (!state) getState(connection)
-    if (!supply) getSupply(connection)
-  }, [connection, wallet.connected, state, supply])
+    const programID = new PublicKey(UBI_PROGRAM)
 
-  return (
+    let provider: AnchorProvider = null
 
-    <div className='apply-gradient min-h-screen w-screen place-content-evenly'>
-      <div className="flex flex-col mx-auto">
+    try {
+        provider = getProvider(connection, wallet)
+    } catch (error) { console.log(error) }
 
-        <p className="pt-8 pb-4 mx-auto">
-          <img src='argonubi.svg' className='h-16' />
-        </p>
+    let [program, setProgram] = useState<Program>()
+    let running = false
+    useEffect(() => {
+        let run = async () => {
+            running = true
+
+            let idl = await useIDL(programID, provider)
+            setProgram(new Program(idl, programID, provider))
+        }
+
+        if (!running) run()
+    }, [])
+
+    useEffect(() => {
+        if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
+        if (!state) getState(connection)
+        if (!supply) getSupply(connection)
+    }, [connection, wallet.connected, state, supply])
+
+    return (
+
+        <div className='apply-gradient min-h-screen w-screen place-content-evenly'>
+            <div className="flex flex-col mx-auto">
+
+                <p className="pt-8 pb-4 mx-auto">
+                    <img src='argonubi.svg' className='h-16' />
+                </p>
 
 
-        <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
-          Global unconditional income secured by Civic
-        </h4>
+                <h4 className="md:w-full text-2xl md:text-3xl text-center text-slate-300 my-2">
+                    Global unconditional income secured by Civic
+                </h4>
 
-        <div className="flex flex-row place-content-center">
+                <div className="flex flex-row place-content-center">
 
-          <Link href={`/`}>
-            <button className="btn btn-square m-2">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
-                <path d="M480 902.218 153.782 576 480 249.782l56.131 55.566-230.477 231.043h500.564v79.218H305.654l230.477 230.478L480 902.218Z" />
-              </svg>
-            </button>
-          </Link>
+                    <Link href={`/`}>
+                        <button className="btn btn-square m-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor">
+                                <path d="M480 902.218 153.782 576 480 249.782l56.131 55.566-230.477 231.043h500.564v79.218H305.654l230.477 230.478L480 902.218Z" />
+                            </svg>
+                        </button>
+                    </Link>
 
-          <GatewayProvider
-            wallet={wallet}
-            gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
-            connection={connection}
-            options={{ autoShowModal: false }}>
+                    <GatewayProvider
+                        wallet={wallet}
+                        gatekeeperNetwork={new PublicKey("uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv")}
+                        connection={connection}
+                        options={{ autoShowModal: false }}>
 
-            {!initialized && !info ? <InitializeAccount /> : <Mint info={info} />}
+                        {!initialized && !info ? <InitializeAccount /> : <Mint ubiInfo={info} connection={connection} program={program} />}
 
-          </GatewayProvider>
+                    </GatewayProvider>
 
-          <Swap />
+                    <Swap />
 
-        </div>
+                </div>
 
-        <div className='mx-auto mt-4'>
-          <InfoCard supply={supply ? supply : 0} issuance={state ? findIssuance(state.capLeft) : 0} />
-        </div>
-      </div>
-    </div >
+                <div className='mx-auto mt-4'>
+                    <InfoCard supply={supply ? supply : 0} issuance={state ? findIssuance(state.capLeft) : 0} />
+                </div>
+            </div>
+        </div >
 
-  );
+    );
 };

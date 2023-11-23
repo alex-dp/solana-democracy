@@ -10,6 +10,8 @@ const DIST: &str = "dist";
 const PARTITION: &str = "part";
 const ESCROW: &str = "esc";
 
+const HTTPS: &str = "https://";
+
 #[program]
 #[allow(unused_variables)]
 pub mod solana_fundraisers {
@@ -48,7 +50,6 @@ pub mod solana_fundraisers {
 
         first_partition.creator = signer.key();
         first_partition.recipient_owner = ctx.accounts.fp_rec_owner.key();
-        first_partition.recipient_token_addr = ctx.accounts.fp_rec_token.key();
         first_partition.information = partition_info;
         first_partition.name = partition_name;
 
@@ -60,7 +61,6 @@ pub mod solana_fundraisers {
         let fund = &mut ctx.accounts.fund;
         let partition = &mut ctx.accounts.partition;
         let recipient_owner = &ctx.accounts.recipient_owner;
-        let recipient_token_account = &ctx.accounts.recipient_token_account;
 
         let id = fund.next_partition.clone();
         fund.partitions.push(id);
@@ -68,7 +68,6 @@ pub mod solana_fundraisers {
 
         partition.creator = signer.key();
         partition.recipient_owner = recipient_owner.key();
-        partition.recipient_token_addr = recipient_token_account.key();
         partition.information = info;
         partition.name = name;
 
@@ -90,18 +89,6 @@ pub mod solana_fundraisers {
         Ok(())
     }
 
-    pub fn edit_info(
-        ctx: Context<EditInfo>,
-        fund_id: u16,
-        partition_id: u16,
-        new_info: String,
-    ) -> Result<()> {
-        let partition = &mut ctx.accounts.partition;
-        partition.information = new_info;
-
-        Ok(())
-    }
-
     pub fn destroy_partition(
         ctx: Context<DestroyPartition>,
         fund_id: u16,
@@ -109,7 +96,6 @@ pub mod solana_fundraisers {
     ) -> Result<()> {
         let fund = &mut ctx.accounts.fund;
 
-        //todo check contain in constraint
         let idx = fund.partitions.binary_search(&partition_id).unwrap();
 
         fund.partitions.remove(idx.clone());
@@ -157,8 +143,7 @@ pub mod solana_fundraisers {
         let fund = &mut ctx.accounts.fund;
         let distribution = &mut ctx.accounts.distribution;
         let recipient = &mut ctx.accounts.partition_token_account;
-
-        let idx = fund.partitions.binary_search(&partition_id).unwrap();
+        let partition = &mut ctx.accounts.partition;
 
         let amount = distribution.total.clone() / fund.partitions.len() as u64;
 
@@ -174,7 +159,8 @@ pub mod solana_fundraisers {
         let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
         token::transfer(cpi_ctx, amount)?;
 
-        distribution.done[idx] = true;
+        partition.amount_received += amount as u128;
+        distribution.done[fund.partitions.binary_search(&partition_id).unwrap()] = true;
         Ok(())
     }
 
@@ -228,7 +214,7 @@ pub struct MakeFund<'info> {
     bump,
     space = 8 + Fund::INIT_SPACE + size_of::<u16>() + info.len() + name.len(),
     payer = signer,
-    constraint = fund_id == live_funds.next_fund
+    constraint = fund_id == live_funds.next_fund && info.starts_with(HTTPS)
     )]
     pub fund: Account<'info, Fund>,
     #[account(mut)]
@@ -238,7 +224,8 @@ pub struct MakeFund<'info> {
     seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &[0, 0]],
     bump,
     space = 8 + Partition::INIT_SPACE + partition_info.len() + partition_name.len(),
-    payer = signer
+    payer = signer,
+    constraint = partition_info.starts_with(HTTPS)
     )]
     pub first_partition: Account<'info, Partition>,
     ///CHECK: x
@@ -292,7 +279,8 @@ pub struct MakePartition<'info> {
     seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
     bump,
     space = 8 + Partition::INIT_SPACE + info.len() + name.len(),
-    payer = signer
+    payer = signer,
+    constraint = info.starts_with(HTTPS)
     )]
     pub partition: Account<'info, Partition>,
     ///CHECK: x
@@ -326,33 +314,6 @@ pub struct MarkCompleted<'info> {
     seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
     bump,
     constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator)
-    )]
-    pub partition: Account<'info, Partition>,
-
-    pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
-#[instruction(fund_id: u16, partition_id: u16, new_info: String)]
-pub struct EditInfo<'info> {
-    ///CHECK: x
-    #[account(signer, mut)]
-    pub signer: AccountInfo<'info>,
-    #[account(
-    mut,
-    seeds = [FUND.as_bytes(), &fund_id.to_be_bytes()],
-    bump,
-    constraint = !fund.locked && match fund.private { true => signer.key.eq(&fund.creator), false => true }
-    )]
-    pub fund: Account<'info, Fund>,
-    #[account(
-    mut,
-    seeds = [PARTITION.as_bytes(), &fund_id.to_be_bytes(), &fund.next_partition.to_be_bytes()],
-    bump,
-    constraint = signer.key.eq(&partition.creator) || signer.key.eq(&fund.creator),
-    realloc = partition.to_account_info().data_len() - partition.information.len() + new_info.len(),
-    realloc::payer = signer,
-    realloc::zero = false
     )]
     pub partition: Account<'info, Partition>,
 
@@ -475,7 +436,11 @@ pub struct DistributeDonation<'info> {
     pub escrow_signer: AccountInfo<'info>,
     #[account(mut, address = fund.mint_addr)]
     pub token_mint: Account<'info, Mint>,
-    #[account(mut, address = partition.recipient_token_addr)]
+    #[account(
+        mut,
+        token::mint = token_mint,
+        token::authority = partition.recipient_owner
+    )]
     pub partition_token_account: Account<'info, TokenAccount>,
     #[account(
     mut,
@@ -554,9 +519,9 @@ pub struct Partition {
     name: String,
     creator: Pubkey,
     recipient_owner: Pubkey,
-    recipient_token_addr: Pubkey,
     #[max_len(0)]
     information: String,
+    amount_received: u128
 }
 
 #[account]

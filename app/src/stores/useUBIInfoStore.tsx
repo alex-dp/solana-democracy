@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, UBI_PROGRAM, clearWithSeeds, RawUBIState, UBIStateLayout, UBI_MINT } from 'types/types';
+import { getWithSeeds, Programs, RawUBIInfo, setWithSeeds, UBIInfoLayout, clearWithSeeds, RawUBIState, UBIStateLayout, UBI_MINT } from 'types/types';
 import { getUbiInfoAddress, getUbiStateAddress } from 'utils/ubi';
-
-const programID = new PublicKey(UBI_PROGRAM);
 
 interface UBIInfoStore {
     info: RawUBIInfo;

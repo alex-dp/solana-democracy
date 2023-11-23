@@ -1,9 +1,7 @@
 import { create } from 'zustand'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { getWithSeeds, PETITION_PROGRAM, Programs, PropLayout, RawProp, setWithSeeds } from 'types/types';
+import { Connection } from '@solana/web3.js'
+import { getWithSeeds, Programs, PropLayout, RawProp, setWithSeeds } from 'types/types';
 import { getPropAddress } from 'utils/petitions';
-
-const programID = new PublicKey(PETITION_PROGRAM);
 
 interface SingleProposalStore {
     proposal: RawProp;

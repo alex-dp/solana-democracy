@@ -3,7 +3,7 @@ import { Transaction, TransactionSignature } from '@solana/web3.js';
 import { FC, useCallback } from 'react';
 
 import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 
 import {
     createAssociatedTokenAccountInstruction,
@@ -13,17 +13,19 @@ import {
     TokenInvalidAccountOwnerError,
 } from "@solana/spl-token";
 
-import { UBI_MINT, UBI_PROGRAM, useIDL } from '../../types/types';
+import { UBI_MINT } from '../../types/types';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getUbiInfoAddress } from 'utils/ubi';
-import { getProvider } from 'utils';
 
 const { SystemProgram } = web3;
 
-const programID = new PublicKey(UBI_PROGRAM);
+type ButtonProps = {
+    connection: Connection,
+    program: Program
+}
 
-export const InitializeAccount: FC = () => {
+export const InitializeAccount: FC = (props: ButtonProps) => {
     const connection = new Connection(process.env.NEXT_PUBLIC_ENDPOINT);
     const wallet = useWallet()
 
@@ -32,14 +34,6 @@ export const InitializeAccount: FC = () => {
     const { notify } = useNotificationStore();
 
     const onClick = useCallback(async () => {
-
-        let provider: AnchorProvider = null
-
-        try {
-            provider = getProvider(connection, wallet)
-        } catch (error) { console.log(error) }
-
-        const idl = await useIDL(programID, provider)
 
         if (!wallet.connected) {
             setVisible(true)
@@ -64,12 +58,10 @@ export const InitializeAccount: FC = () => {
         if (!info_raw) {
             try {
 
-                const program = new Program(idl, programID, provider)
-
                 let transaction = new Transaction();
 
                 transaction.add(
-                    await program.methods.initializeAccount().accounts({
+                    await props.program.methods.initializeAccount().accounts({
                         ubiInfo: pda,
                         userAuthority: wallet.publicKey,
                         systemProgram: SystemProgram.programId,

@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction, TransactionSignature } from '@solana/web3.js';
-import { FormEvent, useCallback, useEffect } from 'react';
+import { FormEvent, useCallback, useEffect, useRef } from 'react';
 
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
@@ -11,25 +11,31 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getEscrowAddresses, getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
-import { getProvider } from 'utils';
+import { getProvider, mints, names } from 'utils';
 import useFundraiserStore from 'stores/useFundraiserStore';
 
 const programID = new PublicKey(FUNDRAISER_PROGRAM);
 
+type ButtonProps = {
+    connection: Connection,
+    program: Program
+}
 
-export const MakeFund = () => {
-    const connection = new Connection("https://api.devnet.solana.com")
+
+export const MakeFund = (props: ButtonProps) => {
     const wallet = useWallet();
 
     const { setVisible } = useWalletModal();
 
     const { notify } = useNotificationStore();
 
-    const {idList, getIdList} = useFundraiserStore()
+    const { idList, getIdList } = useFundraiserStore()
+
+    let mintRef = useRef<HTMLInputElement>()
 
     useEffect(() => {
-        if(!idList) getIdList(connection)
-    }, [connection])
+        if (!idList) getIdList(props.connection)
+    }, [props.connection])
 
     let check = (e) => {
         if (e.target.checked && !wallet.connected) {
@@ -50,7 +56,7 @@ export const MakeFund = () => {
 
         let data = new Map<String, any>()
 
-        for(let i=0;e.target[i].id;i++) {
+        for (let i = 0; e.target[i].id; i++) {
             let target = e.target[i]
             data.set(target.id, target.type == "checkbox" ? target.checked : target.value)
         }
@@ -61,21 +67,11 @@ export const MakeFund = () => {
         let [signer, vault] = getEscrowAddresses(idList.next_fund, new PublicKey(obj.mint))
 
         try {
-            await getAccount(connection, partitionATA)
+            await getAccount(props.connection, partitionATA)
         } catch {
-            notify({type: "error", message: `Recipient ${obj.partition_name} has no token account for mint`})
+            notify({ type: "error", message: `Recipient ${obj.partition_name} has no token account for mint` })
             return
         }
-
-        let provider: AnchorProvider = null
-
-        try {
-            provider = getProvider(connection, wallet)
-        } catch (error) { console.log(error) }
-
-        let idl = await useIDL(programID, provider)
-
-        const program = new Program(idl, programID, provider)
 
         let transaction = new Transaction()
 
@@ -87,9 +83,9 @@ export const MakeFund = () => {
                 new PublicKey(obj.mint) // mint
             )
         );
-        
+
         transaction.add(
-            await program.methods.makeFund(
+            await props.program.methods.makeFund(
                 idList.next_fund,
                 !obj.public,
                 obj.fund_url,
@@ -107,22 +103,23 @@ export const MakeFund = () => {
                     escrowSigner: signer,
                     tokenProgram: TOKEN_PROGRAM_ID,
                     systemProgram: web3.SystemProgram.programId
-            }).instruction()
+                }).instruction()
         );
 
         let signature = null
 
         try {
-            signature = await wallet.sendTransaction(transaction, connection);
+            signature = await wallet.sendTransaction(transaction, props.connection);
         } catch (error) {
             console.log(error)
+            return
         }
 
         notify({ type: 'loading', message: `Creating fund "${obj.fund_name}"`, txid: signature });
 
-        const latestBlockHash = await connection.getLatestBlockhash();
+        const latestBlockHash = await props.connection.getLatestBlockhash();
 
-        await connection.confirmTransaction({
+        await props.connection.confirmTransaction({
             blockhash: latestBlockHash.blockhash,
             lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
             signature: signature,
@@ -130,19 +127,19 @@ export const MakeFund = () => {
 
         notify({ message: `Fund "${obj.fund_name}" created`, txid: signature });
 
-    }, [wallet, connection])
+    }, [wallet, props.connection])
 
     return (
 
         <div>
             <label htmlFor="my-modal-4" className="btn btn-active mx-auto border-2 border-purple-700">
-                Start a new fund
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="currentColor" viewBox="0 0 48 48">
-                    <path d="M22.5 36.3h3v-6.45H32v-3h-6.5v-6.5h-3v6.5H16v3h6.5ZM11 44q-1.2 0-2.1-.9Q8 42.2 8 41V7q0-1.2.9-2.1Q9.8 4 11 4h18.05L40 14.95V41q0 1.2-.9 2.1-.9.9-2.1.9Zm16.55-27.7V7H11v34h26V16.3ZM11 7v9.3V7v34V7Z" />
+                Start your own fund
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill='currentColor'>
+                    <path d="M280-160v-441q0-33 24-56t57-23h439q33 0 56.5 23.5T880-600v320L680-80H360q-33 0-56.5-23.5T280-160ZM81-710q-6-33 13-59.5t52-32.5l434-77q33-6 59.5 13t32.5 52l10 54h-82l-7-40-433 77 40 226v279q-16-9-27.5-24T158-276L81-710Zm279 110v440h280l160-160v-280H360Zm220 220Zm-40 160h80v-120h120v-80H620v-120h-80v120H420v80h120v120Z" />
                 </svg>
             </label>
 
-            <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" onChange={check}/>
+            <input type="checkbox" id="my-modal-4" className="modal-toggle z-100000" onChange={check} />
 
             <label htmlFor="my-modal-4" className="modal cursor-pointer z-1000">
                 <label className="modal-box text-center rounded-xl w-2xl h-fit border-2 border-purple-600" htmlFor="">
@@ -151,7 +148,14 @@ export const MakeFund = () => {
                     <form onSubmit={addFund} className="flex flex-col gap-4">
                         <input id='fund_name' type="text" placeholder="Fund Name" className="input input-bordered w-full max-w-xs mx-auto" />
                         <input id='fund_url' type="text" placeholder="Info URL" className="input input-bordered w-full max-w-xs mx-auto" />
-                        <input id='mint' type="text" placeholder="Receivable Mint Address" className="input input-bordered w-full max-w-xs mx-auto" />
+
+                        <div className='flex flex-row'>
+                            <input ref={mintRef} id='mint' type="text" placeholder="Receivable Mint Address" className="input input-bordered w-full max-w-xs mx-auto" />
+                            <select id='common_mint' className="select select-primary w-fit max-w-xs" onChange={(e) => { mintRef.current.value = e.target.value }}>
+                                <option disabled selected>COMMON MINTS</option>
+                                {names.map((e, i) => <option value={mints[i]}>{e}</option>)}
+                            </select>
+                        </div>
 
                         <div className="form-control">
                             <label className="label cursor-pointer input input-bordered w-full max-w-xs mx-auto">
@@ -161,9 +165,9 @@ export const MakeFund = () => {
                         </div>
 
                         <div className='flex flex-row w-full gap-4 place-content-center place-items-center'>
-                            <div className='h-[1px] w-20 bg-white'/>
+                            <div className='h-[1px] w-20 bg-white' />
                             <h3>Info for the first participating project</h3>
-                            <div className='h-[1px] w-20 bg-white'/>
+                            <div className='h-[1px] w-20 bg-white' />
                         </div>
 
                         <input id='partition_name' type="text" placeholder="Project Name" className="input input-bordered w-full max-w-xs mx-auto" />

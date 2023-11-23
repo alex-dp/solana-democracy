@@ -161,7 +161,7 @@ export const PetitionsView: FC = ({ }) => {
           </label>
         </label>
 
-        {regStates?.map((v, i) => <div className="mx-auto my-2"><RegionRow description={v.description} code={v.region} key={i} /></div>)}
+        {regStates?.map((v, i) => <div className="mx-auto my-2" key={i}><RegionRow description={v.description} code={v.region} /></div>)}
 
       </div>
     </div >

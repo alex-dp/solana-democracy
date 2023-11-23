@@ -193,8 +193,8 @@ export interface RawPartition {
     name: String,
     creator: PublicKey,
     recipient_owner: PublicKey,
-    recipient_token_addr: PublicKey,
     information: String,
+    amount_received: number
 }
 
 export const PartitionLayout = borsh.struct<RawPartition>([
@@ -202,6 +202,6 @@ export const PartitionLayout = borsh.struct<RawPartition>([
     borsh.str('name'),
     borsh.publicKey('creator'),
     borsh.publicKey('recipient_owner'),
-    borsh.publicKey('recipient_token_addr'),
-    borsh.str('information')
+    borsh.str('information'),
+    borsh.i128('amount_received')
 ])
