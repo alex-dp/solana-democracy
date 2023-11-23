@@ -41,16 +41,16 @@ const FundListItem = (props: RowProps) => {
     })
 
     return (
-        <div className="flex flex-row w-full place-content-between gap-4">
+        <div className="flex flex-wrap w-fit place-content-between">
 
-            <div className="my-auto flex flex-col">
-                <div className="uppercase font-bold whitespace-nowrap">{fund.name}</div>
-                <div className="text-xs whitespace-nowrap">Mint: {getMintName(fund.mint_addr)}</div>
-            </div>
+            <div className="flex flex-row w-min gap-4 mx-auto">
 
+                <div className="my-auto flex flex-col">
+                    <div className="uppercase font-bold whitespace-nowrap">{fund.name}</div>
+                    <div className="text-xs whitespace-nowrap">Mint: {getMintName(fund.mint_addr)}</div>
+                </div>
 
-            <div className="flex flex-row w-min gap-4">
-                <div className="dropdown dropdown-hover min-w-fit">
+                <div className="dropdown dropdown-hover min-w-fit md:mr-14">
                     <label tabIndex={0} className="btn btn-ghost">
                         <div className="uppercase my-auto">{fund.partitions.length} recipient{fund.partitions.length != 1 && "s"}</div>
                         <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z" /></svg>
@@ -89,6 +89,10 @@ const FundListItem = (props: RowProps) => {
                         })}
                     </div>
                 </div>
+
+            </div>
+
+            <div className="flex flex-row gap-4 mx-auto">
                 {(!fund.private || (wallet.connected && wallet.publicKey.equals(fund.creator)))
                     && <AddPartition {...props} />}
                 <Donate decimals={decimals} {...props} />
@@ -102,7 +106,6 @@ const FundListItem = (props: RowProps) => {
 
                 {(wallet.connected && props.fund.creator.equals(wallet.publicKey)) && <DestroyFund {...props} />}
             </div>
-
         </div>
     );
 };

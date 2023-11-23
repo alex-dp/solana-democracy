@@ -71,7 +71,7 @@ export const FundraisersView = () => {
                 <MakeFund connection={connection} program={program} />
             </div>
 
-            <div className="flex flex-col gap-4 w-fit mx-auto overflow-x-scroll md:overflow-x-visible max-w-full px-6 min-h-fit">
+            <div className="flex flex-col gap-4 w-fit mx-auto max-w-full px-6 min-h-fit">
                 {
                     liveFunds?.map((v, i) =>
                         <FundListItem
