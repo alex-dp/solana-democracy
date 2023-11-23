@@ -153,7 +153,7 @@ export const MakeFund = (props: ButtonProps) => {
                             <input ref={mintRef} id='mint' type="text" placeholder="Receivable Mint Address" className="input input-bordered w-full max-w-xs mx-auto" />
                             <select id='common_mint' value="COMMON MINTS" className="select select-primary w-fit max-w-xs" onChange={(e) => { mintRef.current.value = e.target.value }}>
                                 <option disabled>COMMON MINTS</option>
-                                {names.map((e, i) => <option value={mints[i]}>{e}</option>)}
+                                {names.map((e, i) => <option value={mints[i]} key={i}>{e}</option>)}
                             </select>
                         </div>
 

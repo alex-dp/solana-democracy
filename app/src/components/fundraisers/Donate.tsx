@@ -33,6 +33,8 @@ export const Donate = (props: ButtonProps) => {
 
     const modal_id = "d-modal-" + props.fundID
 
+    console.log("decimals", props.decimals)
+
     let running = false
 
     useEffect(() => {
@@ -68,6 +70,8 @@ export const Donate = (props: ButtonProps) => {
         console.log(e.target)
 
         let amount = e.target[0].value
+
+        console.log("amount", amount)
 
         console.log("fund", props.fund)
 
@@ -192,11 +196,11 @@ export const Donate = (props: ButtonProps) => {
 
                         <div className='mx-auto w-full mx-4'>
                             <div className='w-fit ml-auto mb-2 gap-2 flex flex-row'>
-                                <button type='button' className="badge badge-outline uppercase" onClick={setField(1)}>
+                                <div className="badge badge-outline uppercase" onClick={setField(1)}>
                                     wallet: {walletAmount ? (walletAmount * 10 ** - props.decimals).toFixed(2) : 0}
-                                </button>
-                                <button type='button' className="badge badge-outline uppercase" onClick={setField(2)}>half</button>
-                                <button type='button' className="badge badge-outline uppercase" onClick={setField(4)}>1/4</button>
+                                </div>
+                                <div className="badge badge-outline uppercase" onClick={setField(2)}>half</div>
+                                <div className="badge badge-outline uppercase" onClick={setField(4)}>1/4</div>
                             </div>
                             <input ref={textRef} id='amount' type="number" placeholder="Amount" className="input input-bordered w-full mx-auto" step={0.0001} />
                         </div>
