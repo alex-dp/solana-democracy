@@ -1,0 +1,13 @@
+[package]
+name = "trust-accounts"
+version = "0.1.0"
+description = ""
+edition = "2021"
+
+[lib]
+crate-type = ["lib"]
+name = "trust_accounts"
+
+[dependencies]
+anchor-lang = "0.28.0"
+borsh = "0.10.3"
