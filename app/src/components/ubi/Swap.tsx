@@ -4,16 +4,16 @@ export const Swap: FC = () => {
 
     const onClick = useCallback(async () => {
         window.open(
-            'https://raydium.io/swap?inputCurrency=4HgYp2eiokKcqe5AVAxpwCsfUE5pwCNTiPXvpSxYnDi6&outputCurrency=sol&inputAmount=0&fixed=in',
+            'https://jup.ag/swap/ARGON_4HgYp2eiokKcqe5AVAxpwCsfUE5pwCNTiPXvpSxYnDi6-SOL',
             '_blank'
         );
     }, []);
 
     return (
         <button
-            className="px-8 m-2 btn btn-active btn-primary gap-2"
+            className="px-4 m-2 btn btn-active bg-gradient-to-r from-[#fbc00b] to-[#4eb9e7] gap-4 text-black"
             onClick={onClick}>
-            <img src='raydium.svg' className='btn-img-text-large'></img> Swap
+            <img src='jupiter.svg' className='w-6 h-6'></img> Swap
         </button>
     );
 };
