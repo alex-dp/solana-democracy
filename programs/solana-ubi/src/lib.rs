@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program_option::COption;
 use anchor_spl::token::{self, Mint, MintTo, TokenAccount};
 use solana_gateway::Gateway;
-use trust_accounts::Trust;
 
 const MINTER: &str = "minter";
 const UBI_INFO: &str = "ubi_info3";
@@ -145,7 +144,6 @@ pub struct InitializeAccount<'info> {
     pub platform_fee_account: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
-    pub trust: Account<'info, Trust>
 }
 
 #[account]

@@ -1763,6 +1763,8 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "borsh 0.10.3",
+ "solana-program",
+ "trust-accounts",
 ]
 
 [[package]]
@@ -2221,6 +2223,15 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "borsh 0.10.3",
+]
+
+[[package]]
+name = "trust-networks"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "shared",
+ "trust-accounts",
 ]
 
 [[package]]

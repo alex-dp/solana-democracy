@@ -1,15 +1,15 @@
 [features]
 seeds = false
 skip-lint = false
-
 [programs.localnet]
 solana_ubi = "EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd"
+trust-networks = "61htBumLAB45Sp4XxwLLUfTc3A4dUYGdj2RwWvUUmeKw"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "Localnet"
 wallet = "/home/alex/.config/solana/id.json"
 
 [scripts]
