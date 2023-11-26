@@ -1,5 +1,5 @@
 use anchor_lang::{account, InitSpace};
-use anchor_lang::prelude::Pubkey;
+use anchor_lang::prelude::{Pubkey};
 use anchor_lang::AnchorDeserialize;
 use anchor_lang::system_program::ID;
 use anchor_lang::AnchorSerialize;
@@ -17,7 +17,7 @@ pub struct TrustList {
 pub struct Trust {
     pub id: u16,
     pub req: u8,
-    pub set_size: u32,
+    pub trustees: u32,
     pub next_id: u32,
 }
 
@@ -27,6 +27,9 @@ pub struct Trustable {
     pub id: u32,
     #[max_len(0)]
     pub username: String,
+    #[max_len(0)]
+    pub full_name: String,
+    pub birthday_timestamp: i64,
     pub trusters: u16,
 }
 
@@ -36,6 +39,13 @@ pub struct TrustLink {}
 
 #[account]
 #[derive(InitSpace)]
-pub struct PKlink {
+pub struct PkLink {
     pub pk: Pubkey
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct SimilarIDs {
+    #[max_len(0)]
+    pub ids: Vec<u32>
 }

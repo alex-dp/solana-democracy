@@ -12,8 +12,12 @@ pub mod program_ids {
 }
 
 pub fn is_trusted(trustable: &Account<Trustable>, trust: &Account<Trust>) -> bool {
-    return match trust.set_size.gt(&(trust.req.clone() as u32)) {
+    return match trust.trustees.gt(&(trust.req.clone() as u32)) {
         true => { trustable.trusters.ge(&(trust.req.clone() as u16)) }
-        false => { trustable.trusters == (trust.set_size.clone() - 1) as u16 }
+        false => { trustable.trusters == (trust.trustees.clone() - 1) as u16 }
     }
+}
+
+pub fn butcher(name: &String) -> String {
+    name.replace(|ch: char| ch.is_whitespace(), "").to_lowercase()
 }
