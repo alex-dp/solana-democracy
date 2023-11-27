@@ -7,7 +7,6 @@ declare_id!("61htBumLAB45Sp4XxwLLUfTc3A4dUYGdj2RwWvUUmeKw");
 
 #[program]
 pub mod trust_networks {
-    use std::ops::Index;
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
@@ -281,8 +280,8 @@ pub struct Report<'info> {
     pub trust: Account<'info, Trust>,
 
     #[account(
-    mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump
-    constraint = is_trusted(&trust, &signer_trustable)
+    mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump,
+    constraint = is_trusted(&signer_trustable, &trust)
     )]
     pub signer_trustable: Account<'info, Trustable>,
 
@@ -314,7 +313,10 @@ pub struct CloseTrustable<'info> {
     #[account(
     mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &reportee_owner.key().to_bytes()], bump,
     close = signer,
-    constraint = reportee.reports > trust.trustees / 2
+    constraint =
+        reportee.reports > trust.trustees / 2 &&
+        reportee.trusted_by.len() == 0 &&
+        reportee.does_trust.len() == 0
     )]
     pub reportee: Account<'info, Trustable>,
 
