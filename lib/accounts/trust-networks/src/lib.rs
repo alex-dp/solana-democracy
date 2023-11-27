@@ -4,6 +4,13 @@ use anchor_lang::AnchorDeserialize;
 use anchor_lang::system_program::ID;
 use anchor_lang::AnchorSerialize;
 
+pub const TRUST_LIST_SEED: &[u8] = "trust_list".as_bytes();
+pub const TRUSTABLE_SEED: &[u8] = "trustable".as_bytes();
+pub const TRUST_SEED: &[u8] = "trust".as_bytes();
+pub const TRUST_LINK_SEED: &[u8] = "trust_link".as_bytes();
+pub const PK_LINK_SEED: &[u8] = "pk_link".as_bytes();
+pub const SIMILAR_ID_SEED: &[u8] = "sim_ids".as_bytes();
+
 #[account]
 #[derive(InitSpace)]
 pub struct TrustList {

@@ -17,5 +17,5 @@ default = []
 
 [dependencies]
 anchor-lang = "0.28.0"
-trust-accounts = {path = "../../lib/trust-accounts"}
+trust-accounts = {path = "../../lib/accounts/trust-networks" }
 shared = {path = "../../lib/shared"}

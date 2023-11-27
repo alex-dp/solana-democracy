@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use trust_accounts::{Trust, Trustable};
 use anchor_lang::solana_program::*;
+use diacritics::remove_diacritics;
 
 pub mod program_ids {
     use super::{pubkey, Pubkey};
@@ -12,12 +13,17 @@ pub mod program_ids {
 }
 
 pub fn is_trusted(trustable: &Account<Trustable>, trust: &Account<Trust>) -> bool {
-    return match trust.trustees.gt(&(trust.req.clone() as u32)) {
+    match trust.trustees.gt(&(trust.req.clone() as u32)) {
         true => { trustable.trusters.ge(&(trust.req.clone() as u16)) }
         false => { trustable.trusters == (trust.trustees.clone() - 1) as u16 }
     }
 }
 
 pub fn butcher(name: &String) -> String {
-    name.replace(|ch: char| ch.is_whitespace(), "").to_lowercase()
+    let plain = &remove_diacritics(name).replace(
+        |ch: char| ch.is_whitespace() || !ch.is_ascii(), "").to_lowercase()[..];
+
+    let mut chars: Vec<char> = plain.chars().collect();
+    chars.sort_by(|a, b| b.cmp(a));
+    chars.iter().collect()
 }

@@ -20,4 +20,3 @@ anchor-lang = "0.28.0"
 anchor-spl = "0.28.0"
 anchor-derive-accounts = {version = "0.28.0" }
 solana-gateway = {version = "0.4.0", features = ["no-entrypoint"]}
-trust-accounts = {path = "../../lib/trust-accounts"}

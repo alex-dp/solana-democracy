@@ -8,3 +8,5 @@ test-ledger
 
 .idea
 migrations
+
+Anchor.toml

@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "programs/*",
-    "lib/*"
+    "lib/shared",
+    "lib/accounts/*",
 ]
 
 [profile.release]

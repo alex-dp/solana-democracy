@@ -840,6 +840,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "diacritics"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fec6444e5b31ce44f10cd5e51dee3923970ec090b39f7a806fbe57ef4c89c7e2"
+
+[[package]]
 name = "digest"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1763,6 +1769,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "borsh 0.10.3",
+ "diacritics",
  "solana-program",
  "trust-accounts",
 ]
@@ -2004,7 +2011,6 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "solana-gateway",
- "trust-accounts",
 ]
 
 [[package]]

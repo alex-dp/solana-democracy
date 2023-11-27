@@ -11,5 +11,6 @@ name = "shared"
 [dependencies]
 anchor-lang = "0.28.0"
 borsh = "0.10.3"
-trust-accounts = {path = "../trust-accounts"}
+trust-accounts = {path = "../../lib/accounts/trust-networks" }
 solana-program = "*"
+diacritics = "0.2.0"
