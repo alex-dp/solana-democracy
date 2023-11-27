@@ -11,7 +11,7 @@ export const Swap: FC = () => {
 
     return (
         <button
-            className="px-4 m-2 btn btn-active bg-gradient-to-r from-[#fbc00b] to-[#4eb9e7] gap-4 text-black"
+            className="px-4 m-2 btn bg-gradient-to-r from-[#fbc00b] to-[#4eb9e7] gap-4 text-black"
             onClick={onClick}>
             <img src='jupiter.svg' className='w-6 h-6'></img> Swap
         </button>
