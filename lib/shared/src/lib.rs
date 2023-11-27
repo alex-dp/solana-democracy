@@ -19,6 +19,14 @@ pub fn is_trusted(trustable: &Account<Trustable>, trust: &Account<Trust>) -> boo
     }
 }
 
+pub fn break_trust_fn(trust_from: &mut Account<Trustable>, trust_to: &mut Account<Trustable>) {
+    let mut idx = trust_from.does_trust.iter().position(|id| id == &trust_to.id).unwrap();
+    trust_from.does_trust.remove(idx);
+
+    idx = trust_to.trusted_by.iter().position(|id| id == &trust_from.id).unwrap();
+    trust_to.trusted_by.remove(idx);
+}
+
 pub fn butcher(name: &String) -> String {
     let plain = &remove_diacritics(name).replace(
         |ch: char| ch.is_whitespace() || !ch.is_ascii(), "").to_lowercase()[..];

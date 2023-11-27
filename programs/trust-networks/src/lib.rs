@@ -61,11 +61,7 @@ pub mod trust_networks {
         let breaker = &mut ctx.accounts.signer_trustable;
         let breakee = &mut ctx.accounts.breakee_trustable;
 
-        let mut idx = breaker.does_trust.iter().position(|id| id == &breakee.id).unwrap();
-        breaker.does_trust.remove(idx);
-
-        idx = breakee.trusted_by.iter().position(|id| id == &breaker.id).unwrap();
-        breakee.trusted_by.remove(idx);
+        break_trust_fn(breaker, breakee);
 
         Ok(())
     }
@@ -74,17 +70,8 @@ pub mod trust_networks {
         let breaker = &mut ctx.accounts.signer_trustable;
         let breakee = &mut ctx.accounts.breakee_trustable;
 
-        let mut idx = breaker.does_trust.iter().position(|id| id == &breakee.id).unwrap();
-        breaker.does_trust.remove(idx);
-
-        idx = breakee.trusted_by.iter().position(|id| id == &breaker.id).unwrap();
-        breakee.trusted_by.remove(idx);
-
-        idx = breaker.trusted_by.iter().position(|id| id == &breakee.id).unwrap();
-        breaker.trusted_by.remove(idx);
-
-        idx = breakee.does_trust.iter().position(|id| id == &breaker.id).unwrap();
-        breakee.does_trust.remove(idx);
+        break_trust_fn(breaker, breakee);
+        break_trust_fn(breakee, breaker);
 
         Ok(())
     }
