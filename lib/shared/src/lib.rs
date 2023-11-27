@@ -14,8 +14,8 @@ pub mod program_ids {
 
 pub fn is_trusted(trustable: &Account<Trustable>, trust: &Account<Trust>) -> bool {
     match trust.trustees.gt(&(trust.req.clone() as u32)) {
-        true => { trustable.trusters.ge(&(trust.req.clone() as u16)) }
-        false => { trustable.trusters == (trust.trustees.clone() - 1) as u16 }
+        true => { trustable.trusted_by.len().ge(&(trust.req.clone() as usize)) }
+        false => { trustable.trusted_by.len() == (trust.trustees.clone() - 1) as usize }
     }
 }
 

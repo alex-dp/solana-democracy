@@ -7,6 +7,7 @@ declare_id!("61htBumLAB45Sp4XxwLLUfTc3A4dUYGdj2RwWvUUmeKw");
 
 #[program]
 pub mod trust_networks {
+    use std::ops::Index;
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
@@ -17,7 +18,8 @@ pub mod trust_networks {
         let trust_list = &mut ctx.accounts.trust_list;
         let trust = &mut ctx.accounts.trust;
 
-        trust_list.id_list.push(trust_list.next_id.clone());
+        let next_id = trust_list.next_id.to_owned();
+        trust_list.id_list.push(next_id);
 
         trust.req = req;
         trust.id = trust_list.next_id.clone();
@@ -46,29 +48,56 @@ pub mod trust_networks {
         Ok(())
     }
 
-    pub fn make_trust_link(ctx: Context<MakeTrustLink>) -> Result<()> {
+    pub fn give_trust(ctx: Context<GiveTrust>) -> Result<()> {
         let trust_to = &mut ctx.accounts.trust_to;
+        let trust_from = &mut ctx.accounts.trust_from;
 
-        trust_to.trusters += 1;
-
-        Ok(())
-    }
-
-    pub fn break_trust_link(ctx: Context<BreakTrustLink>) -> Result<()> {
-        let breakee = &mut ctx.accounts.breakee_trustable;
-
-        breakee.trusters -= 1;
+        trust_to.trusted_by.push(trust_from.id.clone());
+        trust_from.does_trust.push(trust_to.id.clone());
 
         Ok(())
     }
 
-    pub fn break_mutual_trust_link(ctx: Context<BreakMutualTrustLink>) -> Result<()> {
+    pub fn break_trust(ctx: Context<BreakTrust>) -> Result<()> {
         let breaker = &mut ctx.accounts.signer_trustable;
         let breakee = &mut ctx.accounts.breakee_trustable;
 
-        breaker.trusters -= 1;
-        breakee.trusters -= 1;
+        let mut idx = breaker.does_trust.iter().position(|id| id == &breakee.id).unwrap();
+        breaker.does_trust.remove(idx);
 
+        idx = breakee.trusted_by.iter().position(|id| id == &breaker.id).unwrap();
+        breakee.trusted_by.remove(idx);
+
+        Ok(())
+    }
+
+    pub fn break_mutual_trust(ctx: Context<BreakMutualTrust>) -> Result<()> {
+        let breaker = &mut ctx.accounts.signer_trustable;
+        let breakee = &mut ctx.accounts.breakee_trustable;
+
+        let mut idx = breaker.does_trust.iter().position(|id| id == &breakee.id).unwrap();
+        breaker.does_trust.remove(idx);
+
+        idx = breakee.trusted_by.iter().position(|id| id == &breaker.id).unwrap();
+        breakee.trusted_by.remove(idx);
+
+        idx = breaker.trusted_by.iter().position(|id| id == &breakee.id).unwrap();
+        breaker.trusted_by.remove(idx);
+
+        idx = breakee.does_trust.iter().position(|id| id == &breaker.id).unwrap();
+        breakee.does_trust.remove(idx);
+
+        Ok(())
+    }
+
+    pub fn report(ctx: Context<Report>) -> Result<()> {
+        let reportee = &mut ctx.accounts.reportee;
+
+        reportee.reports += 1;
+        Ok(())
+    }
+
+    pub fn close_trustable(ctx: Context<CloseTrustable>) -> Result<()> {
         Ok(())
     }
 }
@@ -163,7 +192,7 @@ pub struct MakeTrustable<'info> {
 
 #[derive(Accounts)]
 #[instruction(trust_id: u16)]
-pub struct MakeTrustLink<'info> {
+pub struct GiveTrust<'info> {
     ///CHECK: x
     #[account(mut, signer)]
     pub signer: AccountInfo<'info>,
@@ -177,26 +206,27 @@ pub struct MakeTrustLink<'info> {
     pub trust: Account<'info, Trust>,
     #[account(
     mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump,
-    constraint = is_trusted(&trust_from, &trust)
+    constraint = is_trusted(&trust_from, &trust),
+    realloc = &trust_from.to_account_info().data_len() + size_of::<u32>(),
+    realloc::payer = signer,
+    realloc::zero = false
     )]
     pub trust_from: Account<'info, Trustable>,
 
-    #[account(mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &trustee_owner.key().to_bytes()], bump)]
+    #[account(
+    mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &trustee_owner.key().to_bytes()], bump,
+    realloc = &trust_to.to_account_info().data_len() + size_of::<u32>(),
+    realloc::payer = signer,
+    realloc::zero = false
+    )]
     pub trust_to: Account<'info, Trustable>,
 
-    #[account(
-    init, seeds=[TRUST_LINK_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes(), &trustee_owner.key().to_bytes()],
-    bump, payer=signer,
-    space = TrustLink::INIT_SPACE
-    )]
-    pub trust_link: Account<'info, TrustLink>,
-
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 #[instruction(trust_id: u16)]
-pub struct BreakTrustLink<'info> {
+pub struct BreakTrust<'info> {
     ///CHECK: x
     #[account(mut, signer)]
     pub signer: AccountInfo<'info>,
@@ -214,18 +244,12 @@ pub struct BreakTrustLink<'info> {
     #[account(mut, seeds = [TRUST_SEED, &trust_id.to_be_bytes()], bump)]
     pub trust: Account<'info, Trust>,
 
-    #[account(
-    mut, seeds=[TRUST_LINK_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes(), &breakee_owner.key().to_bytes()],
-    bump, close=signer
-    )]
-    pub trust_link: Account<'info, TrustLink>,
-
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 #[instruction(trust_id: u16)]
-pub struct BreakMutualTrustLink<'info> {
+pub struct BreakMutualTrust<'info> {
     ///CHECK: x
     #[account(mut, signer)]
     pub signer: AccountInfo<'info>,
@@ -243,17 +267,56 @@ pub struct BreakMutualTrustLink<'info> {
     #[account(mut, seeds = [TRUST_SEED, &trust_id.to_be_bytes()], bump)]
     pub trust: Account<'info, Trust>,
 
-    #[account(
-    mut, seeds=[TRUST_LINK_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes(), &breakee_owner.key().to_bytes()],
-    bump, close=signer
-    )]
-    pub trust_link_to: Account<'info, TrustLink>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(trust_id: u16)]
+pub struct Report<'info> {
+    ///CHECK: x
+    #[account(mut, signer)]
+    pub signer: AccountInfo<'info>,
+
+    #[account(mut, seeds = [TRUST_SEED, &trust_id.to_be_bytes()], bump)]
+    pub trust: Account<'info, Trust>,
 
     #[account(
-    mut, seeds=[TRUST_LINK_SEED, &trust_id.to_be_bytes(), &breakee_owner.key().to_bytes(), &signer.key().to_bytes()],
-    bump, close=signer
+    mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump
+    constraint = is_trusted(&trust, &signer_trustable)
     )]
-    pub trust_link_from: Account<'info, TrustLink>,
+    pub signer_trustable: Account<'info, Trustable>,
+
+    ///CHECK: x
+    #[account(constraint = !reportee_owner.key().eq(&signer.key()))]
+    pub reportee_owner: AccountInfo<'info>,
+
+    #[account(mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &reportee_owner.key().to_bytes()], bump)]
+    pub reportee: Account<'info, Trustable>,
+}
+
+#[derive(Accounts)]
+#[instruction(trust_id: u16)]
+pub struct CloseTrustable<'info> {
+    ///CHECK: x
+    #[account(mut, signer)]
+    pub signer: AccountInfo<'info>,
+
+    #[account(mut, seeds = [TRUST_SEED, &trust_id.to_be_bytes()], bump)]
+    pub trust: Account<'info, Trust>,
+
+    #[account(mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump)]
+    pub signer_trustable: Account<'info, Trustable>,
+
+    ///CHECK: x
+    #[account(constraint = !reportee_owner.key().eq(&signer.key()))]
+    pub reportee_owner: AccountInfo<'info>,
+
+    #[account(
+    mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &reportee_owner.key().to_bytes()], bump,
+    close = signer,
+    constraint = reportee.reports > trust.trustees / 2
+    )]
+    pub reportee: Account<'info, Trustable>,
 
     pub system_program: Program<'info, System>,
 }

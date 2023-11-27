@@ -7,7 +7,6 @@ use anchor_lang::AnchorSerialize;
 pub const TRUST_LIST_SEED: &[u8] = "trust_list".as_bytes();
 pub const TRUSTABLE_SEED: &[u8] = "trustable".as_bytes();
 pub const TRUST_SEED: &[u8] = "trust".as_bytes();
-pub const TRUST_LINK_SEED: &[u8] = "trust_link".as_bytes();
 pub const PK_LINK_SEED: &[u8] = "pk_link".as_bytes();
 pub const SIMILAR_ID_SEED: &[u8] = "sim_ids".as_bytes();
 
@@ -37,12 +36,12 @@ pub struct Trustable {
     #[max_len(0)]
     pub full_name: String,
     pub birthday_timestamp: i64,
-    pub trusters: u16,
+    #[max_len(0)]
+    pub trusted_by: Vec<u32>,
+    #[max_len(0)]
+    pub does_trust: Vec<u32>,
+    pub reports: u32
 }
-
-#[account]
-#[derive(InitSpace)]
-pub struct TrustLink {}
 
 #[account]
 #[derive(InitSpace)]
