@@ -16,12 +16,16 @@ pub mod trust_networks {
     pub fn make_trust(ctx: Context<MakeTrust>, req: u8) -> Result<()> {
         let trust_list = &mut ctx.accounts.trust_list;
         let trust = &mut ctx.accounts.trust;
+        let first_participant = &mut ctx.accounts.first_participant;
 
         let next_id = trust_list.next_id.to_owned();
         trust_list.id_list.push(next_id);
 
         trust.req = req;
         trust.id = trust_list.next_id.clone();
+        trust.trustees = 1;
+
+        first_participant.trusted = true;
 
         trust_list.next_id += 1;
         Ok(())
@@ -50,9 +54,15 @@ pub mod trust_networks {
     pub fn give_trust(ctx: Context<GiveTrust>) -> Result<()> {
         let trust_to = &mut ctx.accounts.trust_to;
         let trust_from = &mut ctx.accounts.trust_from;
+        let trust = &mut ctx.accounts.trust;
 
         trust_to.trusted_by.push(trust_from.id.clone());
         trust_from.does_trust.push(trust_to.id.clone());
+
+        if trust_to.trusted_by.len() == cutoff(trust) {
+            trust.trustees += 1;
+            trust_to.trusted = true;
+        }
 
         Ok(())
     }
@@ -60,8 +70,9 @@ pub mod trust_networks {
     pub fn break_trust(ctx: Context<BreakTrust>) -> Result<()> {
         let breaker = &mut ctx.accounts.signer_trustable;
         let breakee = &mut ctx.accounts.breakee_trustable;
+        let trust = &mut ctx.accounts.trust;
 
-        break_trust_fn(breaker, breakee);
+        break_trust_fn(breaker, breakee, trust);
 
         Ok(())
     }
@@ -69,9 +80,10 @@ pub mod trust_networks {
     pub fn break_mutual_trust(ctx: Context<BreakMutualTrust>) -> Result<()> {
         let breaker = &mut ctx.accounts.signer_trustable;
         let breakee = &mut ctx.accounts.breakee_trustable;
+        let trust = &mut ctx.accounts.trust;
 
-        break_trust_fn(breaker, breakee);
-        break_trust_fn(breakee, breaker);
+        break_trust_fn(breaker, breakee, trust);
+        break_trust_fn(breakee, breaker, trust);
 
         Ok(())
     }
@@ -192,7 +204,7 @@ pub struct GiveTrust<'info> {
     pub trust: Account<'info, Trust>,
     #[account(
     mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump,
-    constraint = is_trusted(&trust_from, &trust),
+    constraint = &trust_from.trusted,
     realloc = &trust_from.to_account_info().data_len() + size_of::<u32>(),
     realloc::payer = signer,
     realloc::zero = false
@@ -268,7 +280,7 @@ pub struct Report<'info> {
 
     #[account(
     mut, seeds = [TRUSTABLE_SEED, &trust_id.to_be_bytes(), &signer.key().to_bytes()], bump,
-    constraint = is_trusted(&signer_trustable, &trust)
+    constraint = &signer_trustable.trusted
     )]
     pub signer_trustable: Account<'info, Trustable>,
 

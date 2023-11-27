@@ -40,7 +40,8 @@ pub struct Trustable {
     pub trusted_by: Vec<u32>,
     #[max_len(0)]
     pub does_trust: Vec<u32>,
-    pub reports: u32
+    pub reports: u32,
+    pub trusted: bool
 }
 
 #[account]
