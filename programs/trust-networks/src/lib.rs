@@ -59,7 +59,7 @@ pub mod trust_networks {
         trust_to.trusted_by.push(trust_from.id.clone());
         trust_from.does_trust.push(trust_to.id.clone());
 
-        if trust_to.trusted_by.len() == cutoff(trust) {
+        if !trust_to.trusted.clone() && trust_to.trusted_by.len() == cutoff(trust) {
             trust.trustees += 1;
             trust_to.trusted = true;
         }

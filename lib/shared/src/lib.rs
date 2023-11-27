@@ -23,7 +23,7 @@ pub fn break_trust_fn(
     idx = trust_to.trusted_by.iter().position(|id| id == &trust_from.id).unwrap();
     trust_to.trusted_by.remove(idx);
 
-    if trust_to.trusted_by.len().lt(&cutoff(trust)) {
+    if trust_to.trusted.clone() && trust_to.trusted_by.len().lt(&cutoff(trust)) {
         trust.trustees -= 1;
         trust_to.trusted = false;
     }
@@ -39,8 +39,5 @@ pub fn butcher(name: &String) -> String {
 }
 
 pub fn cutoff(trust: &Account<Trust>) -> usize {
-    return match trust.trustees.gt(&(trust.req.clone() as u32)) {
-        true => { trust.req.clone() as u32 }
-        false => { trust.trustees.clone() }
-    } as usize
+    trust.trustees.clamp(0, trust.req.clone() as u32) as usize
 }
