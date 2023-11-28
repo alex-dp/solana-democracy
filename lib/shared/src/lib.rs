@@ -1,3 +1,4 @@
+use std::ops::Div;
 use anchor_lang::prelude::*;
 use trust_accounts::{Trust, Trustable};
 use anchor_lang::solana_program::*;
@@ -40,4 +41,8 @@ pub fn butcher(name: &String) -> String {
 
 pub fn cutoff(trust: &Account<Trust>) -> usize {
     trust.trustees.clamp(0, trust.req.clone() as u32) as usize
+}
+
+pub fn report_threshold(trust: &Account<Trust>) -> u32 {
+    trust.trustees.div(trust.trustees.ilog10() + 1)
 }
