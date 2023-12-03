@@ -1,6 +1,5 @@
 import Spline from '@splinetool/react-spline';
 import { ProgramCard } from 'components/ProgramCard';
-import { Ref, useEffect, useRef } from 'react';
 import { FUNDRAISER_PROGRAM, PETITION_PROGRAM, UBI_PROGRAM, clearAll } from 'types/types';
 
 export const HomeView = () => {

@@ -636,6 +636,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "census"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -905,6 +912,22 @@ name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
+
+[[package]]
+name = "election-accounts"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "borsh 0.10.3",
+]
+
+[[package]]
+name = "elections"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "election-accounts",
+]
 
 [[package]]
 name = "env_logger"
@@ -1588,6 +1611,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "referenda"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+]
+
+[[package]]
 name = "regex"
 version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1642,6 +1672,13 @@ name = "ryu"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ad4cc8da4ef723ed60bced201181d83791ad433213d8c24efffda1eec85d741"
+
+[[package]]
+name = "sampling"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+]
 
 [[package]]
 name = "scopeguard"

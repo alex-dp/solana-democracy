@@ -2,6 +2,10 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
+census = "4oxsfZUZH6SJV4vEmGkJHNP5AcXdEYgXegfwpUPgnANx"
+elections = "4EnL8KhUvhEVBsRCeAxdtzVgiSphXqDPJqUFnwszEJji"
+referenda = "B7smquytE2vHW6PiMdKBXvJsgdgJEBk8n87y2c2HxqXi"
+sampling = "Ht1487w1ipPZJ92wsmiqNXaZ3KjjuSRzd77hWATwpkFm"
 solana_ubi = "EcFTDXxknt3vRBi1pVZYN7SjZLcbHjJRAmCmjZ7Js3fd"
 trust-networks = "61htBumLAB45Sp4XxwLLUfTc3A4dUYGdj2RwWvUUmeKw"
 
