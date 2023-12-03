@@ -37,7 +37,7 @@ export const Donate = (props: ButtonProps) => {
 
     let run = async () => {
         let info = await props.connection.getParsedAccountInfo(ata)
-        info.value && setWalletAmount(info.value.data.parsed.info.tokenAmount.amount)
+        info.value && setWalletAmount((info.value.data as ParsedAccountData).parsed.info.tokenAmount.amount)
     }
 
     useEffect(() => {
