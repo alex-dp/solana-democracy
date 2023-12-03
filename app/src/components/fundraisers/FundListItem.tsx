@@ -26,19 +26,15 @@ const FundListItem = (props: RowProps) => {
 
     let [decimals, setDecimals] = useState<number>()
 
-    useEffect(() => {
+    let run = async () => {
+        let mai = await props.connection.getParsedAccountInfo(props.fund.mint_addr)
 
-        let run = async () => {
-            let mai = await props.connection.getParsedAccountInfo(props.fund.mint_addr)
+        let mintInfo = (mai.value.data as ParsedAccountData).parsed.info
 
-            let mintInfo = (mai.value.data as ParsedAccountData).parsed.info
+        setDecimals(mintInfo.decimals)
+    }
 
-            setDecimals(mintInfo.decimals)
-        }
-
-        run()
-
-    })
+    useEffect(() => {run()}, [])
 
     return (
         <div className="flex flex-wrap w-fit place-content-between">

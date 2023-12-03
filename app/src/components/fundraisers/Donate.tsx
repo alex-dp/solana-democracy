@@ -33,31 +33,20 @@ export const Donate = (props: ButtonProps) => {
 
     const modal_id = "d-modal-" + props.fundID
 
-    console.log("decimals", props.decimals)
+    let ata = null
 
-    let running = false
+    let run = async () => {
+        let info = await props.connection.getParsedAccountInfo(ata)
+        info.value && setWalletAmount(info.value.data.parsed.info.tokenAmount.amount)
+    }
 
     useEffect(() => {
-        if (wallet.connected) {
-            let ata = getAssociatedTokenAddressSync(props.fund.mint_addr, wallet.publicKey, false)
-
-            let run = async () => {
-                running = true
-                let info
-                try {
-                    info = await props.connection.getParsedAccountInfo(ata)
-                } catch {
-                    running = false
-                    return
-                }
-
-                info.value && setWalletAmount(info.value.data.parsed.info.tokenAmount.amount)
-
-            }
-
-            if (!running) run()
+        if (wallet.connected && !ata) {
+            ata = getAssociatedTokenAddressSync(props.fund.mint_addr, wallet.publicKey, false)
         }
     }, [wallet])
+
+    useEffect(() => {ata && run()}, [ata])
 
     let donate = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()

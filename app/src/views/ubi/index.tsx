@@ -31,23 +31,18 @@ export const UBIView = () => {
     } catch (error) { console.log(error) }
 
     let [program, setProgram] = useState<Program>()
-    let running = false
-    useEffect(() => {
-        let run = async () => {
-            running = true
-
-            let idl = await useIDL(programID, provider)
+    
+    let run = async () => {
+        await useIDL(programID, provider).then((idl) => {
             setProgram(new Program(idl, programID, provider))
-        }
+        })
+    }
 
-        if (!running) run()
-    }, [])
+    useEffect(()=>{run()}, [])
 
-    useEffect(() => {
-        if (wallet.publicKey && !info && initialized) getInfo(connection, wallet.publicKey)
-        if (!state) getState(connection)
-        if (!supply) getSupply(connection)
-    }, [connection, wallet.connected, state, supply])
+    useEffect(() => {wallet.connected && !info && initialized && getInfo(connection, wallet.publicKey)}, [wallet.connected])
+    useEffect(() => {!state && getState(connection)})
+    useEffect(() => {!supply && getSupply(connection)})
 
     return (
 

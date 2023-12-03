@@ -24,33 +24,33 @@ export const FundraisersView = () => {
     } catch (error) { console.log(error) }
 
     let [program, setProgram] = useState<Program>()
-    let running = false
 
     const { getFunds, liveFunds, getIdList, idList, getPartitions, partitions } = useFundraiserStore();
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (!idList) getIdList(connection)
+    //     if (!idList) getIdList(connection)
 
-        if (idList && idList.funds.length > 0 && idList.funds.length != liveFunds.length) {
-            getFunds(connection, idList.funds)
-        }
+    //     if (idList && idList.funds.length > 0 && idList.funds.length != liveFunds.length) {
+    //         getFunds(connection, idList.funds)
+    //     }
 
-        if (idList && liveFunds.length > 0 && idList.funds.length == liveFunds.length && partitions.size == 0) {
-            getPartitions(connection, idList.funds, liveFunds)
-        }
-    }, [idList, liveFunds, partitions])
+    //     if (idList && liveFunds.length > 0 && idList.funds.length == liveFunds.length && partitions.size == 0) {
+    //         getPartitions(connection, idList.funds, liveFunds)
+    //     }
+    // }, [idList, liveFunds, partitions])
 
-    useEffect(() => {
-        let run = async () => {
-            running = true
-
-            let idl = await useIDL(programID, provider)
+    let run = async () => {
+        await useIDL(programID, provider).then((idl) => {
             setProgram(new Program(idl, programID, provider))
-        }
+        })
+    }
 
-        if (!running) run()
-    }, [])
+    useEffect(()=>{run()}, [])
+
+    useEffect(()=>{getIdList(connection)}, [])
+    useEffect(()=>{idList && liveFunds.length == 0 && getFunds(connection, idList.funds)}, [idList])
+    useEffect(()=>{idList && liveFunds.length > 0 && partitions.size == 0 && getPartitions(connection, idList.funds, liveFunds)}, [idList, liveFunds])
 
     return (
         <div className='w-screen min-h-screen apply-gradient pt-4'>

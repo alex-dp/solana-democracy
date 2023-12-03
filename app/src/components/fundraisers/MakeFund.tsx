@@ -11,10 +11,8 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getEscrowAddresses, getFundAddress, getFundListAddress, getPartitionAddress } from 'utils/fundraisers';
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddressSync } from '@solana/spl-token';
-import { getProvider, mints, names } from 'utils';
+import { mints, names } from 'utils';
 import useFundraiserStore from 'stores/useFundraiserStore';
-
-const programID = new PublicKey(FUNDRAISER_PROGRAM);
 
 type ButtonProps = {
     connection: Connection,

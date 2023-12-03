@@ -2,19 +2,17 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Connection, Transaction, TransactionSignature } from '@solana/web3.js';
 import { useCallback } from 'react';
 
-import { Buffer } from 'buffer';
 import { PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 
 import { TOKEN_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
-import { createAssociatedTokenAccountInstruction, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
-import { RawUBIInfo, useIDL, UBI_PROGRAM, UBI_MINT } from '../../types/types';
+import { createAssociatedTokenAccountInstruction, getAccount, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from '@solana/spl-token';
+import { RawUBIInfo, UBI_MINT } from '../../types/types';
 import { useGateway } from '@civic/solana-gateway-react';
 import useUBIInfoStore from 'stores/useUBIInfoStore';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import useNotificationStore from 'stores/useNotificationStore';
 import { getMintSignerAddress, getUbiInfoAddress, getUserToken } from 'utils/ubi';
-import { getProvider } from 'utils';
 
 const { SystemProgram } = web3;
 
@@ -50,7 +48,7 @@ export const Mint = (props: MintProps) => {
 
         if (Date.now() / 1000 < Number(props.ubiInfo.lastIssuance) + 24 * 3600) {
             let hDiff = Math.ceil((Number(props.ubiInfo.lastIssuance) + 24 * 3600 - Date.now() / 1000) / 3600)
-            notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 ? "s" : ""}` })
+            notify({ type: 'error', message: `Please try again in ${hDiff} hour${hDiff != 1 && "s"}` })
             return
         }
 
