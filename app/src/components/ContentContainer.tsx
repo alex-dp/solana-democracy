@@ -34,18 +34,6 @@ export const ContentContainer: React.FC<Props> = ({ children }) => {
           </li>
           <li className='w-full'>
             <NavElement
-              label="Petitions"
-              href="/petitions"
-            />
-          </li>
-          <li className='w-full'>
-            <NavElement
-              label="Fundraisers"
-              href="/fundraisers"
-            />
-          </li>
-          <li className='w-full'>
-            <NavElement
               label="Mirrors"
               href="/mirrors"
             />

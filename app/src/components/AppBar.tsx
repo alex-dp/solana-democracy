@@ -42,16 +42,6 @@ export const AppBar: FC = () => {
               />
 
               <NavElement
-                label="Petitions"
-                href="/petitions"
-              />
-
-              <NavElement
-                label="Fundraisers"
-                href="/fundraisers"
-              />
-
-              <NavElement
                 label="Mirrors"
                 href="/mirrors"
               />

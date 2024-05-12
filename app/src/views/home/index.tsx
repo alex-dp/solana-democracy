@@ -35,8 +35,6 @@ export const HomeView = () => {
         <div className="flex flex-wrap place-content-center lg:px-32 xl:px-40 lg:px-32 xl:px-40">
 
           <ProgramCard destination="/ubi" title="UBI" description="Universal Basic Income" disabled={false} pid={UBI_PROGRAM}/>
-          <ProgramCard destination="/petitions" title="Petitions" description="with legacy gating" disabled={false} pid={PETITION_PROGRAM}/>
-          <ProgramCard destination="/fundraisers" title="Fundraisers" description="For public goods and services" disabled={false} pid={FUNDRAISER_PROGRAM}/>
           <ProgramCard destination="/trust" title="Trust Networks" description="Argon's gating layer" disabled={true} />
           <ProgramCard destination="/referenda" title="Referenda" description="Approve or reject a proposal" disabled={true} />
           <ProgramCard destination="/elections" title="Chair Elections" description="Fill a seat by asking voters to rank candidates" disabled={true} />
